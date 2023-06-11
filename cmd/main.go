@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"github.com/rs/zerolog"
+)
 
 func main() {
-	fmt.Print("Hello world!")
+	// UNIX Time is faster and smaller than most timestamps
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
 }
