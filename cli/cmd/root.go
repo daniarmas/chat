@@ -6,6 +6,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/daniarmas/chat/cli/cmd/create"
 	"github.com/daniarmas/chat/cli/cmd/database"
 	"github.com/spf13/cobra"
 )
@@ -36,6 +37,7 @@ func Execute() {
 
 func addSubcommandsPalettes() {
 	rootCmd.AddCommand(database.DatabaseCmd)
+	rootCmd.AddCommand(create.CreateCmd)
 }
 
 func init() {
