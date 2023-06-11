@@ -2,6 +2,16 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar Time
+
+type Mutation {
+  signIn(input: SignInInput!): SignInResponse!
+}
+
+type Query {
+  todos: [Todo!]!
+}
+
 type Todo {
   id: ID!
   text: String!
@@ -11,18 +21,21 @@ type Todo {
 
 type User {
   id: ID!
-  name: String!
+  email: String!
+  password: String!
+  fullname: String!
+  username: String!
+  createTime: Time!
 }
 
-type Query {
-  todos: [Todo!]!
+input SignInInput {
+  email: String!
+  password: String!
+  logout: Boolean!
 }
 
-input NewTodo {
-  text: String!
-  userId: String!
-}
-
-type Mutation {
-  createTodo(input: NewTodo!): Todo!
+type SignInResponse {
+  user: User!
+  accessToken: String!
+  refreshToken: String!
 }

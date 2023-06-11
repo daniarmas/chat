@@ -11,9 +11,9 @@ import (
 	"github.com/daniarmas/chat/graph/model"
 )
 
-// CreateTodo is the resolver for the createTodo field.
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: CreateTodo - createTodo"))
+// SignIn is the resolver for the signIn field.
+func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) (*model.SignInResponse, error) {
+	panic(fmt.Errorf("not implemented: SignIn - signIn"))
 }
 
 // Todos is the resolver for the todos field.

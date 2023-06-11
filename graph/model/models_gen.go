@@ -2,9 +2,20 @@
 
 package model
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID string `json:"userId"`
+import (
+	"time"
+)
+
+type SignInInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Logout   bool   `json:"logout"`
+}
+
+type SignInResponse struct {
+	User         *User  `json:"user"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }
 
 type Todo struct {
@@ -15,6 +26,10 @@ type Todo struct {
 }
 
 type User struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID         string    `json:"id"`
+	Email      string    `json:"email"`
+	Password   string    `json:"password"`
+	Fullname   string    `json:"fullname"`
+	Username   string    `json:"username"`
+	CreateTime time.Time `json:"createTime"`
 }

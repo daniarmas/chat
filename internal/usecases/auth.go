@@ -16,7 +16,7 @@ import (
 )
 
 type AuthUsecase interface {
-	SignInBusiness(ctx context.Context, input inputs.SignInBusinessInput) (*response.SignInBusinessResponse, error)
+	SignIn(ctx context.Context, input inputs.SignInInput) (*response.SignInResponse, error)
 	SignOut(ctx context.Context) error
 	Me(ctx context.Context) (*entity.User, error)
 }
@@ -66,7 +66,7 @@ func (u *authUsecase) Me(ctx context.Context) (*entity.User, error) {
 	return user, nil
 }
 
-func (u *authUsecase) SignInBusiness(ctx context.Context, in inputs.SignInBusinessInput) (*response.SignInBusinessResponse, error) {
+func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*response.SignInResponse, error) {
 	// Check if exists a user with the given email
 	user, err := u.userRepository.GetUserByEmail(ctx, in.Email)
 	if err != nil {
@@ -116,7 +116,7 @@ func (u *authUsecase) SignInBusiness(ctx context.Context, in inputs.SignInBusine
 	refreshJwt, _ := jwt_utils.CreateRefreshToken(refreshToken, u.cfg.JwtSecret, refreshTokenExpireTime)
 	accessJwt, _ := jwt_utils.CreateAccessToken(accessToken, u.cfg.JwtSecret, accessTokenExpireTime)
 
-	return &response.SignInBusinessResponse{
+	return &response.SignInResponse{
 		User:         user,
 		AccessToken:  accessJwt,
 		RefreshToken: refreshJwt,
