@@ -114,11 +114,20 @@ func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) 
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
+	var res model.MeResponse
+
 	user := middleware.ForContext(ctx)
 	if user == nil {
-		return nil, fmt.Errorf("access denied")
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
 	}
-	var res model.MeResponse
 
 	result, err := r.AuthUsecase.Me(ctx, user.ID.String())
 	if err != nil {
