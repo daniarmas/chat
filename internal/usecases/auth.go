@@ -18,7 +18,7 @@ import (
 type AuthUsecase interface {
 	SignIn(ctx context.Context, input inputs.SignInInput) (*response.SignInResponse, error)
 	SignOut(ctx context.Context) error
-	Me(ctx context.Context) (*entity.User, error)
+	Me(ctx context.Context, userId string) (*entity.User, error)
 }
 
 type authUsecase struct {
@@ -52,8 +52,7 @@ func (u *authUsecase) SignOut(ctx context.Context) error {
 	return nil
 }
 
-func (u *authUsecase) Me(ctx context.Context) (*entity.User, error) {
-	userId := ctx.Value("X-User-Id").(string)
+func (u *authUsecase) Me(ctx context.Context, userId string) (*entity.User, error) {
 	user, err := u.userRepository.GetUserById(ctx, userId)
 	if err != nil {
 		switch err.(type) {

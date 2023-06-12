@@ -12,16 +12,17 @@ import (
 
 	"github.com/daniarmas/chat/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
+	"github.com/daniarmas/chat/middleware"
 )
 
 // SignIn is the resolver for the signIn field.
-func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*model.SignInResponse, error) {
+func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) (*model.SignInResponse, error) {
 	var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
 	var validationErr = false
 	var res model.SignInResponse
 	var errorDetails []*model.ErrorDetails
 
-	if in.Email == "" {
+	if input.Email == "" {
 		errorDetails = append(errorDetails, &model.ErrorDetails{
 			Field:   "email",
 			Message: "This field is required",
@@ -29,7 +30,7 @@ func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*m
 		validationErr = true
 	}
 
-	if in.Email != "" && !emailRegex.MatchString(in.Email) {
+	if input.Email != "" && !emailRegex.MatchString(input.Email) {
 		errorDetails = append(errorDetails, &model.ErrorDetails{
 			Field:   "email",
 			Message: "This field is invalid",
@@ -37,7 +38,7 @@ func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*m
 		validationErr = true
 	}
 
-	if in.Password == "" {
+	if input.Password == "" {
 		errorDetails = append(errorDetails, &model.ErrorDetails{
 			Field:   "password",
 			Message: "This field is required",
@@ -57,7 +58,7 @@ func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*m
 		return &res, nil
 	}
 
-	result, err := r.AuthUsecase.SignIn(ctx, inputs.SignInInput{Email: in.Email, Password: in.Password, Logout: in.Logout})
+	result, err := r.AuthUsecase.SignIn(ctx, inputs.SignInInput{Email: input.Email, Password: input.Password, Logout: input.Logout})
 	if err != nil {
 		switch err.Error() {
 		case "the credentials are incorrect":
@@ -100,7 +101,6 @@ func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*m
 		User: &model.User{
 			ID:         result.User.ID.String(),
 			Email:      result.User.Email,
-			Password:   "",
 			Fullname:   result.User.Fullname,
 			Username:   result.User.Username,
 			CreateTime: result.User.CreateTime,
@@ -109,13 +109,41 @@ func (r *mutationResolver) SignIn(ctx context.Context, in model.SignInInput) (*m
 		RefreshToken: result.RefreshToken,
 	}
 
-	// c.JSON(http.StatusOK, res)
 	return &res, nil
 }
 
-// Todos is the resolver for the todos field.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+// Me is the resolver for the me field.
+func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		return nil, fmt.Errorf("access denied")
+	}
+	var res model.MeResponse
+
+	result, err := r.AuthUsecase.Me(ctx, user.ID.String())
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	res.Message = "Success"
+	res.Status = http.StatusOK
+	res.Data = &model.MeData{
+		User: &model.User{ID: result.ID.String(), Email: result.Email, Fullname: result.Fullname, Username: result.Username, CreateTime: result.CreateTime},
+	}
+	res.Error = nil
+
+	return &res, nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -126,3 +154,13 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	panic(fmt.Errorf("not implemented: Todos - todos"))
+}

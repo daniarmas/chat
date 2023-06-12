@@ -9,7 +9,7 @@ type Mutation {
 }
 
 type Query {
-  todos: [Todo!]!
+  me: MeResponse!
 }
 
 type Todo {
@@ -22,7 +22,7 @@ type Todo {
 type User {
   id: ID!
   email: String!
-  password: String!
+  password: String
   fullname: String!
   username: String!
   createTime: Time!
@@ -61,6 +61,18 @@ type SignInResponse implements Response {
   message: String!
   error: Error
   data: SignInData
+}
+
+type MeResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: MeData
+}
+
+type MeData implements Data {
+  status: Int!
+  user: User!
 }
 
 type SignInData implements Data {

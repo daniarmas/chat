@@ -30,6 +30,27 @@ type ErrorDetails struct {
 	Message string `json:"message"`
 }
 
+type MeData struct {
+	Status int   `json:"status"`
+	User   *User `json:"user"`
+}
+
+func (MeData) IsData()             {}
+func (this MeData) GetStatus() int { return this.Status }
+
+type MeResponse struct {
+	Status  int     `json:"status"`
+	Message string  `json:"message"`
+	Error   *Error  `json:"error,omitempty"`
+	Data    *MeData `json:"data,omitempty"`
+}
+
+func (MeResponse) IsResponse()             {}
+func (this MeResponse) GetStatus() int     { return this.Status }
+func (this MeResponse) GetMessage() string { return this.Message }
+func (this MeResponse) GetError() *Error   { return this.Error }
+func (this MeResponse) GetData() Data      { return *this.Data }
+
 type SignInData struct {
 	Status       int    `json:"status"`
 	User         *User  `json:"user"`
@@ -69,7 +90,7 @@ type Todo struct {
 type User struct {
 	ID         string    `json:"id"`
 	Email      string    `json:"email"`
-	Password   string    `json:"password"`
+	Password   *string   `json:"password,omitempty"`
 	Fullname   string    `json:"fullname"`
 	Username   string    `json:"username"`
 	CreateTime time.Time `json:"createTime"`

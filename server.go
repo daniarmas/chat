@@ -1,7 +1,6 @@
 package main
 
 import (
-	logg "log"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
@@ -10,9 +9,12 @@ import (
 	"github.com/daniarmas/chat/graph"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
+	"github.com/daniarmas/chat/middleware"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/go-chi/chi"
 )
 
 const defaultPort = "8080"
@@ -36,11 +38,20 @@ func main() {
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
 
+	router := chi.NewRouter()
+
+	router.Use(middleware.AuthorizationMiddleware(*cfg))
+
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase}}))
 
-	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", srv)
+	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
+	router.Handle("/query", srv)
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", cfg.GraphqlPort)
-	logg.Fatal(http.ListenAndServe(":"+cfg.GraphqlPort, nil))
+
+	err = http.ListenAndServe(":8080", router)
+	if err != nil {
+		panic(err)
+	}
+
 }
