@@ -38,6 +38,9 @@ to quickly create a Cobra application.`,
 		if err := db.Gorm.Exec("DELETE FROM \"access_token\";").Error; err != nil {
 			log.Fatal().Msg(err.Error())
 		}
+		if err := db.Gorm.Exec("DELETE FROM \"message\";").Error; err != nil {
+			log.Fatal().Msg(err.Error())
+		}
 		log.Info().Msg("Database cleaned!")
 	},
 }
