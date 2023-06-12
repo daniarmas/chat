@@ -39,7 +39,6 @@ func (FetchAllMessagesData) IsData()             {}
 func (this FetchAllMessagesData) GetStatus() int { return this.Status }
 
 type FetchAllMessagesInput struct {
-	Content    string `json:"content"`
 	ChatUserID string `json:"chatUserId"`
 }
 

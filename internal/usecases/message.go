@@ -13,6 +13,7 @@ import (
 
 type MessageUsecase interface {
 	SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error)
+	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string) ([]*entity.Message, error)
 }
 
 type messageUsecase struct {
@@ -28,6 +29,15 @@ func NewMessageUsecase(userRepo repository.UserRepository, messageRepository rep
 		messageRepository: messageRepository,
 		cfg:               cfg,
 	}
+}
+
+func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string) ([]*entity.Message, error) {
+	messages, err := m.messageRepository.GetMessagesByChat(ctx, userId, input.ChatUserId)
+	if err != nil {
+		log.Fatal().Msgf(err.Error())
+		return nil, err
+	}
+	return messages, nil
 }
 
 func (m *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {

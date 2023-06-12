@@ -51,7 +51,6 @@ input SendMessageInput {
 }
 
 input FetchAllMessagesInput {
-  content: String!
   chatUserId: String!
 }
 
