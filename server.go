@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/daniarmas/chat/config"
 	"github.com/daniarmas/chat/graph"
@@ -45,6 +46,8 @@ func main() {
 	router.Use(middleware.AuthorizationMiddleware(*cfg))
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase}}))
+
+	srv.AddTransport(&transport.Websocket{})
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)
