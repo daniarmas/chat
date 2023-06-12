@@ -10,6 +10,7 @@ type Config struct {
 	JwtSecret               string `mapstructure:"JWT_SECRET"`
 	RefreshTokenExpireHours int    `mapstructure:"REFRESH_TOKEN_EXPIRE_HOURS"`
 	AccessTokenExpireHours  int    `mapstructure:"ACCESS_TOKEN_EXPIRE_HOURS"`
+	GraphqlPort             string `mapstructure:"GRAPHQL_PORT"`
 }
 
 func NewConfig() *Config {
