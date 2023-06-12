@@ -6,6 +6,7 @@ scalar Time
 
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
+  signOut: SignOutResponse!
 }
 
 type Query {
@@ -63,6 +64,13 @@ type SignInResponse implements Response {
   data: SignInData
 }
 
+type SignOutResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: SignOutData
+}
+
 type MeResponse implements Response {
   status: Int!
   message: String!
@@ -80,4 +88,8 @@ type SignInData implements Data {
   user: User!
   accessToken: String!
   refreshToken: String!
+}
+
+type SignOutData implements Data {
+  status: Int!
 }

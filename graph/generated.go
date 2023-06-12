@@ -70,7 +70,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		SignIn func(childComplexity int, input model.SignInInput) int
+		SignIn  func(childComplexity int, input model.SignInInput) int
+		SignOut func(childComplexity int) int
 	}
 
 	Query struct {
@@ -85,6 +86,17 @@ type ComplexityRoot struct {
 	}
 
 	SignInResponse struct {
+		Data    func(childComplexity int) int
+		Error   func(childComplexity int) int
+		Message func(childComplexity int) int
+		Status  func(childComplexity int) int
+	}
+
+	SignOutData struct {
+		Status func(childComplexity int) int
+	}
+
+	SignOutResponse struct {
 		Data    func(childComplexity int) int
 		Error   func(childComplexity int) int
 		Message func(childComplexity int) int
@@ -110,6 +122,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	SignIn(ctx context.Context, input model.SignInInput) (*model.SignInResponse, error)
+	SignOut(ctx context.Context) (*model.SignOutResponse, error)
 }
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.MeResponse, error)
@@ -219,6 +232,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.SignIn(childComplexity, args["input"].(model.SignInInput)), true
 
+	case "Mutation.signOut":
+		if e.complexity.Mutation.SignOut == nil {
+			break
+		}
+
+		return e.complexity.Mutation.SignOut(childComplexity), true
+
 	case "Query.me":
 		if e.complexity.Query.Me == nil {
 			break
@@ -281,6 +301,41 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.SignInResponse.Status(childComplexity), true
+
+	case "SignOutData.status":
+		if e.complexity.SignOutData.Status == nil {
+			break
+		}
+
+		return e.complexity.SignOutData.Status(childComplexity), true
+
+	case "SignOutResponse.data":
+		if e.complexity.SignOutResponse.Data == nil {
+			break
+		}
+
+		return e.complexity.SignOutResponse.Data(childComplexity), true
+
+	case "SignOutResponse.error":
+		if e.complexity.SignOutResponse.Error == nil {
+			break
+		}
+
+		return e.complexity.SignOutResponse.Error(childComplexity), true
+
+	case "SignOutResponse.message":
+		if e.complexity.SignOutResponse.Message == nil {
+			break
+		}
+
+		return e.complexity.SignOutResponse.Message(childComplexity), true
+
+	case "SignOutResponse.status":
+		if e.complexity.SignOutResponse.Status == nil {
+			break
+		}
+
+		return e.complexity.SignOutResponse.Status(childComplexity), true
 
 	case "Todo.done":
 		if e.complexity.Todo.Done == nil {
@@ -1119,6 +1174,60 @@ func (ec *executionContext) fieldContext_Mutation_signIn(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_signOut(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_signOut(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().SignOut(rctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*model.SignOutResponse)
+	fc.Result = res
+	return ec.marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_signOut(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_SignOutResponse_status(ctx, field)
+			case "message":
+				return ec.fieldContext_SignOutResponse_message(ctx, field)
+			case "error":
+				return ec.fieldContext_SignOutResponse_error(ctx, field)
+			case "data":
+				return ec.fieldContext_SignOutResponse_data(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SignOutResponse", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Query_me(ctx, field)
 	if err != nil {
@@ -1675,6 +1784,232 @@ func (ec *executionContext) fieldContext_SignInResponse_data(ctx context.Context
 				return ec.fieldContext_SignInData_refreshToken(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type SignInData", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignOutData_status(ctx context.Context, field graphql.CollectedField, obj *model.SignOutData) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SignOutData_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SignOutData_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignOutData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignOutResponse_status(ctx context.Context, field graphql.CollectedField, obj *model.SignOutResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SignOutResponse_status(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Status, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SignOutResponse_status(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignOutResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignOutResponse_message(ctx context.Context, field graphql.CollectedField, obj *model.SignOutResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SignOutResponse_message(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Message, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SignOutResponse_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignOutResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignOutResponse_error(ctx context.Context, field graphql.CollectedField, obj *model.SignOutResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SignOutResponse_error(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Error, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.Error)
+	fc.Result = res
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SignOutResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignOutResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "code":
+				return ec.fieldContext_Error_code(ctx, field)
+			case "message":
+				return ec.fieldContext_Error_message(ctx, field)
+			case "details":
+				return ec.fieldContext_Error_details(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Error", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _SignOutResponse_data(ctx context.Context, field graphql.CollectedField, obj *model.SignOutResponse) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_SignOutResponse_data(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Data, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*model.SignOutData)
+	fc.Result = res
+	return ec.marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutData(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_SignOutResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "SignOutResponse",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "status":
+				return ec.fieldContext_SignOutData_status(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type SignOutData", field.Name)
 		},
 	}
 	return fc, nil
@@ -3973,6 +4308,13 @@ func (ec *executionContext) _Data(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._SignInData(ctx, sel, obj)
+	case model.SignOutData:
+		return ec._SignOutData(ctx, sel, &obj)
+	case *model.SignOutData:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SignOutData(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -3989,6 +4331,13 @@ func (ec *executionContext) _Response(ctx context.Context, sel ast.SelectionSet,
 			return graphql.Null
 		}
 		return ec._SignInResponse(ctx, sel, obj)
+	case model.SignOutResponse:
+		return ec._SignOutResponse(ctx, sel, &obj)
+	case *model.SignOutResponse:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._SignOutResponse(ctx, sel, obj)
 	case model.MeResponse:
 		return ec._MeResponse(ctx, sel, &obj)
 	case *model.MeResponse:
@@ -4213,6 +4562,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "signOut":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_signOut(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4387,6 +4743,93 @@ func (ec *executionContext) _SignInResponse(ctx context.Context, sel ast.Selecti
 			out.Values[i] = ec._SignInResponse_error(ctx, field, obj)
 		case "data":
 			out.Values[i] = ec._SignInResponse_data(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var signOutDataImplementors = []string{"SignOutData", "Data"}
+
+func (ec *executionContext) _SignOutData(ctx context.Context, sel ast.SelectionSet, obj *model.SignOutData) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, signOutDataImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SignOutData")
+		case "status":
+			out.Values[i] = ec._SignOutData_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var signOutResponseImplementors = []string{"SignOutResponse", "Response"}
+
+func (ec *executionContext) _SignOutResponse(ctx context.Context, sel ast.SelectionSet, obj *model.SignOutResponse) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, signOutResponseImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("SignOutResponse")
+		case "status":
+			out.Values[i] = ec._SignOutResponse_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "message":
+			out.Values[i] = ec._SignOutResponse_message(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "error":
+			out.Values[i] = ec._SignOutResponse_error(ctx, field, obj)
+		case "data":
+			out.Values[i] = ec._SignOutResponse_data(ctx, field, obj)
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4929,6 +5372,20 @@ func (ec *executionContext) marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmas�
 	return ec._SignInResponse(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNSignOutResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v model.SignOutResponse) graphql.Marshaler {
+	return ec._SignOutResponse(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v *model.SignOutResponse) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._SignOutResponse(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v interface{}) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -5315,6 +5772,13 @@ func (ec *executionContext) marshalOSignInData2ᚖgithubᚗcomᚋdaniarmasᚋcha
 		return graphql.Null
 	}
 	return ec._SignInData(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutData(ctx context.Context, sel ast.SelectionSet, v *model.SignOutData) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._SignOutData(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v interface{}) (*string, error) {

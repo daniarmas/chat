@@ -112,6 +112,46 @@ func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) 
 	return &res, nil
 }
 
+// SignOut is the resolver for the signOut field.
+func (r *mutationResolver) SignOut(ctx context.Context) (*model.SignOutResponse, error) {
+	var res model.SignOutResponse
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	err := r.AuthUsecase.SignOut(ctx, user.ID.String())
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	res.Message = http.StatusText(http.StatusNoContent)
+	res.Status = http.StatusNoContent
+	res.Data = nil
+	res.Error = nil
+	return &res, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 	var res model.MeResponse

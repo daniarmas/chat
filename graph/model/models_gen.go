@@ -80,6 +80,26 @@ func (this SignInResponse) GetMessage() string { return this.Message }
 func (this SignInResponse) GetError() *Error   { return this.Error }
 func (this SignInResponse) GetData() Data      { return *this.Data }
 
+type SignOutData struct {
+	Status int `json:"status"`
+}
+
+func (SignOutData) IsData()             {}
+func (this SignOutData) GetStatus() int { return this.Status }
+
+type SignOutResponse struct {
+	Status  int          `json:"status"`
+	Message string       `json:"message"`
+	Error   *Error       `json:"error,omitempty"`
+	Data    *SignOutData `json:"data,omitempty"`
+}
+
+func (SignOutResponse) IsResponse()             {}
+func (this SignOutResponse) GetStatus() int     { return this.Status }
+func (this SignOutResponse) GetMessage() string { return this.Message }
+func (this SignOutResponse) GetError() *Error   { return this.Error }
+func (this SignOutResponse) GetData() Data      { return *this.Data }
+
 type Todo struct {
 	ID   string `json:"id"`
 	Text string `json:"text"`

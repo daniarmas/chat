@@ -17,7 +17,7 @@ import (
 
 type AuthUsecase interface {
 	SignIn(ctx context.Context, input inputs.SignInInput) (*response.SignInResponse, error)
-	SignOut(ctx context.Context) error
+	SignOut(ctx context.Context, userId string) error
 	Me(ctx context.Context, userId string) (*entity.User, error)
 }
 
@@ -38,8 +38,7 @@ func NewAuthUsecase(userRepo repository.UserRepository, refreshRepository reposi
 	}
 }
 
-func (u *authUsecase) SignOut(ctx context.Context) error {
-	userId := ctx.Value("X-User-Id").(string)
+func (u *authUsecase) SignOut(ctx context.Context, userId string) error {
 	err := u.refreshRepository.DeleteRefreshTokenByUserId(ctx, userId)
 	if err != nil {
 		switch err.(type) {
