@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type ChatMessageOrm struct {
+type MessageOrm struct {
 	ID         *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
 	SenderID   *uuid.UUID `gorm:"not null" json:"sender_id"`
 	ReceiverID *uuid.UUID `gorm:"not null" json:"receiver_id"`
@@ -16,17 +16,17 @@ type ChatMessageOrm struct {
 	CreateTime time.Time  `json:"create_time"`
 }
 
-func (ChatMessageOrm) TableName() string {
-	return "chat_message"
+func (MessageOrm) TableName() string {
+	return "message"
 }
 
-func (i *ChatMessageOrm) BeforeCreate(tx *gorm.DB) (err error) {
+func (i *MessageOrm) BeforeCreate(tx *gorm.DB) (err error) {
 	i.CreateTime = time.Now().UTC()
 	return
 }
 
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
-func (a *ChatMessageOrm) MapToChatMessageGorm(message *entity.ChatMessage) {
+func (a *MessageOrm) MapToMessageGorm(message *entity.Message) {
 	a.ID = message.ID
 	a.Content = message.Content
 	a.ReceiverID = message.ReceiverID
@@ -34,8 +34,8 @@ func (a *ChatMessageOrm) MapToChatMessageGorm(message *entity.ChatMessage) {
 	a.CreateTime = message.CreateTime
 }
 
-func (a ChatMessageOrm) MapFromChatMessageGorm() *entity.ChatMessage {
-	return &entity.ChatMessage{
+func (a MessageOrm) MapFromMessageGorm() *entity.Message {
+	return &entity.Message{
 		ID:         a.ID,
 		Content:    a.Content,
 		SenderID:   a.SenderID,

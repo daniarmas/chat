@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type ChatMessage struct {
+type Message struct {
 	ID         *uuid.UUID `json:"id"`         // Unique identifier for the message
 	SenderID   *uuid.UUID `json:"senderId"`   // ID of the user who sent the message
 	ReceiverID *uuid.UUID `json:"receiverId"` // ID of the user who receive the message
