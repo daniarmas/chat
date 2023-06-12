@@ -31,15 +31,17 @@ type ErrorDetails struct {
 }
 
 type FetchAllMessagesData struct {
-	Status   int        `json:"status"`
-	Messages []*Message `json:"messages,omitempty"`
+	Status           int        `json:"status"`
+	CreateTimeCursor time.Time  `json:"createTimeCursor"`
+	Messages         []*Message `json:"messages,omitempty"`
 }
 
 func (FetchAllMessagesData) IsData()             {}
 func (this FetchAllMessagesData) GetStatus() int { return this.Status }
 
 type FetchAllMessagesInput struct {
-	ChatUserID string `json:"chatUserId"`
+	ChatUserID       string     `json:"chatUserId"`
+	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
 }
 
 type FetchMessagesResponse struct {

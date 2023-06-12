@@ -52,6 +52,7 @@ input SendMessageInput {
 
 input FetchAllMessagesInput {
   chatUserId: String!
+  createTimeCursor: Time
 }
 
 interface Data {
@@ -120,6 +121,7 @@ type SendMessageData implements Data {
 
 type FetchAllMessagesData implements Data {
   status: Int!
+  createTimeCursor: Time!
   messages: [Message!]
 }
 

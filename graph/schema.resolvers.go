@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"time"
 
 	"github.com/daniarmas/chat/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
@@ -276,6 +277,11 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllMessagesInput) (*model.FetchMessagesResponse, error) {
 	var res model.FetchMessagesResponse
 	var messages []*model.Message
+	var createTimeCursor time.Time
+
+	if input.CreateTimeCursor != nil && !input.CreateTimeCursor.IsZero() {
+		createTimeCursor = input.CreateTimeCursor.UTC()
+	}
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
@@ -290,7 +296,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChat{ChatUserId: input.ChatUserID}, user.ID.String())
+	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChat{ChatUserId: input.ChatUserID}, user.ID.String(), createTimeCursor)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -306,7 +312,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		}
 	}
 
-	for _, element := range result {
+	for _, element := range result.Messages {
 		messages = append(messages, &model.Message{
 			ID:         element.ID.String(),
 			Content:    element.Content,
@@ -316,10 +322,21 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		})
 	}
 
+	if len(messages) == 11 {
+		messages = messages[:len(messages)-1]
+	}
+
+	var createTimeCursorRes time.Time
+
+	if len(messages) != 0 {
+		createTimeCursorRes = messages[len(messages)-1].CreateTime
+	}
+
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.FetchAllMessagesData{
-		Messages: messages,
+		Messages:         messages,
+		CreateTimeCursor: createTimeCursorRes,
 	}
 	res.Error = nil
 

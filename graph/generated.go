@@ -58,8 +58,9 @@ type ComplexityRoot struct {
 	}
 
 	FetchAllMessagesData struct {
-		Messages func(childComplexity int) int
-		Status   func(childComplexity int) int
+		CreateTimeCursor func(childComplexity int) int
+		Messages         func(childComplexity int) int
+		Status           func(childComplexity int) int
 	}
 
 	FetchMessagesResponse struct {
@@ -213,6 +214,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ErrorDetails.Message(childComplexity), true
+
+	case "FetchAllMessagesData.createTimeCursor":
+		if e.complexity.FetchAllMessagesData.CreateTimeCursor == nil {
+			break
+		}
+
+		return e.complexity.FetchAllMessagesData.CreateTimeCursor(childComplexity), true
 
 	case "FetchAllMessagesData.messages":
 		if e.complexity.FetchAllMessagesData.Messages == nil {
@@ -1078,6 +1086,50 @@ func (ec *executionContext) fieldContext_FetchAllMessagesData_status(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _FetchAllMessagesData_createTimeCursor(ctx context.Context, field graphql.CollectedField, obj *model.FetchAllMessagesData) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_FetchAllMessagesData_createTimeCursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CreateTimeCursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(time.Time)
+	fc.Result = res
+	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_FetchAllMessagesData_createTimeCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "FetchAllMessagesData",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Time does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _FetchAllMessagesData_messages(ctx context.Context, field graphql.CollectedField, obj *model.FetchAllMessagesData) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_FetchAllMessagesData_messages(ctx, field)
 	if err != nil {
@@ -1306,6 +1358,8 @@ func (ec *executionContext) fieldContext_FetchMessagesResponse_data(ctx context.
 			switch field.Name {
 			case "status":
 				return ec.fieldContext_FetchAllMessagesData_status(ctx, field)
+			case "createTimeCursor":
+				return ec.fieldContext_FetchAllMessagesData_createTimeCursor(ctx, field)
 			case "messages":
 				return ec.fieldContext_FetchAllMessagesData_messages(ctx, field)
 			}
@@ -5372,7 +5426,7 @@ func (ec *executionContext) unmarshalInputFetchAllMessagesInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"chatUserId"}
+	fieldsInOrder := [...]string{"chatUserId", "createTimeCursor"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -5388,6 +5442,15 @@ func (ec *executionContext) unmarshalInputFetchAllMessagesInput(ctx context.Cont
 				return it, err
 			}
 			it.ChatUserID = data
+		case "createTimeCursor":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("createTimeCursor"))
+			data, err := ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CreateTimeCursor = data
 		}
 	}
 
@@ -5678,6 +5741,11 @@ func (ec *executionContext) _FetchAllMessagesData(ctx context.Context, sel ast.S
 			out.Values[i] = graphql.MarshalString("FetchAllMessagesData")
 		case "status":
 			out.Values[i] = ec._FetchAllMessagesData_status(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createTimeCursor":
+			out.Values[i] = ec._FetchAllMessagesData_createTimeCursor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
@@ -7393,6 +7461,22 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 		return graphql.Null
 	}
 	res := graphql.MarshalString(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOTime2ᚖtimeᚐTime(ctx context.Context, v interface{}) (*time.Time, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalTime(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOTime2ᚖtimeᚐTime(ctx context.Context, sel ast.SelectionSet, v *time.Time) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	res := graphql.MarshalTime(*v)
 	return res
 }
 

@@ -2,18 +2,20 @@ package usecases
 
 import (
 	"context"
+	"time"
 
 	"github.com/daniarmas/chat/config"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
+	"github.com/daniarmas/chat/pkg/response"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
 type MessageUsecase interface {
 	SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error)
-	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string) ([]*entity.Message, error)
+	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error)
 }
 
 type messageUsecase struct {
@@ -31,13 +33,15 @@ func NewMessageUsecase(userRepo repository.UserRepository, messageRepository rep
 	}
 }
 
-func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string) ([]*entity.Message, error) {
-	messages, err := m.messageRepository.GetMessagesByChat(ctx, userId, input.ChatUserId)
+func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error) {
+	var res response.GetMessagesByChatResponse
+	messages, err := m.messageRepository.GetMessagesByChat(ctx, userId, input.ChatUserId, createTimeCursor)
 	if err != nil {
 		log.Fatal().Msgf(err.Error())
 		return nil, err
 	}
-	return messages, nil
+	res.Messages = messages
+	return &res, nil
 }
 
 func (m *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {
