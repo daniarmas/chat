@@ -152,6 +152,11 @@ func (r *mutationResolver) SignOut(ctx context.Context) (*model.SignOutResponse,
 	return &res, nil
 }
 
+// SendMessage is the resolver for the sendMessage field.
+func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMessageInput) (*model.SendMessageResponse, error) {
+	panic(fmt.Errorf("not implemented: SendMessage - sendMessage"))
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 	var res model.MeResponse

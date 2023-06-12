@@ -51,6 +51,40 @@ func (this MeResponse) GetMessage() string { return this.Message }
 func (this MeResponse) GetError() *Error   { return this.Error }
 func (this MeResponse) GetData() Data      { return *this.Data }
 
+type Message struct {
+	ID         string    `json:"id"`
+	Content    string    `json:"content"`
+	SenderID   string    `json:"senderId"`
+	ReceiverID string    `json:"receiverId"`
+	CreateTime time.Time `json:"createTime"`
+}
+
+type SendMessageData struct {
+	Status  int      `json:"status"`
+	Message *Message `json:"message"`
+}
+
+func (SendMessageData) IsData()             {}
+func (this SendMessageData) GetStatus() int { return this.Status }
+
+type SendMessageInput struct {
+	Content    string `json:"content"`
+	ReceiverID string `json:"receiverId"`
+}
+
+type SendMessageResponse struct {
+	Status  int              `json:"status"`
+	Message string           `json:"message"`
+	Error   *Error           `json:"error,omitempty"`
+	Data    *SendMessageData `json:"data,omitempty"`
+}
+
+func (SendMessageResponse) IsResponse()             {}
+func (this SendMessageResponse) GetStatus() int     { return this.Status }
+func (this SendMessageResponse) GetMessage() string { return this.Message }
+func (this SendMessageResponse) GetError() *Error   { return this.Error }
+func (this SendMessageResponse) GetData() Data      { return *this.Data }
+
 type SignInData struct {
 	Status       int    `json:"status"`
 	User         *User  `json:"user"`
