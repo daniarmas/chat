@@ -34,7 +34,37 @@ input SignInInput {
   logout: Boolean!
 }
 
-type SignInResponse {
+interface Data {
+  status: Int!
+}
+
+interface Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: Data
+}
+
+type Error {
+	code: String!
+	message: String!
+	details: [ErrorDetails]
+}
+
+type ErrorDetails {
+  field: String!
+  message: String!
+}
+
+type SignInResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: SignInData
+}
+
+type SignInData implements Data {
+  status: Int!
   user: User!
   accessToken: String!
   refreshToken: String!

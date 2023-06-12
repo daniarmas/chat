@@ -6,6 +6,40 @@ import (
 	"time"
 )
 
+type Data interface {
+	IsData()
+	GetStatus() int
+}
+
+type Response interface {
+	IsResponse()
+	GetStatus() int
+	GetMessage() string
+	GetError() *Error
+	GetData() Data
+}
+
+type Error struct {
+	Code    string          `json:"code"`
+	Message string          `json:"message"`
+	Details []*ErrorDetails `json:"details,omitempty"`
+}
+
+type ErrorDetails struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+type SignInData struct {
+	Status       int    `json:"status"`
+	User         *User  `json:"user"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
+}
+
+func (SignInData) IsData()             {}
+func (this SignInData) GetStatus() int { return this.Status }
+
 type SignInInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -13,10 +47,17 @@ type SignInInput struct {
 }
 
 type SignInResponse struct {
-	User         *User  `json:"user"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	Status  int         `json:"status"`
+	Message string      `json:"message"`
+	Error   *Error      `json:"error,omitempty"`
+	Data    *SignInData `json:"data,omitempty"`
 }
+
+func (SignInResponse) IsResponse()             {}
+func (this SignInResponse) GetStatus() int     { return this.Status }
+func (this SignInResponse) GetMessage() string { return this.Message }
+func (this SignInResponse) GetError() *Error   { return this.Error }
+func (this SignInResponse) GetData() Data      { return *this.Data }
 
 type Todo struct {
 	ID   string `json:"id"`

@@ -77,6 +77,11 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 			return nil, err
 		}
 	}
+	// Check if the password is correct
+	passIsCorrect := bcryptutils.CheckPasswordHash(in.Password, user.Password)
+	if !passIsCorrect {
+		return nil, errors.New("the credentials are incorrect")
+	}
 	// Check if the user is already loged in the system
 	refreshTokenCheck, err := u.refreshRepository.GetRefreshTokenByUserId(ctx, user.ID.String())
 	if err != nil {
@@ -94,11 +99,6 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		}
 	} else if refreshTokenCheck != nil {
 		return nil, errors.New("the user is already logged in")
-	}
-	// Check if the password is correct
-	passIsCorrect := bcryptutils.CheckPasswordHash(in.Password, user.Password)
-	if !passIsCorrect {
-		return nil, errors.New("the credentials are incorrect")
 	}
 	// Create RefreshToken and AccessToken in the database for track sessions.
 	refreshTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.RefreshTokenExpireHours)).UTC()
