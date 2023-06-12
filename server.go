@@ -35,14 +35,16 @@ func main() {
 	userRepository := repository.NewUserRepository(db)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
 	accessTokenRepository := repository.NewAccessTokenRepository(db)
+	messageRepository := repository.NewMessageRepository(db)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
+	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg)
 
 	router := chi.NewRouter()
 
 	router.Use(middleware.AuthorizationMiddleware(*cfg))
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase}}))
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", srv)

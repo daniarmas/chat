@@ -13,6 +13,7 @@ import (
 	"github.com/daniarmas/chat/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/middleware"
+	"github.com/google/uuid"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -154,7 +155,78 @@ func (r *mutationResolver) SignOut(ctx context.Context) (*model.SignOutResponse,
 
 // SendMessage is the resolver for the sendMessage field.
 func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMessageInput) (*model.SendMessageResponse, error) {
-	panic(fmt.Errorf("not implemented: SendMessage - sendMessage"))
+	var res model.SendMessageResponse
+	var errorDetails []*model.ErrorDetails
+	var validationErr = false
+	var receiverId uuid.UUID
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	if input.Content == "" {
+		errorDetails = append(errorDetails, &model.ErrorDetails{
+			Field:   "content",
+			Message: "This field is required",
+		})
+		validationErr = true
+	}
+
+	if input.ReceiverID == "" {
+		errorDetails = append(errorDetails, &model.ErrorDetails{
+			Field:   "receiver_id",
+			Message: "This field is required",
+		})
+		validationErr = true
+	} else {
+		receiverId = uuid.MustParse(input.ReceiverID)
+	}
+
+	if validationErr {
+		res.Message = "Bad request"
+		res.Status = http.StatusBadRequest
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "INVALID_ARGUMENT",
+			Message: "The request contains invalid arguments",
+			Details: errorDetails,
+		}
+		return &res, nil
+	}
+
+	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ReceiverID: &receiverId, Content: input.Content}, user.ID.String())
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	res.Message = "Success"
+	res.Status = http.StatusOK
+	res.Data = &model.SendMessageData{
+		Message: &model.Message{ID: result.ID.String(), Content: result.Content, SenderID: result.SenderID.String(), ReceiverID: result.ReceiverID.String(), CreateTime: result.CreateTime},
+	}
+	res.Error = nil
+
+	return &res, nil
 }
 
 // Me is the resolver for the me field.
