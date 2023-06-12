@@ -274,7 +274,56 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 
 // FetchMessages is the resolver for the fetchMessages field.
 func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllMessagesInput) (*model.FetchMessagesResponse, error) {
-	panic(fmt.Errorf("not implemented: FetchMessages - fetchMessages"))
+	var res model.FetchMessagesResponse
+	var messages []*model.Message
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChat{ChatUserId: input.ChatUserID}, user.ID.String())
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	for _, element := range result {
+		messages = append(messages, &model.Message{
+			ID:         element.ID.String(),
+			Content:    element.Content,
+			SenderID:   element.SenderID.String(),
+			ReceiverID: element.ReceiverID.String(),
+			CreateTime: element.CreateTime,
+		})
+	}
+
+	res.Message = "Success"
+	res.Status = http.StatusOK
+	res.Data = &model.FetchAllMessagesData{
+		Messages: messages,
+	}
+	res.Error = nil
+
+	return &res, nil
 }
 
 // Mutation returns MutationResolver implementation.

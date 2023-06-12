@@ -27,9 +27,9 @@ func (repo messageRepository) GetMessagesByChat(ctx context.Context, firstUserId
 	var messagesOrm []models.MessageOrm
 	var messages []*entity.Message
 	result := repo.database.Gorm.Where(
-		repo.database.Gorm.Where("sender_id == ?", firstUserId).Or("receiver_id == ?", firstUserId),
+		repo.database.Gorm.Where("sender_id = ?", firstUserId).Or("receiver_id = ?", firstUserId),
 	).Where(
-		repo.database.Gorm.Where("sender_id == ?", secondUserId).Or("receiver_id == ?", secondUserId),
+		repo.database.Gorm.Where("sender_id = ?", secondUserId).Or("receiver_id = ?", secondUserId),
 	).Find(&messagesOrm)
 	if result.Error != nil {
 		return nil, result.Error
