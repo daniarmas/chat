@@ -30,6 +30,32 @@ type ErrorDetails struct {
 	Message string `json:"message"`
 }
 
+type FetchAllMessagesData struct {
+	Status   int        `json:"status"`
+	Messages []*Message `json:"messages,omitempty"`
+}
+
+func (FetchAllMessagesData) IsData()             {}
+func (this FetchAllMessagesData) GetStatus() int { return this.Status }
+
+type FetchAllMessagesInput struct {
+	Content    string `json:"content"`
+	ChatUserID string `json:"chatUserId"`
+}
+
+type FetchMessagesResponse struct {
+	Status  int                   `json:"status"`
+	Message string                `json:"message"`
+	Error   *Error                `json:"error,omitempty"`
+	Data    *FetchAllMessagesData `json:"data,omitempty"`
+}
+
+func (FetchMessagesResponse) IsResponse()             {}
+func (this FetchMessagesResponse) GetStatus() int     { return this.Status }
+func (this FetchMessagesResponse) GetMessage() string { return this.Message }
+func (this FetchMessagesResponse) GetError() *Error   { return this.Error }
+func (this FetchMessagesResponse) GetData() Data      { return *this.Data }
+
 type MeData struct {
 	Status int   `json:"status"`
 	User   *User `json:"user"`

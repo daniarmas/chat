@@ -12,6 +12,7 @@ type Mutation {
 
 type Query {
   me: MeResponse!
+  fetchMessages(input: FetchAllMessagesInput!): FetchMessagesResponse!
 }
 
 type Todo {
@@ -47,6 +48,11 @@ input SignInInput {
 input SendMessageInput {
   content: String!
   receiverId: String!
+}
+
+input FetchAllMessagesInput {
+  content: String!
+  chatUserId: String!
 }
 
 interface Data {
@@ -113,9 +119,21 @@ type SendMessageData implements Data {
   message: Message!
 }
 
+type FetchAllMessagesData implements Data {
+  status: Int!
+  messages: [Message!]
+}
+
 type SendMessageResponse implements Response {
   status: Int!
   message: String!
   error: Error
   data: SendMessageData
+}
+
+type FetchMessagesResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: FetchAllMessagesData
 }

@@ -272,6 +272,11 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 	return &res, nil
 }
 
+// FetchMessages is the resolver for the fetchMessages field.
+func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllMessagesInput) (*model.FetchMessagesResponse, error) {
+	panic(fmt.Errorf("not implemented: FetchMessages - fetchMessages"))
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
