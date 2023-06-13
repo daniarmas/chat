@@ -6307,22 +6307,22 @@ func (ec *executionContext) unmarshalInputGetOrCreateChatInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"otherUserId"}
+	fieldsInOrder := [...]string{"receiverId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "otherUserId":
+		case "receiverId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otherUserId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverId"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.OtherUserID = data
+			it.ReceiverID = data
 		}
 	}
 

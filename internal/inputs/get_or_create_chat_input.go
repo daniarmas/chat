@@ -5,7 +5,7 @@ import (
 )
 
 type GetOrCreateChatInput struct {
-	OtherUserId *uuid.UUID `json:"otherUserId"`
+	ReceiverId *uuid.UUID `json:"receiverId"`
 }
 
 func (in *GetOrCreateChatInput) Sanitize() {

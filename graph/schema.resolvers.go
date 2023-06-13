@@ -235,7 +235,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 	var res model.GetOrCreateChatResponse
 	var errorDetails []*model.ErrorDetails
 	var validationErr = false
-	var otherUserId uuid.UUID
+	var receiverId uuid.UUID
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
@@ -250,14 +250,14 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 		return &res, nil
 	}
 
-	if input.OtherUserID == "" {
+	if input.ReceiverID == "" {
 		errorDetails = append(errorDetails, &model.ErrorDetails{
-			Field:   "other_user_id",
+			Field:   "receiver_id",
 			Message: "This field is required",
 		})
 		validationErr = true
 	} else {
-		otherUserId = uuid.MustParse(input.OtherUserID)
+		receiverId = uuid.MustParse(input.ReceiverID)
 	}
 
 	if validationErr {
@@ -272,7 +272,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 		return &res, nil
 	}
 
-	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{OtherUserId: &otherUserId}, user.ID.String())
+	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{ReceiverId: &receiverId}, user.ID.String())
 	if err != nil {
 		switch err.Error() {
 		default:

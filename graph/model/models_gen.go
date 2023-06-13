@@ -74,7 +74,7 @@ func (GetOrCreateChatData) IsData()             {}
 func (this GetOrCreateChatData) GetStatus() int { return this.Status }
 
 type GetOrCreateChatInput struct {
-	OtherUserID string `json:"otherUserId"`
+	ReceiverID string `json:"receiverId"`
 }
 
 type GetOrCreateChatResponse struct {

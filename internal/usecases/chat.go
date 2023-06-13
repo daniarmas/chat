@@ -27,12 +27,12 @@ func NewChatUsecase(chatRepo repository.ChatRepository) ChatUsecase {
 
 func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error) {
 	userIdUUID := uuid.MustParse(userId)
-	chat, err := u.chatRepository.GetChat(ctx, userId, input.OtherUserId.String())
+	chat, err := u.chatRepository.GetChat(ctx, userId, input.ReceiverId.String())
 	switch err.(type) {
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.OtherUserId})
+		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
 		if err != nil {
 			log.Error().Msgf(err.Error())
 			return nil, err
