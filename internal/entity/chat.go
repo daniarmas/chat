@@ -11,5 +11,6 @@ type Chat struct {
 	Channel      string     `json:"channel"`
 	FirstUserId  *uuid.UUID `json:"firstUserId"`
 	SecondUserId *uuid.UUID `json:"secondUserId"`
-	CreateTime   time.Time  `json:"timestamp"`
+	CreateTime   time.Time  `json:"create_time"`
+	UpdateTime   time.Time  `json:"update_time"`
 }

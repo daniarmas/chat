@@ -2,17 +2,20 @@ package usecases
 
 import (
 	"context"
+	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
+	"github.com/daniarmas/chat/pkg/response"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
 type ChatUsecase interface {
 	GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error)
+	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) (*response.GetChatsResponse, error)
 }
 
 type chatUsecase struct {
@@ -42,4 +45,16 @@ func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCrea
 		return nil, err
 	}
 	return chat, nil
+}
+
+func (u chatUsecase) GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) (*response.GetChatsResponse, error) {
+	var res response.GetChatsResponse
+	chats, err := u.chatRepository.GetChats(ctx, userId, updateTimeCursor)
+	if err != nil {
+		log.Fatal().Msgf(err.Error())
+		return nil, err
+	}
+	res.Chats = chats
+	return &res, nil
+
 }

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
@@ -13,6 +14,7 @@ import (
 type ChatRepository interface {
 	CreateChat(ctx context.Context, chat entity.Chat) (*entity.Chat, error)
 	GetChat(ctx context.Context, firstUserId string, secondUserId string) (*entity.Chat, error)
+	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) ([]*entity.Chat, error)
 }
 
 type chatRepository struct {
@@ -53,4 +55,25 @@ func (repo chatRepository) GetChat(ctx context.Context, firstUserId string, seco
 	}
 	res := chat.MapFromChatGorm()
 	return res, nil
+}
+
+func (repo chatRepository) GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) ([]*entity.Chat, error) {
+	var cursor time.Time
+	if updateTimeCursor.IsZero() {
+		cursor = time.Now().UTC()
+	} else {
+		cursor = updateTimeCursor
+	}
+	var chatsOrm []models.ChatOrm
+	var chats []*entity.Chat
+	result := repo.database.Gorm.Where(
+		repo.database.Gorm.Where("first_user_id = ?", userId).Or("second_user_id = ?", userId),
+	).Where("update_time < ?", cursor).Limit(11).Order("update_time DESC").Find(&chatsOrm)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	for _, element := range chatsOrm {
+		chats = append(chats, element.MapFromChatGorm())
+	}
+	return chats, nil
 }

@@ -13,7 +13,8 @@ type ChatOrm struct {
 	Channel      string     `gorm:"not null" json:"channel"`
 	FirstUserId  *uuid.UUID `gorm:"not null" json:"firstUserId"`
 	SecondUserId *uuid.UUID `gorm:"not null" json:"secondUserId"`
-	CreateTime   time.Time  `json:"timestamp"`
+	CreateTime   time.Time  `json:"create_time"`
+	UpdateTime   time.Time  `json:"update_time"`
 }
 
 func (ChatOrm) TableName() string {
@@ -22,6 +23,7 @@ func (ChatOrm) TableName() string {
 
 func (i *ChatOrm) BeforeCreate(tx *gorm.DB) (err error) {
 	i.CreateTime = time.Now().UTC()
+	i.UpdateTime = time.Now().UTC()
 	return
 }
 
@@ -32,6 +34,7 @@ func (a *ChatOrm) MapToChatGorm(chat *entity.Chat) {
 	a.FirstUserId = chat.FirstUserId
 	a.SecondUserId = chat.SecondUserId
 	a.CreateTime = chat.CreateTime
+	a.UpdateTime = chat.UpdateTime
 }
 
 func (a ChatOrm) MapFromChatGorm() *entity.Chat {
@@ -41,5 +44,6 @@ func (a ChatOrm) MapFromChatGorm() *entity.Chat {
 		FirstUserId:  a.FirstUserId,
 		SecondUserId: a.SecondUserId,
 		CreateTime:   a.CreateTime,
+		UpdateTime:   a.UpdateTime,
 	}
 }
