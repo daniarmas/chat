@@ -159,7 +159,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	var res model.SendMessageResponse
 	var errorDetails []*model.ErrorDetails
 	var validationErr = false
-	var receiverId uuid.UUID
+	var chatId uuid.UUID
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
@@ -182,14 +182,14 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		validationErr = true
 	}
 
-	if input.ReceiverID == "" {
+	if input.ChatID == "" {
 		errorDetails = append(errorDetails, &model.ErrorDetails{
 			Field:   "receiver_id",
 			Message: "This field is required",
 		})
 		validationErr = true
 	} else {
-		receiverId = uuid.MustParse(input.ReceiverID)
+		chatId = uuid.MustParse(input.ChatID)
 	}
 
 	if validationErr {
@@ -204,7 +204,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ReceiverID: &receiverId, Content: input.Content}, user.ID.String())
+	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: &chatId, Content: input.Content}, user.ID.String())
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -223,7 +223,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.SendMessageData{
-		Message: &model.Message{ID: result.ID.String(), Content: result.Content, SenderID: result.SenderID.String(), ReceiverID: result.ReceiverID.String(), CreateTime: result.CreateTime},
+		Message: &model.Message{ID: result.ID.String(), Content: result.Content, SenderID: "", ReceiverID: "", CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -384,8 +384,8 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		messages = append(messages, &model.Message{
 			ID:         element.ID.String(),
 			Content:    element.Content,
-			SenderID:   element.SenderID.String(),
-			ReceiverID: element.ReceiverID.String(),
+			SenderID:   "",
+			ReceiverID: "",
 			CreateTime: element.CreateTime,
 		})
 	}

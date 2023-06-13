@@ -5,6 +5,6 @@ import (
 )
 
 type SendMessage struct {
-	ReceiverID *uuid.UUID
-	Content    string
+	ChatID  *uuid.UUID
+	Content string
 }

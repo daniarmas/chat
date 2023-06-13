@@ -33,6 +33,7 @@ type Todo {
 type Message {
   id: ID!
   content: String!
+  chatId: String!
   senderId: String!
   receiverId: String!
   createTime: Time!
@@ -67,7 +68,7 @@ input SignInInput {
 
 input SendMessageInput {
   content: String!
-  receiverId: String!
+  chatId: String!
 }
 
 input FetchAllMessagesInput {

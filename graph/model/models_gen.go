@@ -114,6 +114,7 @@ func (this MeResponse) GetData() Data      { return *this.Data }
 type Message struct {
 	ID         string    `json:"id"`
 	Content    string    `json:"content"`
+	ChatID     string    `json:"chatId"`
 	SenderID   string    `json:"senderId"`
 	ReceiverID string    `json:"receiverId"`
 	CreateTime time.Time `json:"createTime"`
@@ -128,8 +129,8 @@ func (SendMessageData) IsData()             {}
 func (this SendMessageData) GetStatus() int { return this.Status }
 
 type SendMessageInput struct {
-	Content    string `json:"content"`
-	ReceiverID string `json:"receiverId"`
+	Content string `json:"content"`
+	ChatID  string `json:"chatId"`
 }
 
 type SendMessageResponse struct {

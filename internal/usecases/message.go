@@ -9,7 +9,6 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/pkg/response"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -45,8 +44,7 @@ func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetM
 }
 
 func (m *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {
-	userIdUUID := uuid.MustParse(userId)
-	message, err := m.messageRepository.CreateMessage(ctx, entity.Message{ReceiverID: input.ReceiverID, Content: input.Content, SenderID: &userIdUUID})
+	message, err := m.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID})
 	if err != nil {
 		log.Fatal().Msgf(err.Error())
 		return nil, err

@@ -105,6 +105,7 @@ type ComplexityRoot struct {
 	}
 
 	Message struct {
+		ChatID     func(childComplexity int) int
 		Content    func(childComplexity int) int
 		CreateTime func(childComplexity int) int
 		ID         func(childComplexity int) int
@@ -413,6 +414,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.MeResponse.Status(childComplexity), true
+
+	case "Message.chatId":
+		if e.complexity.Message.ChatID == nil {
+			break
+		}
+
+		return e.complexity.Message.ChatID(childComplexity), true
 
 	case "Message.content":
 		if e.complexity.Message.Content == nil {
@@ -1550,6 +1558,8 @@ func (ec *executionContext) fieldContext_FetchAllMessagesData_messages(ctx conte
 				return ec.fieldContext_Message_id(ctx, field)
 			case "content":
 				return ec.fieldContext_Message_content(ctx, field)
+			case "chatId":
+				return ec.fieldContext_Message_chatId(ctx, field)
 			case "senderId":
 				return ec.fieldContext_Message_senderId(ctx, field)
 			case "receiverId":
@@ -2407,6 +2417,50 @@ func (ec *executionContext) fieldContext_Message_content(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Message_chatId(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Message_chatId(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChatID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Message_chatId(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Message_senderId(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Message_senderId(ctx, field)
 	if err != nil {
@@ -3123,6 +3177,8 @@ func (ec *executionContext) fieldContext_SendMessageData_message(ctx context.Con
 				return ec.fieldContext_Message_id(ctx, field)
 			case "content":
 				return ec.fieldContext_Message_content(ctx, field)
+			case "chatId":
+				return ec.fieldContext_Message_chatId(ctx, field)
 			case "senderId":
 				return ec.fieldContext_Message_senderId(ctx, field)
 			case "receiverId":
@@ -6280,7 +6336,7 @@ func (ec *executionContext) unmarshalInputSendMessageInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"content", "receiverId"}
+	fieldsInOrder := [...]string{"content", "chatId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -6296,15 +6352,15 @@ func (ec *executionContext) unmarshalInputSendMessageInput(ctx context.Context, 
 				return it, err
 			}
 			it.Content = data
-		case "receiverId":
+		case "chatId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("receiverId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chatId"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ReceiverID = data
+			it.ChatID = data
 		}
 	}
 
@@ -6913,6 +6969,11 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "content":
 			out.Values[i] = ec._Message_content(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "chatId":
+			out.Values[i] = ec._Message_chatId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

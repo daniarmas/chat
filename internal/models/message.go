@@ -10,8 +10,8 @@ import (
 
 type MessageOrm struct {
 	ID         *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	SenderID   *uuid.UUID `gorm:"not null" json:"sender_id"`
-	ReceiverID *uuid.UUID `gorm:"not null" json:"receiver_id"`
+	Chat       ChatOrm    `gorm:"foreignKey:ChatId"`
+	ChatId     *uuid.UUID `json:"chat_id"`
 	Content    string     `gorm:"not null" json:"content"`
 	CreateTime time.Time  `json:"create_time"`
 }
@@ -27,19 +27,21 @@ func (i *MessageOrm) BeforeCreate(tx *gorm.DB) (err error) {
 
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *MessageOrm) MapToMessageGorm(message *entity.Message) {
+	chatOrm := ChatOrm{}
+	chatOrm.MapToChatGorm(message.Chat)
 	a.ID = message.ID
+	a.Chat = chatOrm
+	a.ChatId = chatOrm.ID
 	a.Content = message.Content
-	a.ReceiverID = message.ReceiverID
-	a.SenderID = message.SenderID
 	a.CreateTime = message.CreateTime
 }
 
 func (a MessageOrm) MapFromMessageGorm() *entity.Message {
 	return &entity.Message{
 		ID:         a.ID,
+		Chat:       a.Chat.MapFromChatGorm(),
+		ChatId:     a.Chat.ID,
 		Content:    a.Content,
-		SenderID:   a.SenderID,
-		ReceiverID: a.ReceiverID,
 		CreateTime: a.CreateTime,
 	}
 }
