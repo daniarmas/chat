@@ -9,12 +9,6 @@ services:
     ports:
      - 54322:5432
     restart: always
-    command: >
-      bash -c "
-        echo 'CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";' >> /docker-entrypoint-initdb.d/init.sql &&
-        echo 'CREATE EXTENSION IF NOT EXISTS postgis;' >> /docker-entrypoint-initdb.d/init.sql &&
-        docker-entrypoint.sh postgres
-      "
     environment:
       # POSTGRES_HOST_AUTH_METHOD: scram-sha-256
       POSTGRES_DB: postgres
