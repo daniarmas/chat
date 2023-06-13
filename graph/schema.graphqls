@@ -56,8 +56,7 @@ type User {
 }
 
 input GetOrCreateChatInput {
-  firstUserId: String!
-  SecondUserId: String!
+  otherUserId: String!
 }
 
 input SignInInput {
@@ -148,7 +147,6 @@ type FetchAllMessagesData implements Data {
 
 type GetOrCreateChatData implements Data {
   status: Int!
-  createTimeCursor: Time!
   chat: Chat!
 }
 

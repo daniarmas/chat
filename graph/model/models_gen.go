@@ -66,17 +66,15 @@ func (this FetchMessagesResponse) GetError() *Error   { return this.Error }
 func (this FetchMessagesResponse) GetData() Data      { return *this.Data }
 
 type GetOrCreateChatData struct {
-	Status           int       `json:"status"`
-	CreateTimeCursor time.Time `json:"createTimeCursor"`
-	Chat             *Chat     `json:"chat"`
+	Status int   `json:"status"`
+	Chat   *Chat `json:"chat"`
 }
 
 func (GetOrCreateChatData) IsData()             {}
 func (this GetOrCreateChatData) GetStatus() int { return this.Status }
 
 type GetOrCreateChatInput struct {
-	FirstUserID  string `json:"firstUserId"`
-	SecondUserID string `json:"SecondUserId"`
+	OtherUserID string `json:"otherUserId"`
 }
 
 type GetOrCreateChatResponse struct {

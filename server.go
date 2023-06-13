@@ -37,15 +37,17 @@ func main() {
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
 	accessTokenRepository := repository.NewAccessTokenRepository(db)
 	messageRepository := repository.NewMessageRepository(db)
+	chatRepository := repository.NewChatRepository(db)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
 	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg)
+	chatUsecase := usecases.NewChatUsecase(chatRepository)
 
 	router := chi.NewRouter()
 
 	router.Use(middleware.AuthorizationMiddleware(*cfg))
 
-	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase}}))
+	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 
 	srv.AddTransport(&transport.Websocket{})
 

@@ -81,9 +81,8 @@ type ComplexityRoot struct {
 	}
 
 	GetOrCreateChatData struct {
-		Chat             func(childComplexity int) int
-		CreateTimeCursor func(childComplexity int) int
-		Status           func(childComplexity int) int
+		Chat   func(childComplexity int) int
+		Status func(childComplexity int) int
 	}
 
 	GetOrCreateChatResponse struct {
@@ -337,13 +336,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.GetOrCreateChatData.Chat(childComplexity), true
-
-	case "GetOrCreateChatData.createTimeCursor":
-		if e.complexity.GetOrCreateChatData.CreateTimeCursor == nil {
-			break
-		}
-
-		return e.complexity.GetOrCreateChatData.CreateTimeCursor(childComplexity), true
 
 	case "GetOrCreateChatData.status":
 		if e.complexity.GetOrCreateChatData.Status == nil {
@@ -1801,50 +1793,6 @@ func (ec *executionContext) fieldContext_GetOrCreateChatData_status(ctx context.
 	return fc, nil
 }
 
-func (ec *executionContext) _GetOrCreateChatData_createTimeCursor(ctx context.Context, field graphql.CollectedField, obj *model.GetOrCreateChatData) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GetOrCreateChatData_createTimeCursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CreateTimeCursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(time.Time)
-	fc.Result = res
-	return ec.marshalNTime2timeᚐTime(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GetOrCreateChatData_createTimeCursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GetOrCreateChatData",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Time does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _GetOrCreateChatData_chat(ctx context.Context, field graphql.CollectedField, obj *model.GetOrCreateChatData) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_GetOrCreateChatData_chat(ctx, field)
 	if err != nil {
@@ -2076,8 +2024,6 @@ func (ec *executionContext) fieldContext_GetOrCreateChatResponse_data(ctx contex
 			switch field.Name {
 			case "status":
 				return ec.fieldContext_GetOrCreateChatData_status(ctx, field)
-			case "createTimeCursor":
-				return ec.fieldContext_GetOrCreateChatData_createTimeCursor(ctx, field)
 			case "chat":
 				return ec.fieldContext_GetOrCreateChatData_chat(ctx, field)
 			}
@@ -6305,31 +6251,22 @@ func (ec *executionContext) unmarshalInputGetOrCreateChatInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"firstUserId", "SecondUserId"}
+	fieldsInOrder := [...]string{"otherUserId"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "firstUserId":
+		case "otherUserId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("firstUserId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("otherUserId"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.FirstUserID = data
-		case "SecondUserId":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("SecondUserId"))
-			data, err := ec.unmarshalNString2string(ctx, v)
-			if err != nil {
-				return it, err
-			}
-			it.SecondUserID = data
+			it.OtherUserID = data
 		}
 	}
 
@@ -6787,11 +6724,6 @@ func (ec *executionContext) _GetOrCreateChatData(ctx context.Context, sel ast.Se
 			out.Values[i] = graphql.MarshalString("GetOrCreateChatData")
 		case "status":
 			out.Values[i] = ec._GetOrCreateChatData_status(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "createTimeCursor":
-			out.Values[i] = ec._GetOrCreateChatData_createTimeCursor(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

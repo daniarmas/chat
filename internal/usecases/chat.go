@@ -7,11 +7,12 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
+	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
 type ChatUsecase interface {
-	GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput) (*entity.Chat, error)
+	GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error)
 }
 
 type chatUsecase struct {
@@ -24,13 +25,14 @@ func NewChatUsecase(chatRepo repository.ChatRepository) ChatUsecase {
 	}
 }
 
-func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput) (*entity.Chat, error) {
-	chat, err := u.chatRepository.GetChat(ctx, input.FirstUserId.String(), input.SecondUserId.String())
+func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error) {
+	userIdUUID := uuid.MustParse(userId)
+	chat, err := u.chatRepository.GetChat(ctx, userId, input.OtherUserId.String())
 	switch err.(type) {
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: input.FirstUserId, SecondUserId: input.SecondUserId})
+		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.OtherUserId})
 		if err != nil {
 			log.Error().Msgf(err.Error())
 			return nil, err
