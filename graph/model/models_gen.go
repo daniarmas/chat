@@ -19,6 +19,14 @@ type Response interface {
 	GetData() Data
 }
 
+type Chat struct {
+	ID           string    `json:"id"`
+	Channel      string    `json:"channel"`
+	FirstUserID  string    `json:"firstUserId"`
+	SecondUserID string    `json:"secondUserId"`
+	CreateTime   time.Time `json:"createTime"`
+}
+
 type Error struct {
 	Code    string          `json:"code"`
 	Message string          `json:"message"`
@@ -56,6 +64,33 @@ func (this FetchMessagesResponse) GetStatus() int     { return this.Status }
 func (this FetchMessagesResponse) GetMessage() string { return this.Message }
 func (this FetchMessagesResponse) GetError() *Error   { return this.Error }
 func (this FetchMessagesResponse) GetData() Data      { return *this.Data }
+
+type GetOrCreateChatData struct {
+	Status           int       `json:"status"`
+	CreateTimeCursor time.Time `json:"createTimeCursor"`
+	Chat             *Chat     `json:"chat"`
+}
+
+func (GetOrCreateChatData) IsData()             {}
+func (this GetOrCreateChatData) GetStatus() int { return this.Status }
+
+type GetOrCreateChatInput struct {
+	FirstUserID  string `json:"firstUserId"`
+	SecondUserID string `json:"SecondUserId"`
+}
+
+type GetOrCreateChatResponse struct {
+	Status  int                  `json:"status"`
+	Message string               `json:"message"`
+	Error   *Error               `json:"error,omitempty"`
+	Data    *GetOrCreateChatData `json:"data,omitempty"`
+}
+
+func (GetOrCreateChatResponse) IsResponse()             {}
+func (this GetOrCreateChatResponse) GetStatus() int     { return this.Status }
+func (this GetOrCreateChatResponse) GetMessage() string { return this.Message }
+func (this GetOrCreateChatResponse) GetError() *Error   { return this.Error }
+func (this GetOrCreateChatResponse) GetData() Data      { return *this.Data }
 
 type MeData struct {
 	Status int   `json:"status"`

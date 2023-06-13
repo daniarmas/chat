@@ -9,4 +9,5 @@ import "github.com/daniarmas/chat/internal/usecases"
 type Resolver struct {
 	AuthUsecase    usecases.AuthUsecase
 	MessageUsecase usecases.MessageUsecase
+	ChatUsecase    usecases.ChatUsecase
 }

@@ -230,6 +230,84 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	return &res, nil
 }
 
+// GetOrCreateChat is the resolver for the getOrCreateChat field.
+func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetOrCreateChatInput) (*model.GetOrCreateChatResponse, error) {
+	var res model.GetOrCreateChatResponse
+	var firstUserId, secondUserId uuid.UUID
+	var errorDetails []*model.ErrorDetails
+	var validationErr = false
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	if input.FirstUserID == "" {
+		errorDetails = append(errorDetails, &model.ErrorDetails{
+			Field:   "first_user_id",
+			Message: "This field is required",
+		})
+		validationErr = true
+	} else {
+		firstUserId = uuid.MustParse(input.FirstUserID)
+	}
+
+	if input.SecondUserID == "" {
+		errorDetails = append(errorDetails, &model.ErrorDetails{
+			Field:   "second_user_id",
+			Message: "This field is required",
+		})
+		validationErr = true
+	} else {
+		secondUserId = uuid.MustParse(input.SecondUserID)
+	}
+
+	if validationErr {
+		res.Message = "Bad request"
+		res.Status = http.StatusBadRequest
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "INVALID_ARGUMENT",
+			Message: "The request contains invalid arguments",
+			Details: errorDetails,
+		}
+		return &res, nil
+	}
+
+	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{FirstUserId: &firstUserId, SecondUserId: &secondUserId})
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	res.Message = "Success"
+	res.Status = http.StatusOK
+	res.Data = &model.GetOrCreateChatData{
+		Chat: &model.Chat{ID: result.ID.String(), Channel: result.Channel, FirstUserID: result.FirstUserId.String(), SecondUserID: result.SecondUserId.String(), CreateTime: result.CreateTime},
+	}
+	res.Error = nil
+
+	return &res, nil
+}
+
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 	var res model.MeResponse

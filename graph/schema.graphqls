@@ -15,6 +15,7 @@ type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signOut: SignOutResponse!
   sendMessage(input: SendMessageInput!): SendMessageResponse!
+  getOrCreateChat(input: GetOrCreateChatInput!): GetOrCreateChatResponse!
 }
 
 type Query {
@@ -37,6 +38,14 @@ type Message {
   createTime: Time!
 }
 
+type Chat {
+  id: ID!
+  channel: String!
+  firstUserId: String!
+  secondUserId: String!
+  createTime: Time!
+}
+
 type User {
   id: ID!
   email: String!
@@ -44,6 +53,11 @@ type User {
   fullname: String!
   username: String!
   createTime: Time!
+}
+
+input GetOrCreateChatInput {
+  firstUserId: String!
+  SecondUserId: String!
 }
 
 input SignInInput {
@@ -132,6 +146,12 @@ type FetchAllMessagesData implements Data {
   messages: [Message!]
 }
 
+type GetOrCreateChatData implements Data {
+  status: Int!
+  createTimeCursor: Time!
+  chat: Chat!
+}
+
 type SendMessageResponse implements Response {
   status: Int!
   message: String!
@@ -144,4 +164,11 @@ type FetchMessagesResponse implements Response {
   message: String!
   error: Error
   data: FetchAllMessagesData
+}
+
+type GetOrCreateChatResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: GetOrCreateChatData
 }
