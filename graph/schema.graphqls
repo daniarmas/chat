@@ -4,6 +4,13 @@
 
 scalar Time
 
+type Subscription {
+  """
+  `currentTime` will return a stream of `Time` objects.
+  """
+  currentTime: Time!
+}
+
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signOut: SignOutResponse!
