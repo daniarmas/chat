@@ -7,7 +7,6 @@ import (
 	"github.com/daniarmas/chat/internal/datasource/cache"
 	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 )
 
 type ChatRepository interface {
@@ -18,14 +17,12 @@ type ChatRepository interface {
 }
 
 type chatRepository struct {
-	database         *sqldatabase.Sql
 	chatDbDatasource dbdatasource.ChatDbDatasource
 	chatCache        cache.ChatCacheDatasource
 }
 
-func NewChatRepository(database *sqldatabase.Sql, chatCache cache.ChatCacheDatasource, chatDbDatasource dbdatasource.ChatDbDatasource) ChatRepository {
+func NewChatRepository(chatCache cache.ChatCacheDatasource, chatDbDatasource dbdatasource.ChatDbDatasource) ChatRepository {
 	return &chatRepository{
-		database:         database,
 		chatDbDatasource: chatDbDatasource,
 		chatCache:        chatCache,
 	}

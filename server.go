@@ -45,13 +45,14 @@ func main() {
 
 	// Datasources
 	chatDbDatasource := dbdatasource.NewChatDbDatasource(db)
+	accessTokenDbDatasource := dbdatasource.NewAccessTokenDbDatasource(db)
 	chatCacheDatasource := cache.NewChatCacheDatasource(redis)
 
 	userRepository := repository.NewUserRepository(db)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
-	accessTokenRepository := repository.NewAccessTokenRepository(db)
+	accessTokenRepository := repository.NewAccessTokenRepository(accessTokenDbDatasource)
 	messageRepository := repository.NewMessageRepository(db)
-	chatRepository := repository.NewChatRepository(db, chatCacheDatasource, chatDbDatasource)
+	chatRepository := repository.NewChatRepository(chatCacheDatasource, chatDbDatasource)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
 	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, chatRepository, cfg, redis)
