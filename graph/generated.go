@@ -6269,22 +6269,22 @@ func (ec *executionContext) unmarshalInputFetchAllMessagesInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"chatUserId", "createTimeCursor"}
+	fieldsInOrder := [...]string{"chatId", "createTimeCursor"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
 			continue
 		}
 		switch k {
-		case "chatUserId":
+		case "chatId":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chatUserId"))
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chatId"))
 			data, err := ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
-			it.ChatUserID = data
+			it.ChatID = data
 		case "createTimeCursor":
 			var err error
 

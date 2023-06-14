@@ -364,7 +364,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChat{ChatUserId: input.ChatUserID}, user.ID.String(), createTimeCursor)
+	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChatId{ChatId: input.ChatID}, user.ID.String(), createTimeCursor)
 	if err != nil {
 		switch err.Error() {
 		default:

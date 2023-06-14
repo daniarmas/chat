@@ -11,7 +11,7 @@ import (
 
 type MessageRepository interface {
 	CreateMessage(ctx context.Context, message entity.Message) (*entity.Message, error)
-	GetMessagesByChat(ctx context.Context, firstUserId string, secondUserId string, createTimeCursor time.Time) ([]*entity.Message, error)
+	GetMessagesByChatId(ctx context.Context, chatId string, createTimeCursor time.Time) ([]*entity.Message, error)
 }
 
 type messageRepository struct {
@@ -24,7 +24,7 @@ func NewMessageRepository(database *sqldatabase.Sql) MessageRepository {
 	}
 }
 
-func (repo messageRepository) GetMessagesByChat(ctx context.Context, firstUserId string, secondUserId string, createTimeCursor time.Time) ([]*entity.Message, error) {
+func (repo messageRepository) GetMessagesByChatId(ctx context.Context, chatId string, createTimeCursor time.Time) ([]*entity.Message, error) {
 	var cursor time.Time
 	if createTimeCursor.IsZero() {
 		cursor = time.Now().UTC()
@@ -33,11 +33,7 @@ func (repo messageRepository) GetMessagesByChat(ctx context.Context, firstUserId
 	}
 	var messagesOrm []models.MessageOrm
 	var messages []*entity.Message
-	result := repo.database.Gorm.Where(
-		repo.database.Gorm.Where("sender_id = ?", firstUserId).Or("receiver_id = ?", firstUserId),
-	).Where(
-		repo.database.Gorm.Where("sender_id = ?", secondUserId).Or("receiver_id = ?", secondUserId),
-	).Where("create_time < ?", cursor).Limit(11).Order("create_time DESC").Find(&messagesOrm)
+	result := repo.database.Gorm.Where("chat_id = ?", chatId).Where("create_time < ?", cursor).Limit(11).Order("create_time DESC").Find(&messagesOrm)
 	if result.Error != nil {
 		return nil, result.Error
 	}

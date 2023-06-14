@@ -14,7 +14,7 @@ import (
 
 type MessageUsecase interface {
 	SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error)
-	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error)
+	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChatId, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error)
 }
 
 type messageUsecase struct {
@@ -32,9 +32,9 @@ func NewMessageUsecase(userRepo repository.UserRepository, messageRepository rep
 	}
 }
 
-func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChat, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error) {
+func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChatId, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error) {
 	var res response.GetMessagesByChatResponse
-	messages, err := m.messageRepository.GetMessagesByChat(ctx, userId, input.ChatUserId, createTimeCursor)
+	messages, err := m.messageRepository.GetMessagesByChatId(ctx, input.ChatId, createTimeCursor)
 	if err != nil {
 		log.Fatal().Msgf(err.Error())
 		return nil, err

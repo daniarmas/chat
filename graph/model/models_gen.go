@@ -48,7 +48,7 @@ func (FetchAllMessagesData) IsData()             {}
 func (this FetchAllMessagesData) GetStatus() int { return this.Status }
 
 type FetchAllMessagesInput struct {
-	ChatUserID       string     `json:"chatUserId"`
+	ChatID           string     `json:"chatId"`
 	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
 }
 

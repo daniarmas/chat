@@ -1,5 +1,5 @@
 package inputs
 
-type GetMessagesByChat struct {
-	ChatUserId string
+type GetMessagesByChatId struct {
+	ChatId string
 }

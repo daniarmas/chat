@@ -72,7 +72,7 @@ input SendMessageInput {
 }
 
 input FetchAllMessagesInput {
-  chatUserId: String!
+  chatId: String!
   createTimeCursor: Time
 }
 
