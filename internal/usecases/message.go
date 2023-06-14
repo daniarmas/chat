@@ -9,6 +9,7 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/pkg/response"
+	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
@@ -21,14 +22,16 @@ type messageUsecase struct {
 	userRepository    repository.UserRepository
 	messageRepository repository.MessageRepository
 	cfg               *config.Config
+	redis             *redis.Client
 }
 
 // NewAuthUsecase will create new an authUsecase object representation of usecases.AuthUsecase interface
-func NewMessageUsecase(userRepo repository.UserRepository, messageRepository repository.MessageRepository, cfg *config.Config) MessageUsecase {
+func NewMessageUsecase(userRepo repository.UserRepository, messageRepository repository.MessageRepository, cfg *config.Config, redis *redis.Client) MessageUsecase {
 	return &messageUsecase{
 		userRepository:    userRepo,
 		messageRepository: messageRepository,
 		cfg:               cfg,
+		redis:             redis,
 	}
 }
 
@@ -43,11 +46,16 @@ func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetM
 	return &res, nil
 }
 
-func (m *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {
-	message, err := m.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID})
+func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {
+	message, err := usecase.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID})
 	if err != nil {
 		log.Fatal().Msgf(err.Error())
 		return nil, err
+	}
+	// Post the message on the redis channel corresponding to the chat
+	err = usecase.redis.Publish(ctx, input.ChatID.String(), message).Err()
+	if err != nil {
+		panic(err)
 	}
 	return message, nil
 }

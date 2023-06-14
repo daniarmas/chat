@@ -11,6 +11,7 @@ import (
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	"github.com/daniarmas/chat/middleware"
+	ownredis "github.com/daniarmas/chat/pkg/own-redis"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -33,6 +34,11 @@ func main() {
 
 	defer db.Close()
 
+	redis, err := ownredis.NewRedis(cfg)
+	if err != nil {
+		log.Fatal().Msgf("Redis Error: %v", err)
+	}
+
 	userRepository := repository.NewUserRepository(db)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
 	accessTokenRepository := repository.NewAccessTokenRepository(db)
@@ -40,7 +46,7 @@ func main() {
 	chatRepository := repository.NewChatRepository(db)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
-	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg)
+	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg, redis)
 	chatUsecase := usecases.NewChatUsecase(chatRepository)
 
 	router := chi.NewRouter()
