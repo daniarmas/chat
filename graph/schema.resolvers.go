@@ -344,7 +344,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 // FetchMessages is the resolver for the fetchMessages field.
 func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllMessagesInput) (*model.FetchMessagesResponse, error) {
 	var res model.FetchMessagesResponse
-	var messages []*model.Message
+	messages := make([]*model.Message, 0)
 	var createTimeCursor time.Time
 
 	if input.CreateTimeCursor != nil && !input.CreateTimeCursor.IsZero() {
@@ -403,7 +403,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 	res.Status = http.StatusOK
 	res.Data = &model.FetchAllMessagesData{
 		Messages:         messages,
-		CreateTimeCursor: createTimeCursorRes,
+		CreateTimeCursor: &createTimeCursorRes,
 	}
 	res.Error = nil
 

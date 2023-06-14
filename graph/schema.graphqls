@@ -139,8 +139,8 @@ type SendMessageData implements Data {
 
 type FetchAllMessagesData implements Data {
   status: Int!
-  createTimeCursor: Time!
-  messages: [Message!]
+  createTimeCursor: Time
+  messages: [Message]!
 }
 
 type GetOrCreateChatData implements Data {

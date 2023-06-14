@@ -39,8 +39,8 @@ type ErrorDetails struct {
 
 type FetchAllMessagesData struct {
 	Status           int        `json:"status"`
-	CreateTimeCursor time.Time  `json:"createTimeCursor"`
-	Messages         []*Message `json:"messages,omitempty"`
+	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
+	Messages         []*Message `json:"messages"`
 }
 
 func (FetchAllMessagesData) IsData()             {}
