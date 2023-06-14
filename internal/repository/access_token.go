@@ -22,9 +22,9 @@ func NewAccessTokenRepository(accessTokenDbDatasource dbdatasource.AccessTokenDb
 }
 
 func (repo accessToken) CreateAccessToken(ctx context.Context, accessToken entity.AccessToken) (*entity.AccessToken, error) {
-	chat, err := repo.accessTokenDbDatasource.CreateAccessToken(ctx, accessToken)
+	res, err := repo.accessTokenDbDatasource.CreateAccessToken(ctx, accessToken)
 	if err != nil {
 		return nil, err
 	}
-	return chat, nil
+	return res, nil
 }
