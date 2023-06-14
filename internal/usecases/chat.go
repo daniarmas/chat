@@ -35,7 +35,7 @@ func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCrea
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
+		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
 		if err != nil {
 			log.Error().Msgf(err.Error())
 			return nil, err
