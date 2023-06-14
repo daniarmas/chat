@@ -1,0 +1,40 @@
+version: "3.7"
+
+services:
+  postgresql:
+    image: docker.uclv.cu/postgis/postgis
+    container_name: moolpostgres
+    volumes:
+      - postgresql:/var/lib/postgresql/data
+    ports:
+     - 54322:5432
+    restart: always
+    environment:
+      # POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_DB: postgres
+      # POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  pgadmin:
+    image: docker.uclv.cu/dpage/pgadmin4
+    container_name: pgadmin
+    volumes:
+      - pgadmin4:/var/lib/pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.net
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - 80:80
+  redis:
+    image: docker.uclv.cu/redis:alpine
+    container_name: redis
+    volumes:
+      - ./docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - 6379:6379
+    restart: always
+    command: redis-server /usr/local/etc/redis/redis.conf
+volumes:
+  postgresql:
+  pgadmin4:

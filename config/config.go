@@ -7,6 +7,9 @@ import (
 
 type Config struct {
 	PostgresqlDsn           string `mapstructure:"POSTGRESQL_DSN"`
+	RedisDsn                string `mapstructure:"Redis_DSN"`
+	RedisPassword           string `mapstructure:"Redis_Password"`
+	RedisDb                 int    `mapstructure:"Redis_DB"`
 	JwtSecret               string `mapstructure:"JWT_SECRET"`
 	RefreshTokenExpireHours int    `mapstructure:"REFRESH_TOKEN_EXPIRE_HOURS"`
 	AccessTokenExpireHours  int    `mapstructure:"ACCESS_TOKEN_EXPIRE_HOURS"`

@@ -4,13 +4,22 @@
 
 scalar Time
 
+type Subscription {
+  receiveMessagesByChat(input: ReceiveMessagesByChatInput!): Message
+  receiveMessages: Message
+}
+
 type Mutation {
   signIn(input: SignInInput!): SignInResponse!
   signOut: SignOutResponse!
+  sendMessage(input: SendMessageInput!): SendMessageResponse!
+  getOrCreateChat(input: GetOrCreateChatInput!): GetOrCreateChatResponse!
 }
 
 type Query {
   me: MeResponse!
+  fetchMessages(input: FetchAllMessagesInput!): FetchMessagesResponse!
+  fetchChats(input: FetchAllChatsInput!): FetchChatsResponse!
 }
 
 type Todo {
@@ -18,6 +27,21 @@ type Todo {
   text: String!
   done: Boolean!
   user: User!
+}
+
+type Message {
+  id: ID!
+  content: String!
+  chatId: String!
+  userId: String!
+  createTime: Time!
+}
+
+type Chat {
+  id: ID!
+  firstUserId: String!
+  secondUserId: String!
+  createTime: Time!
 }
 
 type User {
@@ -29,10 +53,32 @@ type User {
   createTime: Time!
 }
 
+input ReceiveMessagesByChatInput {
+  chatId: String!
+}
+
+input GetOrCreateChatInput {
+  receiverId: String!
+}
+
 input SignInInput {
   email: String!
   password: String!
   logout: Boolean!
+}
+
+input SendMessageInput {
+  content: String!
+  chatId: String!
+}
+
+input FetchAllMessagesInput {
+  chatId: String!
+  createTimeCursor: Time
+}
+
+input FetchAllChatsInput {
+  updateTimeCursor: Time
 }
 
 interface Data {
@@ -92,4 +138,54 @@ type SignInData implements Data {
 
 type SignOutData implements Data {
   status: Int!
+}
+
+type SendMessageData implements Data {
+  status: Int!
+  message: Message!
+}
+
+type FetchAllMessagesData implements Data {
+  status: Int!
+  createTimeCursor: Time
+  messages: [Message]!
+}
+
+type GetOrCreateChatData implements Data {
+  status: Int!
+  chat: Chat!
+}
+
+type FetchChatsData implements Data {
+  status: Int!
+  updateTimeCursor: Time
+  chats: [Chat]!
+}
+
+type SendMessageResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: SendMessageData
+}
+
+type FetchMessagesResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: FetchAllMessagesData
+}
+
+type GetOrCreateChatResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: GetOrCreateChatData
+}
+
+type FetchChatsResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: FetchChatsData
 }

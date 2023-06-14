@@ -19,6 +19,13 @@ type Response interface {
 	GetData() Data
 }
 
+type Chat struct {
+	ID           string    `json:"id"`
+	FirstUserID  string    `json:"firstUserId"`
+	SecondUserID string    `json:"secondUserId"`
+	CreateTime   time.Time `json:"createTime"`
+}
+
 type Error struct {
 	Code    string          `json:"code"`
 	Message string          `json:"message"`
@@ -29,6 +36,84 @@ type ErrorDetails struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
 }
+
+type FetchAllChatsInput struct {
+	UpdateTimeCursor *time.Time `json:"updateTimeCursor,omitempty"`
+}
+
+type FetchAllMessagesData struct {
+	Status           int        `json:"status"`
+	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
+	Messages         []*Message `json:"messages"`
+}
+
+func (FetchAllMessagesData) IsData()             {}
+func (this FetchAllMessagesData) GetStatus() int { return this.Status }
+
+type FetchAllMessagesInput struct {
+	ChatID           string     `json:"chatId"`
+	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
+}
+
+type FetchChatsData struct {
+	Status           int        `json:"status"`
+	UpdateTimeCursor *time.Time `json:"updateTimeCursor,omitempty"`
+	Chats            []*Chat    `json:"chats"`
+}
+
+func (FetchChatsData) IsData()             {}
+func (this FetchChatsData) GetStatus() int { return this.Status }
+
+type FetchChatsResponse struct {
+	Status  int             `json:"status"`
+	Message string          `json:"message"`
+	Error   *Error          `json:"error,omitempty"`
+	Data    *FetchChatsData `json:"data,omitempty"`
+}
+
+func (FetchChatsResponse) IsResponse()             {}
+func (this FetchChatsResponse) GetStatus() int     { return this.Status }
+func (this FetchChatsResponse) GetMessage() string { return this.Message }
+func (this FetchChatsResponse) GetError() *Error   { return this.Error }
+func (this FetchChatsResponse) GetData() Data      { return *this.Data }
+
+type FetchMessagesResponse struct {
+	Status  int                   `json:"status"`
+	Message string                `json:"message"`
+	Error   *Error                `json:"error,omitempty"`
+	Data    *FetchAllMessagesData `json:"data,omitempty"`
+}
+
+func (FetchMessagesResponse) IsResponse()             {}
+func (this FetchMessagesResponse) GetStatus() int     { return this.Status }
+func (this FetchMessagesResponse) GetMessage() string { return this.Message }
+func (this FetchMessagesResponse) GetError() *Error   { return this.Error }
+func (this FetchMessagesResponse) GetData() Data      { return *this.Data }
+
+type GetOrCreateChatData struct {
+	Status int   `json:"status"`
+	Chat   *Chat `json:"chat"`
+}
+
+func (GetOrCreateChatData) IsData()             {}
+func (this GetOrCreateChatData) GetStatus() int { return this.Status }
+
+type GetOrCreateChatInput struct {
+	ReceiverID string `json:"receiverId"`
+}
+
+type GetOrCreateChatResponse struct {
+	Status  int                  `json:"status"`
+	Message string               `json:"message"`
+	Error   *Error               `json:"error,omitempty"`
+	Data    *GetOrCreateChatData `json:"data,omitempty"`
+}
+
+func (GetOrCreateChatResponse) IsResponse()             {}
+func (this GetOrCreateChatResponse) GetStatus() int     { return this.Status }
+func (this GetOrCreateChatResponse) GetMessage() string { return this.Message }
+func (this GetOrCreateChatResponse) GetError() *Error   { return this.Error }
+func (this GetOrCreateChatResponse) GetData() Data      { return *this.Data }
 
 type MeData struct {
 	Status int   `json:"status"`
@@ -50,6 +135,44 @@ func (this MeResponse) GetStatus() int     { return this.Status }
 func (this MeResponse) GetMessage() string { return this.Message }
 func (this MeResponse) GetError() *Error   { return this.Error }
 func (this MeResponse) GetData() Data      { return *this.Data }
+
+type Message struct {
+	ID         string    `json:"id"`
+	Content    string    `json:"content"`
+	ChatID     string    `json:"chatId"`
+	UserID     string    `json:"userId"`
+	CreateTime time.Time `json:"createTime"`
+}
+
+type ReceiveMessagesByChatInput struct {
+	ChatID string `json:"chatId"`
+}
+
+type SendMessageData struct {
+	Status  int      `json:"status"`
+	Message *Message `json:"message"`
+}
+
+func (SendMessageData) IsData()             {}
+func (this SendMessageData) GetStatus() int { return this.Status }
+
+type SendMessageInput struct {
+	Content string `json:"content"`
+	ChatID  string `json:"chatId"`
+}
+
+type SendMessageResponse struct {
+	Status  int              `json:"status"`
+	Message string           `json:"message"`
+	Error   *Error           `json:"error,omitempty"`
+	Data    *SendMessageData `json:"data,omitempty"`
+}
+
+func (SendMessageResponse) IsResponse()             {}
+func (this SendMessageResponse) GetStatus() int     { return this.Status }
+func (this SendMessageResponse) GetMessage() string { return this.Message }
+func (this SendMessageResponse) GetError() *Error   { return this.Error }
+func (this SendMessageResponse) GetData() Data      { return *this.Data }
 
 type SignInData struct {
 	Status       int    `json:"status"`

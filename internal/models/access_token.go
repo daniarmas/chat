@@ -10,7 +10,7 @@ import (
 
 type AccessTokenOrm struct {
 	ID             *uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	User           UserOrm         `gorm:"foreignKey:UserId"`
+	User           UserOrm         `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE;"`
 	UserId         *uuid.UUID      `json:"user_id"`
 	RefreshTokenId *uuid.UUID      `json:"refresh_token_id"`
 	RefreshToken   RefreshTokenOrm `gorm:"foreignKey:RefreshTokenId;constraint:OnDelete:CASCADE;"`
