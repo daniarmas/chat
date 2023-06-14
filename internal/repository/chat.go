@@ -13,6 +13,7 @@ import (
 
 type ChatRepository interface {
 	CreateChat(ctx context.Context, chat entity.Chat) (*entity.Chat, error)
+	GetChatById(ctx context.Context, chatId string) (*entity.Chat, error)
 	GetChat(ctx context.Context, userId string, otherUserId string) (*entity.Chat, error)
 	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) ([]*entity.Chat, error)
 }
@@ -48,6 +49,20 @@ func (repo chatRepository) GetChat(ctx context.Context, userId string, otherUser
 	).Where(
 		repo.database.Gorm.Where("first_user_id = ?", otherUserId).Or("second_user_id = ?", otherUserId),
 	).Take(&chat)
+	if result.Error != nil {
+		if result.Error.Error() == "record not found" {
+			return nil, myerror.NotFoundError{}
+		} else {
+			return nil, myerror.InternalServerError{}
+		}
+	}
+	res := chat.MapFromChatGorm()
+	return res, nil
+}
+
+func (repo chatRepository) GetChatById(ctx context.Context, chatId string) (*entity.Chat, error) {
+	var chat *models.ChatOrm
+	result := repo.database.Gorm.Where("id = ?", chatId).Take(&chat)
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, myerror.NotFoundError{}

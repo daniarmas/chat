@@ -144,7 +144,7 @@ type Message struct {
 	CreateTime time.Time `json:"createTime"`
 }
 
-type ReceiveMessagesInput struct {
+type ReceiveMessagesByChatInput struct {
 	ChatID string `json:"chatId"`
 }
 

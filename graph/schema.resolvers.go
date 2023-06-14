@@ -7,7 +7,6 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 	"regexp"
 	"time"
@@ -480,42 +479,8 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 	return &res, nil
 }
 
-// CurrentTime is the resolver for the currentTime field.
-func (r *subscriptionResolver) CurrentTime(ctx context.Context) (<-chan *time.Time, error) {
-	// First you'll need to `make()` your channel. Use your type here!
-	ch := make(chan *time.Time)
-
-	// You can (and probably should) handle your channels in a central place outside of `schema.resolvers.go`.
-	// For this example we'll simply use a Goroutine with a simple loop.
-	go func() {
-		for {
-			// In our example we'll send the current time every second.
-			time.Sleep(1 * time.Second)
-			fmt.Println("Tick")
-
-			// Prepare your object.
-			currentTime := time.Now()
-
-			// The channel may have gotten closed due to the client disconnecting.
-			// To not have our Goroutine block or panic, we do the send in a select block.
-			// This will jump to the default case if the channel is closed.
-			select {
-			case ch <- &currentTime: // This is the actual send.
-				// Our message went through, do nothing
-			default: // This is run when our send does not work.
-				fmt.Println("Channel closed.")
-				// You can handle any deregistration of the channel here.
-				return // We'll just return ending the routine.
-			}
-		}
-	}()
-
-	// We return the channel and no error.
-	return ch, nil
-}
-
-// ReceiveMessages is the resolver for the receiveMessages field.
-func (r *subscriptionResolver) ReceiveMessages(ctx context.Context, input model.ReceiveMessagesInput) (<-chan *model.Message, error) {
+// ReceiveMessagesByChat is the resolver for the receiveMessagesByChat field.
+func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input model.ReceiveMessagesByChatInput) (<-chan *model.Message, error) {
 	res := make(chan *model.Message)
 
 	user := middleware.ForContext(ctx)
@@ -523,7 +488,45 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context, input model.
 		return nil, errors.New("access token missing")
 	}
 
-	result, err := r.MessageUsecase.ReceiveMessages(ctx, inputs.ReceiveMessagesInput{ChatId: input.ChatID})
+	result, err := r.MessageUsecase.ReceiveMessagesByChat(ctx, inputs.ReceiveMessagesInput{ChatId: input.ChatID})
+	if err != nil {
+		return nil, errors.New("internal server error")
+	}
+
+	// goroutine for publishing model.Message objects to the publishing channel
+	go func() {
+		defer close(res)
+
+		for entityMsg := range result {
+			// convert the entity.Message to model.Message
+			modelMsg := &model.Message{
+				ID:         entityMsg.ID.String(),
+				Content:    entityMsg.Content,
+				ChatID:     entityMsg.ID.String(),
+				UserID:     entityMsg.UserId.String(),
+				CreateTime: entityMsg.CreateTime,
+			}
+
+			// send the model.Message to the modelMessages channel
+			if modelMsg.UserID != user.ID.String() && modelMsg.ChatID == input.ChatID {
+				res <- modelMsg
+			}
+		}
+	}()
+
+	return res, nil
+}
+
+// ReceiveMessages is the resolver for the receiveMessages field.
+func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *model.Message, error) {
+	res := make(chan *model.Message)
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		return nil, errors.New("access token missing")
+	}
+
+	result, err := r.MessageUsecase.ReceiveMessages(ctx, user.ID.String())
 	if err != nil {
 		return nil, errors.New("internal server error")
 	}
@@ -564,13 +567,3 @@ func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionRes
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
-}

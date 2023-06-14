@@ -52,7 +52,7 @@ func main() {
 	chatRepository := repository.NewChatRepository(db, chatCacheDatasource)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
-	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg, redis)
+	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, chatRepository, cfg, redis)
 	chatUsecase := usecases.NewChatUsecase(chatRepository)
 
 	router := chi.NewRouter()
