@@ -411,6 +411,75 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 	return &res, nil
 }
 
+// FetchChats is the resolver for the fetchChats field.
+func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChatsInput) (*model.FetchChatsResponse, error) {
+	var res model.FetchChatsResponse
+	chats := make([]*model.Chat, 0)
+	var updateTimeCursor time.Time
+
+	if input.UpdateTimeCursor != nil && !input.UpdateTimeCursor.IsZero() {
+		updateTimeCursor = input.UpdateTimeCursor.UTC()
+	}
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	result, err := r.ChatUsecase.GetChats(ctx, user.ID.String(), updateTimeCursor)
+	if err != nil {
+		switch err.Error() {
+		default:
+			res.Message = http.StatusText(http.StatusInternalServerError)
+			res.Status = http.StatusInternalServerError
+			res.Data = nil
+			res.Error = &model.Error{
+				Code:    "INTERNAL_SERVER_ERROR",
+				Message: "The server has an internal error.",
+				Details: nil,
+			}
+			return &res, nil
+		}
+	}
+
+	for _, element := range result.Chats {
+		chats = append(chats, &model.Chat{
+			ID:           element.ID.String(),
+			FirstUserID:  element.FirstUserId.String(),
+			SecondUserID: element.SecondUserId.String(),
+			CreateTime:   element.CreateTime,
+		})
+	}
+
+	if len(chats) == 11 {
+		chats = chats[:len(chats)-1]
+	}
+
+	var updateTimeCursorRes time.Time
+
+	if len(chats) != 0 {
+		updateTimeCursorRes = chats[len(chats)-1].CreateTime
+	}
+
+	res.Message = "Success"
+	res.Status = http.StatusOK
+	res.Data = &model.FetchChatsData{
+		Chats:            chats,
+		UpdateTimeCursor: &updateTimeCursorRes,
+	}
+	res.Error = nil
+
+	return &res, nil
+}
+
 // CurrentTime is the resolver for the currentTime field.
 func (r *subscriptionResolver) CurrentTime(ctx context.Context) (<-chan *time.Time, error) {
 	// First you'll need to `make()` your channel. Use your type here!

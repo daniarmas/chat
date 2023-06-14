@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/daniarmas/chat/config"
 	"github.com/daniarmas/chat/graph"
+	"github.com/daniarmas/chat/internal/datasource/cache"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	"github.com/daniarmas/chat/middleware"
@@ -41,11 +42,14 @@ func main() {
 		log.Fatal().Msgf("Redis Error: %v", err)
 	}
 
+	// Datasources
+	chatCacheDatasource := cache.NewChatCacheDatasource(redis)
+
 	userRepository := repository.NewUserRepository(db)
 	refreshTokenRepository := repository.NewRefreshTokenRepository(db)
 	accessTokenRepository := repository.NewAccessTokenRepository(db)
 	messageRepository := repository.NewMessageRepository(db)
-	chatRepository := repository.NewChatRepository(db)
+	chatRepository := repository.NewChatRepository(db, chatCacheDatasource)
 
 	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
 	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, cfg, redis)

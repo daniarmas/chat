@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/daniarmas/chat/internal/datasource/cache"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
@@ -17,12 +18,14 @@ type ChatRepository interface {
 }
 
 type chatRepository struct {
-	database *sqldatabase.Sql
+	database  *sqldatabase.Sql
+	chatCache cache.ChatCacheDatasource
 }
 
-func NewChatRepository(database *sqldatabase.Sql) ChatRepository {
+func NewChatRepository(database *sqldatabase.Sql, chatCache cache.ChatCacheDatasource) ChatRepository {
 	return &chatRepository{
-		database: database,
+		database:  database,
+		chatCache: chatCache,
 	}
 }
 
@@ -65,6 +68,18 @@ func (repo chatRepository) GetChats(ctx context.Context, userId string, updateTi
 	}
 	var chatsOrm []models.ChatOrm
 	var chats []*entity.Chat
+
+	// // Get chats from cache
+	// chats, err := repo.chatCache.GetChats(ctx, userId, cursor)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// if chats != nil {
+	// 	return chats, nil
+	// }
+
+	// Get chats from database
 	result := repo.database.Gorm.Where(
 		repo.database.Gorm.Where("first_user_id = ?", userId).Or("second_user_id = ?", userId),
 	).Where("update_time < ?", cursor).Limit(11).Order("update_time DESC").Find(&chatsOrm)
@@ -74,5 +89,6 @@ func (repo chatRepository) GetChats(ctx context.Context, userId string, updateTi
 	for _, element := range chatsOrm {
 		chats = append(chats, element.MapFromChatGorm())
 	}
+
 	return chats, nil
 }

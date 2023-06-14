@@ -37,6 +37,10 @@ type ErrorDetails struct {
 	Message string `json:"message"`
 }
 
+type FetchAllChatsInput struct {
+	UpdateTimeCursor *time.Time `json:"updateTimeCursor,omitempty"`
+}
+
 type FetchAllMessagesData struct {
 	Status           int        `json:"status"`
 	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
@@ -50,6 +54,28 @@ type FetchAllMessagesInput struct {
 	ChatID           string     `json:"chatId"`
 	CreateTimeCursor *time.Time `json:"createTimeCursor,omitempty"`
 }
+
+type FetchChatsData struct {
+	Status           int        `json:"status"`
+	UpdateTimeCursor *time.Time `json:"updateTimeCursor,omitempty"`
+	Chats            []*Chat    `json:"chats"`
+}
+
+func (FetchChatsData) IsData()             {}
+func (this FetchChatsData) GetStatus() int { return this.Status }
+
+type FetchChatsResponse struct {
+	Status  int             `json:"status"`
+	Message string          `json:"message"`
+	Error   *Error          `json:"error,omitempty"`
+	Data    *FetchChatsData `json:"data,omitempty"`
+}
+
+func (FetchChatsResponse) IsResponse()             {}
+func (this FetchChatsResponse) GetStatus() int     { return this.Status }
+func (this FetchChatsResponse) GetMessage() string { return this.Message }
+func (this FetchChatsResponse) GetError() *Error   { return this.Error }
+func (this FetchChatsResponse) GetData() Data      { return *this.Data }
 
 type FetchMessagesResponse struct {
 	Status  int                   `json:"status"`
