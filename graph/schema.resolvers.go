@@ -16,7 +16,6 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/middleware"
 	"github.com/google/uuid"
-	"github.com/rs/zerolog/log"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -462,8 +461,7 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context, input model.
 
 	// goroutine for publishing model.Message objects to the publishing channel
 	go func() {
-		// defer close(res)
-		defer closeChannel(res)
+		defer close(res)
 
 		for entityMsg := range result {
 			// convert the entity.Message to model.Message
@@ -483,11 +481,6 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context, input model.
 	}()
 
 	return res, nil
-}
-
-func closeChannel(channel chan *model.Message) {
-	log.Info().Msgf("Channel resolver closed")
-	close(channel)
 }
 
 // Mutation returns MutationResolver implementation.

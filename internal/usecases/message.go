@@ -46,8 +46,8 @@ func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, input inputs
 		pubsub := usecase.redis.Subscribe(ctx, input.ChatId)
 
 		// Close the subscription when we are done.
-		// defer pubsub.Close()
-		defer pubsubClose(pubsub)
+		defer pubsub.Close()
+
 		for {
 			msg, err := pubsub.ReceiveMessage(ctx)
 			if err != nil {
@@ -77,11 +77,6 @@ func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, input inputs
 	}()
 
 	return ch, nil
-}
-
-func pubsubClose(pubsub *redis.PubSub) {
-	log.Info().Msgf("Redis pub/sub closed")
-	pubsub.Close()
 }
 
 func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChatId, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error) {
