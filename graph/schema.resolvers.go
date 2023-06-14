@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -15,6 +16,7 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/middleware"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog/log"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -204,7 +206,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: &chatId, Content: input.Content}, user.ID.String())
+	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: &chatId, Content: input.Content}, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -442,6 +444,50 @@ func (r *subscriptionResolver) CurrentTime(ctx context.Context) (<-chan *time.Ti
 
 	// We return the channel and no error.
 	return ch, nil
+}
+
+// ReceiveMessages is the resolver for the receiveMessages field.
+func (r *subscriptionResolver) ReceiveMessages(ctx context.Context, input model.ReceiveMessagesInput) (<-chan *model.Message, error) {
+	res := make(chan *model.Message)
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		return nil, errors.New("access token missing")
+	}
+
+	result, err := r.MessageUsecase.ReceiveMessages(ctx, inputs.ReceiveMessagesInput{ChatId: input.ChatID})
+	if err != nil {
+		return nil, errors.New("internal server error")
+	}
+
+	// goroutine for publishing model.Message objects to the publishing channel
+	go func() {
+		// defer close(res)
+		defer closeChannel(res)
+
+		for entityMsg := range result {
+			// convert the entity.Message to model.Message
+			modelMsg := &model.Message{
+				ID:         entityMsg.ID.String(),
+				Content:    entityMsg.Content,
+				ChatID:     entityMsg.ID.String(),
+				UserID:     entityMsg.UserId.String(),
+				CreateTime: entityMsg.CreateTime,
+			}
+
+			// send the model.Message to the modelMessages channel
+			if modelMsg.UserID != user.ID.String() {
+				res <- modelMsg
+			}
+		}
+	}()
+
+	return res, nil
+}
+
+func closeChannel(channel chan *model.Message) {
+	log.Info().Msgf("Channel resolver closed")
+	close(channel)
 }
 
 // Mutation returns MutationResolver implementation.

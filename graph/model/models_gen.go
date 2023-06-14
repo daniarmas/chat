@@ -114,7 +114,12 @@ type Message struct {
 	ID         string    `json:"id"`
 	Content    string    `json:"content"`
 	ChatID     string    `json:"chatId"`
+	UserID     string    `json:"userId"`
 	CreateTime time.Time `json:"createTime"`
+}
+
+type ReceiveMessagesInput struct {
+	ChatID string `json:"chatId"`
 }
 
 type SendMessageData struct {

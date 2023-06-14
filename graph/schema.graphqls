@@ -9,6 +9,7 @@ type Subscription {
   `currentTime` will return a stream of `Time` objects.
   """
   currentTime: Time!
+  receiveMessages(input: ReceiveMessagesInput!): Message
 }
 
 type Mutation {
@@ -34,6 +35,7 @@ type Message {
   id: ID!
   content: String!
   chatId: String!
+  userId: String!
   createTime: Time!
 }
 
@@ -51,6 +53,10 @@ type User {
   fullname: String!
   username: String!
   createTime: Time!
+}
+
+input ReceiveMessagesInput {
+  chatId: String!
 }
 
 input GetOrCreateChatInput {

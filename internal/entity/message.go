@@ -11,6 +11,8 @@ type Message struct {
 	ID         *uuid.UUID `json:"id" redis:"id"` // Unique identifier for the message
 	Chat       *Chat      `json:"chat" redis:"chat"`
 	ChatId     *uuid.UUID `json:"chat_id" redis:"chat_id"`
+	User       *User      `json:"user" redis:"user"`
+	UserId     *uuid.UUID `json:"user_id" redis:"user_id"`
 	Content    string     `json:"content" redis:"content"`         // Content of the message
 	CreateTime time.Time  `json:"create_time" redis:"create_time"` // Timestamp of when the message was sent
 }

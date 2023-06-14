@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -13,13 +15,13 @@ import (
 	"github.com/daniarmas/chat/middleware"
 	ownredis "github.com/daniarmas/chat/pkg/own-redis"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/gorilla/websocket"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 
 	"github.com/go-chi/chi"
+	"github.com/rs/cors"
 )
-
-const defaultPort = "8080"
 
 func main() {
 	// UNIX Time is faster and smaller than most timestamps
@@ -51,14 +53,33 @@ func main() {
 
 	router := chi.NewRouter()
 
+	// CORS setup, allow any for now
+	// https://gqlgen.com/recipes/cors/
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+		Debug:            false,
+	})
+
 	router.Use(middleware.AuthorizationMiddleware(*cfg))
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 
-	srv.AddTransport(&transport.Websocket{})
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 10 * time.Second,
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return true
+			},
+		},
+		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
+			return middleware.AuthorizationWebsocketMiddleware(ctx, cfg, initPayload)
+		},
+	})
 
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	router.Handle("/query", srv)
+	router.Handle("/query", c.Handler(srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", cfg.GraphqlPort)
 
