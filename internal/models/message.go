@@ -31,7 +31,7 @@ func (a *MessageOrm) MapToMessageGorm(message *entity.Message) {
 	chatOrm.MapToChatGorm(message.Chat)
 	a.ID = message.ID
 	a.Chat = chatOrm
-	a.ChatId = chatOrm.ID
+	a.ChatId = message.ChatId
 	a.Content = message.Content
 	a.CreateTime = message.CreateTime
 }
@@ -40,7 +40,7 @@ func (a MessageOrm) MapFromMessageGorm() *entity.Message {
 	return &entity.Message{
 		ID:         a.ID,
 		Chat:       a.Chat.MapFromChatGorm(),
-		ChatId:     a.Chat.ID,
+		ChatId:     a.ChatId,
 		Content:    a.Content,
 		CreateTime: a.CreateTime,
 	}

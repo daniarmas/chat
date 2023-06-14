@@ -21,7 +21,6 @@ type Response interface {
 
 type Chat struct {
 	ID           string    `json:"id"`
-	Channel      string    `json:"channel"`
 	FirstUserID  string    `json:"firstUserId"`
 	SecondUserID string    `json:"secondUserId"`
 	CreateTime   time.Time `json:"createTime"`
@@ -115,8 +114,6 @@ type Message struct {
 	ID         string    `json:"id"`
 	Content    string    `json:"content"`
 	ChatID     string    `json:"chatId"`
-	SenderID   string    `json:"senderId"`
-	ReceiverID string    `json:"receiverId"`
 	CreateTime time.Time `json:"createTime"`
 }
 

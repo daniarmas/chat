@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
@@ -13,7 +12,7 @@ import (
 
 type ChatRepository interface {
 	CreateChat(ctx context.Context, chat entity.Chat) (*entity.Chat, error)
-	GetChat(ctx context.Context, firstUserId string, secondUserId string) (*entity.Chat, error)
+	GetChat(ctx context.Context, userId string, otherUserId string) (*entity.Chat, error)
 	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) ([]*entity.Chat, error)
 }
 
@@ -29,7 +28,6 @@ func NewChatRepository(database *sqldatabase.Sql) ChatRepository {
 
 func (repo chatRepository) CreateChat(ctx context.Context, chat entity.Chat) (*entity.Chat, error) {
 	chatModel := models.ChatOrm{}
-	chat.Channel = fmt.Sprintf("%s:%s", chat.FirstUserId, chat.SecondUserId)
 	chatModel.MapToChatGorm(&chat)
 	result := repo.database.Gorm.Create(&chatModel)
 	if result.Error != nil {
@@ -40,12 +38,13 @@ func (repo chatRepository) CreateChat(ctx context.Context, chat entity.Chat) (*e
 	return res, nil
 }
 
-func (repo chatRepository) GetChat(ctx context.Context, firstUserId string, secondUserId string) (*entity.Chat, error) {
+func (repo chatRepository) GetChat(ctx context.Context, userId string, otherUserId string) (*entity.Chat, error) {
 	var chat *models.ChatOrm
-	var channel1, channel2 string
-	channel1 = fmt.Sprintf("%s:%s", firstUserId, secondUserId)
-	channel2 = fmt.Sprintf("%s:%s", secondUserId, firstUserId)
-	result := repo.database.Gorm.Where("channel = ?", channel1).Or("channel = ?", channel2).Take(&chat)
+	result := repo.database.Gorm.Where(
+		repo.database.Gorm.Where("first_user_id = ?", userId).Or("second_user_id = ?", userId),
+	).Where(
+		repo.database.Gorm.Where("first_user_id = ?", otherUserId).Or("second_user_id = ?", otherUserId),
+	).Take(&chat)
 	if result.Error != nil {
 		if result.Error.Error() == "record not found" {
 			return nil, myerror.NotFoundError{}

@@ -34,14 +34,11 @@ type Message {
   id: ID!
   content: String!
   chatId: String!
-  senderId: String!
-  receiverId: String!
   createTime: Time!
 }
 
 type Chat {
   id: ID!
-  channel: String!
   firstUserId: String!
   secondUserId: String!
   createTime: Time!

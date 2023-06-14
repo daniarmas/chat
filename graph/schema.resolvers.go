@@ -223,7 +223,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.SendMessageData{
-		Message: &model.Message{ID: result.ID.String(), Content: result.Content, SenderID: "", ReceiverID: "", CreateTime: result.CreateTime},
+		Message: &model.Message{ID: result.ID.String(), Content: result.Content, ChatID: result.ChatId.String(), CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -291,7 +291,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.GetOrCreateChatData{
-		Chat: &model.Chat{ID: result.ID.String(), Channel: result.Channel, FirstUserID: result.FirstUserId.String(), SecondUserID: result.SecondUserId.String(), CreateTime: result.CreateTime},
+		Chat: &model.Chat{ID: result.ID.String(), FirstUserID: result.FirstUserId.String(), SecondUserID: result.SecondUserId.String(), CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -384,8 +384,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		messages = append(messages, &model.Message{
 			ID:         element.ID.String(),
 			Content:    element.Content,
-			SenderID:   "",
-			ReceiverID: "",
+			ChatID:     element.ChatId.String(),
 			CreateTime: element.CreateTime,
 		})
 	}
