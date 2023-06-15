@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: chat
+  name: graphql-chat-api
+spec:
+  ports:
+  - protocol: TCP
+    name: graphql
+    port: 8080
+    targetPort: 8080
+  selector:
+    app: chat-api
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: chat
+  name: postgres
+spec:
+  ports:
+  - protocol: TCP
+    name: postgres
+    port: 5432
+    targetPort: 5432
+  selector:
+    app: postgres
