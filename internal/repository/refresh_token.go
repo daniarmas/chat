@@ -3,10 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
-	myerror "github.com/daniarmas/chat/pkg/my_error"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 )
 
 type RefreshTokenRepository interface {
@@ -17,60 +15,43 @@ type RefreshTokenRepository interface {
 }
 
 type refreshToken struct {
-	database *sqldatabase.Sql
+	refreshTokenDbDatasource databaseds.RefreshTokenDbDatasource
 }
 
-func NewRefreshTokenRepository(database *sqldatabase.Sql) RefreshTokenRepository {
+func NewRefreshToken(refreshTokenDbDatasource databaseds.RefreshTokenDbDatasource) RefreshTokenRepository {
 	return &refreshToken{
-		database: database,
+		refreshTokenDbDatasource: refreshTokenDbDatasource,
 	}
 }
 
 func (repo refreshToken) CreateRefreshToken(ctx context.Context, refreshToken entity.RefreshToken) (*entity.RefreshToken, error) {
-	refreshTokenModel := models.RefreshTokenOrm{}
-	refreshTokenModel.MapToRefreshTokenGorm(&refreshToken)
-	result := repo.database.Gorm.Create(&refreshTokenModel)
-	if result.Error != nil {
-		return nil, result.Error
+	res, err := repo.refreshTokenDbDatasource.CreateRefreshToken(ctx, refreshToken)
+	if err != nil {
+		return nil, err
 	}
-
-	res := refreshTokenModel.MapFromRefreshTokenGorm()
 	return res, nil
 }
 
 func (repo refreshToken) GetRefreshTokenByUserId(ctx context.Context, id string) (*entity.RefreshToken, error) {
-	var refreshTokenOrm models.RefreshTokenOrm
-	result := repo.database.Gorm.Where("user_id = ?", id).Take(&refreshTokenOrm)
-	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			return nil, myerror.NotFoundError{}
-		} else {
-			return nil, myerror.InternalServerError{}
-		}
+	res, err := repo.refreshTokenDbDatasource.GetRefreshTokenByUserId(ctx, id)
+	if err != nil {
+		return nil, err
 	}
-	res := refreshTokenOrm.MapFromRefreshTokenGorm()
 	return res, nil
 }
 
 func (repo refreshToken) DeleteRefreshToken(ctx context.Context, refreshToken entity.RefreshToken) error {
-	refreshTokenGorm := models.RefreshTokenOrm{}
-	refreshTokenGorm.MapToRefreshTokenGorm(&refreshToken)
-	result := repo.database.Gorm.Delete(&refreshTokenGorm)
-	if result.Error != nil {
-		return result.Error
-	} else if result.RowsAffected == 0 {
-		return myerror.NotFoundError{}
+	err := repo.refreshTokenDbDatasource.DeleteRefreshToken(ctx, refreshToken)
+	if err != nil {
+		return err
 	}
 	return nil
 }
 
 func (repo refreshToken) DeleteRefreshTokenByUserId(ctx context.Context, userId string) error {
-	refreshTokenGorm := models.RefreshTokenOrm{}
-	result := repo.database.Gorm.Where("user_id = ?", userId).Delete(&refreshTokenGorm)
-	if result.Error != nil {
-		return result.Error
-	} else if result.RowsAffected == 0 {
-		return myerror.NotFoundError{}
+	err := repo.refreshTokenDbDatasource.DeleteRefreshTokenByUserId(ctx, userId)
+	if err != nil {
+		return err
 	}
 	return nil
 }

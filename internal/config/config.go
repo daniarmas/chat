@@ -24,12 +24,12 @@ func NewConfig() *Config {
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatal().Msgf("Can't find the file .env : %v", err)
+		go log.Fatal().Msgf("Can't find the file .env : %v", err)
 	}
 
 	err = viper.Unmarshal(&env)
 	if err != nil {
-		log.Fatal().Msgf("Environment can't be loaded: %v", err)
+		go log.Fatal().Msgf("Environment can't be loaded: %v", err)
 	}
 
 	return &env

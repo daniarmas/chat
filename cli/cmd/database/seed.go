@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package database
 
 import (
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/models"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/rs/zerolog/log"
@@ -25,14 +25,14 @@ to quickly create a Cobra application.`,
 		cfg := config.NewConfig()
 		db, err := sqldatabase.New(cfg)
 		if err != nil {
-			log.Fatal().Msgf("Postgres Error: %v", err)
+			go log.Fatal().Msgf("Postgres Error: %v", err)
 		}
 		if err := db.Gorm.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		var users = []models.UserOrm{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
 		db.Gorm.Create(&users)
-		log.Info().Msg("Database migrations complete!")
+		go log.Info().Msg("Database migrations complete!")
 	},
 }
 

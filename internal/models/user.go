@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	bcryptutils "github.com/daniarmas/chat/pkg/bcrypt_utils"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -24,11 +24,11 @@ func (UserOrm) TableName() string {
 }
 
 func (i *UserOrm) BeforeCreate(tx *gorm.DB) (err error) {
-	hash, err := bcryptutils.HashPassword(i.Password)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(i.Password), 14)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	i.Password = hash
+	i.Password = string(bytes)
 	i.CreateTime = time.Now().UTC()
 	return
 }

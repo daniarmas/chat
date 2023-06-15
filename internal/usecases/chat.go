@@ -22,7 +22,7 @@ type chatUsecase struct {
 	chatRepository repository.ChatRepository
 }
 
-func NewChatUsecase(chatRepo repository.ChatRepository) ChatUsecase {
+func NewChat(chatRepo repository.ChatRepository) ChatUsecase {
 	return &chatUsecase{
 		chatRepository: chatRepo,
 	}
@@ -35,13 +35,13 @@ func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCrea
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
+		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
 		if err != nil {
-			log.Error().Msgf(err.Error())
+			go log.Error().Msgf(err.Error())
 			return nil, err
 		}
 	default:
-		log.Error().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	return chat, nil
@@ -51,7 +51,7 @@ func (u chatUsecase) GetChats(ctx context.Context, userId string, updateTimeCurs
 	var res response.GetChatsResponse
 	chats, err := u.chatRepository.GetChats(ctx, userId, updateTimeCursor)
 	if err != nil {
-		log.Fatal().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	res.Chats = chats

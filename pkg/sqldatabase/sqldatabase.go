@@ -7,7 +7,7 @@ import (
 
 	logg "log"
 
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/rs/zerolog/log"
 
 	"gorm.io/driver/postgres"

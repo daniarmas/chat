@@ -11,9 +11,9 @@ import (
 	"regexp"
 	"time"
 
-	"github.com/daniarmas/chat/graph/model"
+	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
+	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
-	"github.com/daniarmas/chat/middleware"
 	"github.com/google/uuid"
 )
 
