@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/daniarmas/chat/internal/datasource/cache"
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/cacheds"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -17,11 +17,11 @@ type ChatRepository interface {
 }
 
 type chatRepository struct {
-	chatDbDatasource dbdatasource.ChatDbDatasource
-	chatCache        cache.ChatCacheDatasource
+	chatDbDatasource databaseds.ChatDbDatasource
+	chatCache        cacheds.ChatCacheDatasource
 }
 
-func NewChatRepository(chatCache cache.ChatCacheDatasource, chatDbDatasource dbdatasource.ChatDbDatasource) ChatRepository {
+func NewChat(chatCache cacheds.ChatCacheDatasource, chatDbDatasource databaseds.ChatDbDatasource) ChatRepository {
 	return &chatRepository{
 		chatDbDatasource: chatDbDatasource,
 		chatCache:        chatCache,

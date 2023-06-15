@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -14,10 +14,10 @@ type MessageRepository interface {
 }
 
 type messageRepository struct {
-	messageDbDatasource dbdatasource.MessageDbDatasource
+	messageDbDatasource databaseds.MessageDbDatasource
 }
 
-func NewMessageRepository(messageDbDatasource dbdatasource.MessageDbDatasource) MessageRepository {
+func NewMessage(messageDbDatasource databaseds.MessageDbDatasource) MessageRepository {
 	return &messageRepository{
 		messageDbDatasource: messageDbDatasource,
 	}

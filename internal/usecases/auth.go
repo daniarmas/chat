@@ -28,8 +28,8 @@ type authUsecase struct {
 	cfg               *config.Config
 }
 
-// NewAuthUsecase will create new an authUsecase object representation of usecases.AuthUsecase interface
-func NewAuthUsecase(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, cfg *config.Config) AuthUsecase {
+// NewAuth will create new an authUsecase object representation of usecases.AuthUsecase interface
+func NewAuth(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, cfg *config.Config) AuthUsecase {
 	return &authUsecase{
 		userRepository:    userRepo,
 		refreshRepository: refreshRepository,

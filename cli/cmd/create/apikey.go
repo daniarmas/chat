@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/daniarmas/chat/config"
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
@@ -40,9 +40,9 @@ to quickly create a Cobra application.`,
 		}
 
 		defer db.Close()
-		apiKeyDbDatasource := dbdatasource.NewApiKeyDbDatasource(db)
-		apiKeyRepo := repository.NewApiKeyRepository(apiKeyDbDatasource)
-		apiKeyUsecase := usecases.NewApiKeyUsecase(apiKeyRepo)
+		apiKeyDbDatasource := databaseds.NewApiKey(db)
+		apiKeyRepo := repository.NewApiKey(apiKeyDbDatasource)
+		apiKeyUsecase := usecases.NewApiKey(apiKeyRepo)
 		apiKey, err := apiKeyUsecase.CreateApiKey(ctx, inputs.CreateApiKeyInput{AppVersion: appVersion, Revoked: revoked})
 		if err != nil {
 			log.Fatal().Msg(err.Error())

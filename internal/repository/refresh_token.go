@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -15,10 +15,10 @@ type RefreshTokenRepository interface {
 }
 
 type refreshToken struct {
-	refreshTokenDbDatasource dbdatasource.RefreshTokenDbDatasource
+	refreshTokenDbDatasource databaseds.RefreshTokenDbDatasource
 }
 
-func NewRefreshTokenRepository(refreshTokenDbDatasource dbdatasource.RefreshTokenDbDatasource) RefreshTokenRepository {
+func NewRefreshToken(refreshTokenDbDatasource databaseds.RefreshTokenDbDatasource) RefreshTokenRepository {
 	return &refreshToken{
 		refreshTokenDbDatasource: refreshTokenDbDatasource,
 	}

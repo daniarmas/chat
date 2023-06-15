@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type messageDbDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewMessageDbDatasource(database *sqldatabase.Sql) MessageDbDatasource {
+func NewMessage(database *sqldatabase.Sql) MessageDbDatasource {
 	return &messageDbDatasource{
 		database: database,
 	}

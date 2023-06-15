@@ -18,7 +18,7 @@ type apiKeyUsecase struct {
 	apiKeyRepository repository.ApiKeyRepository
 }
 
-func NewApiKeyUsecase(apiKeyRepo repository.ApiKeyRepository) ApiKeyUsecase {
+func NewApiKey(apiKeyRepo repository.ApiKeyRepository) ApiKeyUsecase {
 	return &apiKeyUsecase{
 		apiKeyRepository: apiKeyRepo,
 	}

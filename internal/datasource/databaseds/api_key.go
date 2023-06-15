@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type apiKeyDbDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewApiKeyDbDatasource(database *sqldatabase.Sql) ApiKeyDbDatasource {
+func NewApiKey(database *sqldatabase.Sql) ApiKeyDbDatasource {
 	return &apiKeyDbDatasource{
 		database: database,
 	}

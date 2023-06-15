@@ -22,7 +22,7 @@ type chatUsecase struct {
 	chatRepository repository.ChatRepository
 }
 
-func NewChatUsecase(chatRepo repository.ChatRepository) ChatUsecase {
+func NewChat(chatRepo repository.ChatRepository) ChatUsecase {
 	return &chatUsecase{
 		chatRepository: chatRepo,
 	}

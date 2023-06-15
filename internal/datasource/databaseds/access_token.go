@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type accessTokenDbDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewAccessTokenDbDatasource(database *sqldatabase.Sql) AccessTokenDbDatasource {
+func NewAccessToken(database *sqldatabase.Sql) AccessTokenDbDatasource {
 	return &accessTokenDbDatasource{
 		database: database,
 	}

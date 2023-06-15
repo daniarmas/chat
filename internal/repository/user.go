@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -14,10 +14,10 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	userDbDatasource dbdatasource.UserDbDatasource
+	userDbDatasource databaseds.UserDbDatasource
 }
 
-func NewUserRepository(userDbDatasource dbdatasource.UserDbDatasource) UserRepository {
+func NewUser(userDbDatasource databaseds.UserDbDatasource) UserRepository {
 	return &userRepository{
 		userDbDatasource: userDbDatasource,
 	}

@@ -31,7 +31,7 @@ type messageUsecase struct {
 }
 
 // NewAuthUsecase will create new an authUsecase object representation of usecases.AuthUsecase interface
-func NewMessageUsecase(userRepo repository.UserRepository, messageRepository repository.MessageRepository, chatRepository repository.ChatRepository, cfg *config.Config, redis *redis.Client) MessageUsecase {
+func NewMessage(userRepo repository.UserRepository, messageRepository repository.MessageRepository, chatRepository repository.ChatRepository, cfg *config.Config, redis *redis.Client) MessageUsecase {
 	return &messageUsecase{
 		userRepository:    userRepo,
 		messageRepository: messageRepository,

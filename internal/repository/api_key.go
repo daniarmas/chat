@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -12,10 +12,10 @@ type ApiKeyRepository interface {
 }
 
 type apiKeyRepository struct {
-	apiKeyDbDatasource dbdatasource.ApiKeyDbDatasource
+	apiKeyDbDatasource databaseds.ApiKeyDbDatasource
 }
 
-func NewApiKeyRepository(apiKeyDbDatasource dbdatasource.ApiKeyDbDatasource) ApiKeyRepository {
+func NewApiKey(apiKeyDbDatasource databaseds.ApiKeyDbDatasource) ApiKeyRepository {
 	return &apiKeyRepository{
 		apiKeyDbDatasource: apiKeyDbDatasource,
 	}

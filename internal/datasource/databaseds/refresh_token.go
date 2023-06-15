@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -20,7 +20,7 @@ type refreshTokenDbDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewRefreshTokenDbDatasource(database *sqldatabase.Sql) RefreshTokenDbDatasource {
+func NewRefreshToken(database *sqldatabase.Sql) RefreshTokenDbDatasource {
 	return &refreshTokenDbDatasource{
 		database: database,
 	}

@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -21,7 +21,7 @@ type chatPostgresDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewChatDbDatasource(database *sqldatabase.Sql) ChatDbDatasource {
+func NewChat(database *sqldatabase.Sql) ChatDbDatasource {
 	return &chatPostgresDatasource{
 		database: database,
 	}

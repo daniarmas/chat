@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
 )
 
@@ -12,10 +12,10 @@ type AccessTokenRepository interface {
 }
 
 type accessToken struct {
-	accessTokenDbDatasource dbdatasource.AccessTokenDbDatasource
+	accessTokenDbDatasource databaseds.AccessTokenDbDatasource
 }
 
-func NewAccessTokenRepository(accessTokenDbDatasource dbdatasource.AccessTokenDbDatasource) AccessTokenRepository {
+func NewAccessToken(accessTokenDbDatasource databaseds.AccessTokenDbDatasource) AccessTokenRepository {
 	return &accessToken{
 		accessTokenDbDatasource: accessTokenDbDatasource,
 	}

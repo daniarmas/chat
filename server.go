@@ -10,8 +10,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/daniarmas/chat/config"
 	"github.com/daniarmas/chat/graph"
-	"github.com/daniarmas/chat/internal/datasource/cache"
-	"github.com/daniarmas/chat/internal/datasource/dbdatasource"
+	"github.com/daniarmas/chat/internal/datasource/cacheds"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	"github.com/daniarmas/chat/middleware"
@@ -43,23 +43,27 @@ func main() {
 		log.Fatal().Msgf("Redis Error: %v", err)
 	}
 
-	// Datasources
-	chatDbDatasource := dbdatasource.NewChatDbDatasource(db)
-	accessTokenDbDatasource := dbdatasource.NewAccessTokenDbDatasource(db)
-	refreshTokenDbDatasource := dbdatasource.NewRefreshTokenDbDatasource(db)
-	userDbDatasource := dbdatasource.NewUserDbDatasource(db)
-	messageDbDatasource := dbdatasource.NewMessageDbDatasource(db)
-	chatCacheDatasource := cache.NewChatCacheDatasource(redis)
+	// Database Datasources
+	chatDatabaseDs := databaseds.NewChat(db)
+	accessTokenDatabaseDs := databaseds.NewAccessToken(db)
+	refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
+	userDatabaseDs := databaseds.NewUser(db)
+	messageDatabaseDs := databaseds.NewMessage(db)
 
-	userRepository := repository.NewUserRepository(userDbDatasource)
-	refreshTokenRepository := repository.NewRefreshTokenRepository(refreshTokenDbDatasource)
-	accessTokenRepository := repository.NewAccessTokenRepository(accessTokenDbDatasource)
-	messageRepository := repository.NewMessageRepository(messageDbDatasource)
-	chatRepository := repository.NewChatRepository(chatCacheDatasource, chatDbDatasource)
+	// Cache Datasources
+	chatCacheDs := cacheds.NewChatCacheDatasource(redis)
 
-	authUsecase := usecases.NewAuthUsecase(userRepository, refreshTokenRepository, accessTokenRepository, cfg)
-	messageUsecase := usecases.NewMessageUsecase(userRepository, messageRepository, chatRepository, cfg, redis)
-	chatUsecase := usecases.NewChatUsecase(chatRepository)
+	// Repositories
+	userRepo := repository.NewUser(userDatabaseDs)
+	refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
+	accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs)
+	messageRepo := repository.NewMessage(messageDatabaseDs)
+	chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
+
+	// Usecases
+	authUsecase := usecases.NewAuth(userRepo, refreshTokenRepo, accessTokenRepo, cfg)
+	messageUsecase := usecases.NewMessage(userRepo, messageRepo, chatRepo, cfg, redis)
+	chatUsecase := usecases.NewChat(chatRepo)
 
 	router := chi.NewRouter()
 

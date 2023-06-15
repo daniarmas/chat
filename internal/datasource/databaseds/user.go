@@ -1,4 +1,4 @@
-package dbdatasource
+package databaseds
 
 import (
 	"context"
@@ -19,7 +19,7 @@ type userDbDatasource struct {
 	database *sqldatabase.Sql
 }
 
-func NewUserDbDatasource(database *sqldatabase.Sql) UserDbDatasource {
+func NewUser(database *sqldatabase.Sql) UserDbDatasource {
 	return &userDbDatasource{
 		database: database,
 	}
