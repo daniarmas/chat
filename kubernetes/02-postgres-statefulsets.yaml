@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  namespace: staging
+  namespace: chat
   name: postgres
   labels:
     app: postgres
