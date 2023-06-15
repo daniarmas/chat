@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
-	bcryptutils "github.com/daniarmas/chat/pkg/bcrypt_utils"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/response"
 )
@@ -26,16 +26,18 @@ type authUsecase struct {
 	refreshRepository repository.RefreshTokenRepository
 	accessRepository  repository.AccessTokenRepository
 	jwtDatasource     jwtds.JwtDatasource
+	hashDatasource    hashds.HashDatasource
 	cfg               *config.Config
 }
 
 // NewAuth will create new an authUsecase object representation of usecases.AuthUsecase interface
-func NewAuth(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, jwtDatasource jwtds.JwtDatasource, cfg *config.Config) AuthUsecase {
+func NewAuth(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, jwtDatasource jwtds.JwtDatasource, hashDatasource hashds.HashDatasource, cfg *config.Config) AuthUsecase {
 	return &authUsecase{
 		userRepository:    userRepo,
 		refreshRepository: refreshRepository,
 		accessRepository:  accessRepository,
 		cfg:               cfg,
+		hashDatasource:    hashDatasource,
 		jwtDatasource:     jwtDatasource,
 	}
 }
@@ -78,7 +80,7 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		}
 	}
 	// Check if the password is correct
-	passIsCorrect := bcryptutils.CheckPasswordHash(in.Password, user.Password)
+	passIsCorrect := u.hashDatasource.CheckHash(in.Password, user.Password)
 	if !passIsCorrect {
 		return nil, errors.New("the credentials are incorrect")
 	}

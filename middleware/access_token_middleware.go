@@ -7,8 +7,7 @@ import (
 	"strings"
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/daniarmas/chat/config"
-	"github.com/daniarmas/chat/pkg/jwt_utils"
+	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/google/uuid"
 )
 
@@ -26,7 +25,7 @@ type UserContext struct {
 }
 
 // Middleware decodes the share session cookie and packs the session into context
-func AuthorizationMiddleware(cfg config.Config) func(http.Handler) http.Handler {
+func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -35,9 +34,9 @@ func AuthorizationMiddleware(cfg config.Config) func(http.Handler) http.Handler 
 
 			if len(t) == 2 {
 				authToken := t[1]
-				authorized, err := jwt_utils.IsAuthorized(authToken, cfg.JwtSecret)
+				authorized, err := jwtDs.IsAuthorized(authToken)
 				if authorized {
-					accessTokenClaim, err := jwt_utils.ExtractTokenClaim(authToken, cfg.JwtSecret)
+					accessTokenClaim, err := jwtDs.ExtractTokenClaim(authToken)
 					if err != nil {
 						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
@@ -68,7 +67,7 @@ func AuthorizationMiddleware(cfg config.Config) func(http.Handler) http.Handler 
 	}
 }
 
-func AuthorizationWebsocketMiddleware(ctx context.Context, cfg *config.Config, initPayload transport.InitPayload) (context.Context, error) {
+func AuthorizationWebsocketMiddleware(ctx context.Context, jwtDs jwtds.JwtDatasource, initPayload transport.InitPayload) (context.Context, error) {
 	// Get the token from payload
 	any := initPayload["authorization"]
 	token, ok := any.(string)
@@ -80,9 +79,9 @@ func AuthorizationWebsocketMiddleware(ctx context.Context, cfg *config.Config, i
 
 	if len(t) == 2 {
 		authToken := t[1]
-		authorized, err := jwt_utils.IsAuthorized(authToken, cfg.JwtSecret)
+		authorized, err := jwtDs.IsAuthorized(authToken)
 		if authorized {
-			accessTokenClaim, err := jwt_utils.ExtractTokenClaim(authToken, cfg.JwtSecret)
+			accessTokenClaim, err := jwtDs.ExtractTokenClaim(authToken)
 			if err != nil {
 				return nil, errors.New("access token invalid")
 			}

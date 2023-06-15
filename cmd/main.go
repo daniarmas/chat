@@ -12,6 +12,7 @@ import (
 	"github.com/daniarmas/chat/graph"
 	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
+	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
@@ -57,6 +58,9 @@ func main() {
 	// Jwt Datasource
 	jwtDs := jwtds.NewJwtDatasource(cfg)
 
+	// Hash Datasource
+	hashDs := hashds.NewBcryptHash()
+
 	// Repositories
 	userRepo := repository.NewUser(userDatabaseDs)
 	refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
@@ -65,7 +69,7 @@ func main() {
 	chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
 	// Usecases
-	authUsecase := usecases.NewAuth(userRepo, refreshTokenRepo, accessTokenRepo, jwtDs, cfg)
+	authUsecase := usecases.NewAuth(userRepo, refreshTokenRepo, accessTokenRepo, jwtDs, hashDs, cfg)
 	messageUsecase := usecases.NewMessage(userRepo, messageRepo, chatRepo, cfg, redis)
 	chatUsecase := usecases.NewChat(chatRepo)
 
@@ -79,7 +83,7 @@ func main() {
 		Debug:            false,
 	})
 
-	router.Use(middleware.AuthorizationMiddleware(*cfg))
+	router.Use(middleware.AuthorizationMiddleware(jwtDs))
 
 	srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 
@@ -92,7 +96,7 @@ func main() {
 			},
 		},
 		InitFunc: func(ctx context.Context, initPayload transport.InitPayload) (context.Context, error) {
-			return middleware.AuthorizationWebsocketMiddleware(ctx, cfg, initPayload)
+			return middleware.AuthorizationWebsocketMiddleware(ctx, jwtDs, initPayload)
 		},
 	})
 
