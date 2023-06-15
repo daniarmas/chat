@@ -1,7 +1,7 @@
 package ownredis
 
 import (
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/redis/go-redis/v9"
 )
 

@@ -6,7 +6,7 @@ package create
 import (
 	"context"
 
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/inputs"

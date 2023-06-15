@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package database
 
 import (
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/models"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/rs/zerolog/log"

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	jwt "github.com/golang-jwt/jwt/v4"
