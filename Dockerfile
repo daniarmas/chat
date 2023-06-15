@@ -28,4 +28,4 @@ EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["chat", "server", "run"]
+ENTRYPOINT ["/app/chat", "server", "run"]
