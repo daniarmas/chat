@@ -16,7 +16,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
-	"github.com/daniarmas/chat/graph/model"
+	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -956,7 +956,7 @@ func (ec *executionContext) field_Mutation_getOrCreateChat_args(ctx context.Cont
 	var arg0 model.GetOrCreateChatInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNGetOrCreateChatInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatInput(ctx, tmp)
+		arg0, err = ec.unmarshalNGetOrCreateChatInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -971,7 +971,7 @@ func (ec *executionContext) field_Mutation_sendMessage_args(ctx context.Context,
 	var arg0 model.SendMessageInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSendMessageInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSendMessageInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -986,7 +986,7 @@ func (ec *executionContext) field_Mutation_signIn_args(ctx context.Context, rawA
 	var arg0 model.SignInInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNSignInInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInInput(ctx, tmp)
+		arg0, err = ec.unmarshalNSignInInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1016,7 +1016,7 @@ func (ec *executionContext) field_Query_fetchChats_args(ctx context.Context, raw
 	var arg0 model.FetchAllChatsInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchAllChatsInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllChatsInput(ctx, tmp)
+		arg0, err = ec.unmarshalNFetchAllChatsInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllChatsInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1031,7 +1031,7 @@ func (ec *executionContext) field_Query_fetchMessages_args(ctx context.Context, 
 	var arg0 model.FetchAllMessagesInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNFetchAllMessagesInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllMessagesInput(ctx, tmp)
+		arg0, err = ec.unmarshalNFetchAllMessagesInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllMessagesInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1046,7 +1046,7 @@ func (ec *executionContext) field_Subscription_receiveMessagesByChat_args(ctx co
 	var arg0 model.ReceiveMessagesByChatInput
 	if tmp, ok := rawArgs["input"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("input"))
-		arg0, err = ec.unmarshalNReceiveMessagesByChatInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐReceiveMessagesByChatInput(ctx, tmp)
+		arg0, err = ec.unmarshalNReceiveMessagesByChatInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐReceiveMessagesByChatInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1382,7 +1382,7 @@ func (ec *executionContext) _Error_details(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*model.ErrorDetails)
 	fc.Result = res
-	return ec.marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐErrorDetails(ctx, field.Selections, res)
+	return ec.marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐErrorDetails(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Error_details(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1605,7 +1605,7 @@ func (ec *executionContext) _FetchAllMessagesData_messages(ctx context.Context, 
 	}
 	res := resTmp.([]*model.Message)
 	fc.Result = res
-	return ec.marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchAllMessagesData_messages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1746,7 +1746,7 @@ func (ec *executionContext) _FetchChatsData_chats(ctx context.Context, field gra
 	}
 	res := resTmp.([]*model.Chat)
 	fc.Result = res
-	return ec.marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx, field.Selections, res)
+	return ec.marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchChatsData_chats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1885,7 +1885,7 @@ func (ec *executionContext) _FetchChatsResponse_error(ctx context.Context, field
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchChatsResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1934,7 +1934,7 @@ func (ec *executionContext) _FetchChatsResponse_data(ctx context.Context, field 
 	}
 	res := resTmp.(*model.FetchChatsData)
 	fc.Result = res
-	return ec.marshalOFetchChatsData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchChatsData(ctx, field.Selections, res)
+	return ec.marshalOFetchChatsData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchChatsData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchChatsResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2071,7 +2071,7 @@ func (ec *executionContext) _FetchMessagesResponse_error(ctx context.Context, fi
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchMessagesResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2120,7 +2120,7 @@ func (ec *executionContext) _FetchMessagesResponse_data(ctx context.Context, fie
 	}
 	res := resTmp.(*model.FetchAllMessagesData)
 	fc.Result = res
-	return ec.marshalOFetchAllMessagesData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllMessagesData(ctx, field.Selections, res)
+	return ec.marshalOFetchAllMessagesData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllMessagesData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_FetchMessagesResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2216,7 +2216,7 @@ func (ec *executionContext) _GetOrCreateChatData_chat(ctx context.Context, field
 	}
 	res := resTmp.(*model.Chat)
 	fc.Result = res
-	return ec.marshalNChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx, field.Selections, res)
+	return ec.marshalNChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GetOrCreateChatData_chat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2355,7 +2355,7 @@ func (ec *executionContext) _GetOrCreateChatResponse_error(ctx context.Context, 
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GetOrCreateChatResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2404,7 +2404,7 @@ func (ec *executionContext) _GetOrCreateChatResponse_data(ctx context.Context, f
 	}
 	res := resTmp.(*model.GetOrCreateChatData)
 	fc.Result = res
-	return ec.marshalOGetOrCreateChatData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatData(ctx, field.Selections, res)
+	return ec.marshalOGetOrCreateChatData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_GetOrCreateChatResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2498,7 +2498,7 @@ func (ec *executionContext) _MeData_user(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MeData_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2641,7 +2641,7 @@ func (ec *executionContext) _MeResponse_error(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MeResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2690,7 +2690,7 @@ func (ec *executionContext) _MeResponse_data(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.MeData)
 	fc.Result = res
-	return ec.marshalOMeData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMeData(ctx, field.Selections, res)
+	return ec.marshalOMeData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMeData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MeResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2960,7 +2960,7 @@ func (ec *executionContext) _Mutation_signIn(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.SignInResponse)
 	fc.Result = res
-	return ec.marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInResponse(ctx, field.Selections, res)
+	return ec.marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_signIn(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3025,7 +3025,7 @@ func (ec *executionContext) _Mutation_signOut(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.SignOutResponse)
 	fc.Result = res
-	return ec.marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx, field.Selections, res)
+	return ec.marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignOutResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_signOut(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3079,7 +3079,7 @@ func (ec *executionContext) _Mutation_sendMessage(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.SendMessageResponse)
 	fc.Result = res
-	return ec.marshalNSendMessageResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageResponse(ctx, field.Selections, res)
+	return ec.marshalNSendMessageResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_sendMessage(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3144,7 +3144,7 @@ func (ec *executionContext) _Mutation_getOrCreateChat(ctx context.Context, field
 	}
 	res := resTmp.(*model.GetOrCreateChatResponse)
 	fc.Result = res
-	return ec.marshalNGetOrCreateChatResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx, field.Selections, res)
+	return ec.marshalNGetOrCreateChatResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_getOrCreateChat(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3209,7 +3209,7 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 	}
 	res := resTmp.(*model.MeResponse)
 	fc.Result = res
-	return ec.marshalNMeResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMeResponse(ctx, field.Selections, res)
+	return ec.marshalNMeResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMeResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3263,7 +3263,7 @@ func (ec *executionContext) _Query_fetchMessages(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.FetchMessagesResponse)
 	fc.Result = res
-	return ec.marshalNFetchMessagesResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchMessagesResponse(ctx, field.Selections, res)
+	return ec.marshalNFetchMessagesResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchMessagesResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_fetchMessages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3328,7 +3328,7 @@ func (ec *executionContext) _Query_fetchChats(ctx context.Context, field graphql
 	}
 	res := resTmp.(*model.FetchChatsResponse)
 	fc.Result = res
-	return ec.marshalNFetchChatsResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchChatsResponse(ctx, field.Selections, res)
+	return ec.marshalNFetchChatsResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchChatsResponse(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_fetchChats(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3566,7 +3566,7 @@ func (ec *executionContext) _SendMessageData_message(ctx context.Context, field 
 	}
 	res := resTmp.(*model.Message)
 	fc.Result = res
-	return ec.marshalNMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
+	return ec.marshalNMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SendMessageData_message(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3707,7 +3707,7 @@ func (ec *executionContext) _SendMessageResponse_error(ctx context.Context, fiel
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SendMessageResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3756,7 +3756,7 @@ func (ec *executionContext) _SendMessageResponse_data(ctx context.Context, field
 	}
 	res := resTmp.(*model.SendMessageData)
 	fc.Result = res
-	return ec.marshalOSendMessageData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageData(ctx, field.Selections, res)
+	return ec.marshalOSendMessageData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SendMessageResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3850,7 +3850,7 @@ func (ec *executionContext) _SignInData_user(ctx context.Context, field graphql.
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SignInData_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4081,7 +4081,7 @@ func (ec *executionContext) _SignInResponse_error(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SignInResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4130,7 +4130,7 @@ func (ec *executionContext) _SignInResponse_data(ctx context.Context, field grap
 	}
 	res := resTmp.(*model.SignInData)
 	fc.Result = res
-	return ec.marshalOSignInData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInData(ctx, field.Selections, res)
+	return ec.marshalOSignInData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SignInResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4313,7 +4313,7 @@ func (ec *executionContext) _SignOutResponse_error(ctx context.Context, field gr
 	}
 	res := resTmp.(*model.Error)
 	fc.Result = res
-	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
+	return ec.marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SignOutResponse_error(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4362,7 +4362,7 @@ func (ec *executionContext) _SignOutResponse_data(ctx context.Context, field gra
 	}
 	res := resTmp.(*model.SignOutData)
 	fc.Result = res
-	return ec.marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutData(ctx, field.Selections, res)
+	return ec.marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignOutData(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_SignOutResponse_data(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4415,7 +4415,7 @@ func (ec *executionContext) _Subscription_receiveMessagesByChat(ctx context.Cont
 				w.Write([]byte{'{'})
 				graphql.MarshalString(field.Alias).MarshalGQL(w)
 				w.Write([]byte{':'})
-				ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
+				ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
 				w.Write([]byte{'}'})
 			})
 		case <-ctx.Done():
@@ -4493,7 +4493,7 @@ func (ec *executionContext) _Subscription_receiveMessages(ctx context.Context, f
 				w.Write([]byte{'{'})
 				graphql.MarshalString(field.Alias).MarshalGQL(w)
 				w.Write([]byte{':'})
-				ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
+				ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx, field.Selections, res).MarshalGQL(w)
 				w.Write([]byte{'}'})
 			})
 		case <-ctx.Done():
@@ -4687,7 +4687,7 @@ func (ec *executionContext) _Todo_user(ctx context.Context, field graphql.Collec
 	}
 	res := resTmp.(*model.User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Todo_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8605,7 +8605,7 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v []*model.Chat) graphql.Marshaler {
+func (ec *executionContext) marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v []*model.Chat) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8629,7 +8629,7 @@ func (ec *executionContext) marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchat�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx, sel, v[i])
+			ret[i] = ec.marshalOChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8643,7 +8643,7 @@ func (ec *executionContext) marshalNChat2ᚕᚖgithubᚗcomᚋdaniarmasᚋchat�
 	return ret
 }
 
-func (ec *executionContext) marshalNChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v *model.Chat) graphql.Marshaler {
+func (ec *executionContext) marshalNChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v *model.Chat) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8653,21 +8653,21 @@ func (ec *executionContext) marshalNChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgr
 	return ec._Chat(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNFetchAllChatsInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllChatsInput(ctx context.Context, v interface{}) (model.FetchAllChatsInput, error) {
+func (ec *executionContext) unmarshalNFetchAllChatsInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllChatsInput(ctx context.Context, v interface{}) (model.FetchAllChatsInput, error) {
 	res, err := ec.unmarshalInputFetchAllChatsInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNFetchAllMessagesInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllMessagesInput(ctx context.Context, v interface{}) (model.FetchAllMessagesInput, error) {
+func (ec *executionContext) unmarshalNFetchAllMessagesInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllMessagesInput(ctx context.Context, v interface{}) (model.FetchAllMessagesInput, error) {
 	res, err := ec.unmarshalInputFetchAllMessagesInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNFetchChatsResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchChatsResponse(ctx context.Context, sel ast.SelectionSet, v model.FetchChatsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchChatsResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchChatsResponse(ctx context.Context, sel ast.SelectionSet, v model.FetchChatsResponse) graphql.Marshaler {
 	return ec._FetchChatsResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFetchChatsResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchChatsResponse(ctx context.Context, sel ast.SelectionSet, v *model.FetchChatsResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchChatsResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchChatsResponse(ctx context.Context, sel ast.SelectionSet, v *model.FetchChatsResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8677,11 +8677,11 @@ func (ec *executionContext) marshalNFetchChatsResponse2ᚖgithubᚗcomᚋdaniarm
 	return ec._FetchChatsResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNFetchMessagesResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchMessagesResponse(ctx context.Context, sel ast.SelectionSet, v model.FetchMessagesResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchMessagesResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchMessagesResponse(ctx context.Context, sel ast.SelectionSet, v model.FetchMessagesResponse) graphql.Marshaler {
 	return ec._FetchMessagesResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNFetchMessagesResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchMessagesResponse(ctx context.Context, sel ast.SelectionSet, v *model.FetchMessagesResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNFetchMessagesResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchMessagesResponse(ctx context.Context, sel ast.SelectionSet, v *model.FetchMessagesResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8691,16 +8691,16 @@ func (ec *executionContext) marshalNFetchMessagesResponse2ᚖgithubᚗcomᚋdani
 	return ec._FetchMessagesResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNGetOrCreateChatInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatInput(ctx context.Context, v interface{}) (model.GetOrCreateChatInput, error) {
+func (ec *executionContext) unmarshalNGetOrCreateChatInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatInput(ctx context.Context, v interface{}) (model.GetOrCreateChatInput, error) {
 	res, err := ec.unmarshalInputGetOrCreateChatInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNGetOrCreateChatResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx context.Context, sel ast.SelectionSet, v model.GetOrCreateChatResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNGetOrCreateChatResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx context.Context, sel ast.SelectionSet, v model.GetOrCreateChatResponse) graphql.Marshaler {
 	return ec._GetOrCreateChatResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNGetOrCreateChatResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx context.Context, sel ast.SelectionSet, v *model.GetOrCreateChatResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNGetOrCreateChatResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatResponse(ctx context.Context, sel ast.SelectionSet, v *model.GetOrCreateChatResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8740,11 +8740,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNMeResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMeResponse(ctx context.Context, sel ast.SelectionSet, v model.MeResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNMeResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMeResponse(ctx context.Context, sel ast.SelectionSet, v model.MeResponse) graphql.Marshaler {
 	return ec._MeResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNMeResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMeResponse(ctx context.Context, sel ast.SelectionSet, v *model.MeResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNMeResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMeResponse(ctx context.Context, sel ast.SelectionSet, v *model.MeResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8754,7 +8754,7 @@ func (ec *executionContext) marshalNMeResponse2ᚖgithubᚗcomᚋdaniarmasᚋcha
 	return ec._MeResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -8778,7 +8778,7 @@ func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋcha
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx, sel, v[i])
+			ret[i] = ec.marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -8792,7 +8792,7 @@ func (ec *executionContext) marshalNMessage2ᚕᚖgithubᚗcomᚋdaniarmasᚋcha
 	return ret
 }
 
-func (ec *executionContext) marshalNMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalNMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8802,21 +8802,21 @@ func (ec *executionContext) marshalNMessage2ᚖgithubᚗcomᚋdaniarmasᚋchat�
 	return ec._Message(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNReceiveMessagesByChatInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐReceiveMessagesByChatInput(ctx context.Context, v interface{}) (model.ReceiveMessagesByChatInput, error) {
+func (ec *executionContext) unmarshalNReceiveMessagesByChatInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐReceiveMessagesByChatInput(ctx context.Context, v interface{}) (model.ReceiveMessagesByChatInput, error) {
 	res, err := ec.unmarshalInputReceiveMessagesByChatInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalNSendMessageInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageInput(ctx context.Context, v interface{}) (model.SendMessageInput, error) {
+func (ec *executionContext) unmarshalNSendMessageInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageInput(ctx context.Context, v interface{}) (model.SendMessageInput, error) {
 	res, err := ec.unmarshalInputSendMessageInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSendMessageResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageResponse(ctx context.Context, sel ast.SelectionSet, v model.SendMessageResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSendMessageResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageResponse(ctx context.Context, sel ast.SelectionSet, v model.SendMessageResponse) graphql.Marshaler {
 	return ec._SendMessageResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSendMessageResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageResponse(ctx context.Context, sel ast.SelectionSet, v *model.SendMessageResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSendMessageResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageResponse(ctx context.Context, sel ast.SelectionSet, v *model.SendMessageResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8826,16 +8826,16 @@ func (ec *executionContext) marshalNSendMessageResponse2ᚖgithubᚗcomᚋdaniar
 	return ec._SendMessageResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSignInInput2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInInput(ctx context.Context, v interface{}) (model.SignInInput, error) {
+func (ec *executionContext) unmarshalNSignInInput2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInInput(ctx context.Context, v interface{}) (model.SignInInput, error) {
 	res, err := ec.unmarshalInputSignInInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSignInResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInResponse(ctx context.Context, sel ast.SelectionSet, v model.SignInResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSignInResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInResponse(ctx context.Context, sel ast.SelectionSet, v model.SignInResponse) graphql.Marshaler {
 	return ec._SignInResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInResponse(ctx context.Context, sel ast.SelectionSet, v *model.SignInResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInResponse(ctx context.Context, sel ast.SelectionSet, v *model.SignInResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8845,11 +8845,11 @@ func (ec *executionContext) marshalNSignInResponse2ᚖgithubᚗcomᚋdaniarmas�
 	return ec._SignInResponse(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNSignOutResponse2githubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v model.SignOutResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSignOutResponse2githubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v model.SignOutResponse) graphql.Marshaler {
 	return ec._SignOutResponse(ctx, sel, &v)
 }
 
-func (ec *executionContext) marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v *model.SignOutResponse) graphql.Marshaler {
+func (ec *executionContext) marshalNSignOutResponse2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignOutResponse(ctx context.Context, sel ast.SelectionSet, v *model.SignOutResponse) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -8889,7 +8889,7 @@ func (ec *executionContext) marshalNTime2timeᚐTime(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -9178,21 +9178,21 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v *model.Chat) graphql.Marshaler {
+func (ec *executionContext) marshalOChat2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐChat(ctx context.Context, sel ast.SelectionSet, v *model.Chat) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Chat(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐError(ctx context.Context, sel ast.SelectionSet, v *model.Error) graphql.Marshaler {
+func (ec *executionContext) marshalOError2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐError(ctx context.Context, sel ast.SelectionSet, v *model.Error) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Error(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐErrorDetails(ctx context.Context, sel ast.SelectionSet, v []*model.ErrorDetails) graphql.Marshaler {
+func (ec *executionContext) marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐErrorDetails(ctx context.Context, sel ast.SelectionSet, v []*model.ErrorDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -9219,7 +9219,7 @@ func (ec *executionContext) marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmas�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalOErrorDetails2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐErrorDetails(ctx, sel, v[i])
+			ret[i] = ec.marshalOErrorDetails2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐErrorDetails(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9233,63 +9233,63 @@ func (ec *executionContext) marshalOErrorDetails2ᚕᚖgithubᚗcomᚋdaniarmas�
 	return ret
 }
 
-func (ec *executionContext) marshalOErrorDetails2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐErrorDetails(ctx context.Context, sel ast.SelectionSet, v *model.ErrorDetails) graphql.Marshaler {
+func (ec *executionContext) marshalOErrorDetails2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐErrorDetails(ctx context.Context, sel ast.SelectionSet, v *model.ErrorDetails) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._ErrorDetails(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOFetchAllMessagesData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchAllMessagesData(ctx context.Context, sel ast.SelectionSet, v *model.FetchAllMessagesData) graphql.Marshaler {
+func (ec *executionContext) marshalOFetchAllMessagesData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchAllMessagesData(ctx context.Context, sel ast.SelectionSet, v *model.FetchAllMessagesData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._FetchAllMessagesData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOFetchChatsData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐFetchChatsData(ctx context.Context, sel ast.SelectionSet, v *model.FetchChatsData) graphql.Marshaler {
+func (ec *executionContext) marshalOFetchChatsData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐFetchChatsData(ctx context.Context, sel ast.SelectionSet, v *model.FetchChatsData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._FetchChatsData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOGetOrCreateChatData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐGetOrCreateChatData(ctx context.Context, sel ast.SelectionSet, v *model.GetOrCreateChatData) graphql.Marshaler {
+func (ec *executionContext) marshalOGetOrCreateChatData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐGetOrCreateChatData(ctx context.Context, sel ast.SelectionSet, v *model.GetOrCreateChatData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._GetOrCreateChatData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOMeData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMeData(ctx context.Context, sel ast.SelectionSet, v *model.MeData) graphql.Marshaler {
+func (ec *executionContext) marshalOMeData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMeData(ctx context.Context, sel ast.SelectionSet, v *model.MeData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._MeData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
+func (ec *executionContext) marshalOMessage2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v *model.Message) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Message(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSendMessageData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSendMessageData(ctx context.Context, sel ast.SelectionSet, v *model.SendMessageData) graphql.Marshaler {
+func (ec *executionContext) marshalOSendMessageData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSendMessageData(ctx context.Context, sel ast.SelectionSet, v *model.SendMessageData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._SendMessageData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSignInData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignInData(ctx context.Context, sel ast.SelectionSet, v *model.SignInData) graphql.Marshaler {
+func (ec *executionContext) marshalOSignInData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignInData(ctx context.Context, sel ast.SelectionSet, v *model.SignInData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._SignInData(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋgraphᚋmodelᚐSignOutData(ctx context.Context, sel ast.SelectionSet, v *model.SignOutData) graphql.Marshaler {
+func (ec *executionContext) marshalOSignOutData2ᚖgithubᚗcomᚋdaniarmasᚋchatᚋinternalᚋdeliveryᚋgraphᚋmodelᚐSignOutData(ctx context.Context, sel ast.SelectionSet, v *model.SignOutData) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
