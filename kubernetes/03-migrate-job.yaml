@@ -9,7 +9,7 @@ spec:
       containers:
       - name: chat-database-migrate-job
         image: ghcr.io/daniarmas/chat:v0.1.0
-        command: ["chat-cli", "database", "migrate"]
+        command: ["chat", "database", "migrate"]
         env:
         # You have to change this values to your own values
         - name: POSTGRESQL_DSN

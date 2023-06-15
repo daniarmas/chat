@@ -16,6 +16,7 @@ spec:
       containers:
       - name: chat-api
         image: ghcr.io/daniarmas/chat:v0.1.0
+        command: ["chat", "server", "run"]
         env:
         # You have to change this values to your own values
         - name: POSTGRESQL_DSN

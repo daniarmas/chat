@@ -9,7 +9,7 @@ spec:
       containers:
       - name: chat-database-seed-job
         image: ghcr.io/daniarmas/chat:v0.1.0
-        command: ["chat-cli", "database", "seed"]
+        command: ["chat", "database", "seed"]
         env:
         # You have to change this values to your own values
         - name: POSTGRESQL_DSN
