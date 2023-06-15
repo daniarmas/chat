@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 )
 
 type AccessTokenRepository interface {
@@ -13,23 +12,19 @@ type AccessTokenRepository interface {
 }
 
 type accessToken struct {
-	database *sqldatabase.Sql
+	accessTokenDbDatasource databaseds.AccessTokenDbDatasource
 }
 
-func NewAccessTokenRepository(database *sqldatabase.Sql) AccessTokenRepository {
+func NewAccessToken(accessTokenDbDatasource databaseds.AccessTokenDbDatasource) AccessTokenRepository {
 	return &accessToken{
-		database: database,
+		accessTokenDbDatasource: accessTokenDbDatasource,
 	}
 }
 
 func (repo accessToken) CreateAccessToken(ctx context.Context, accessToken entity.AccessToken) (*entity.AccessToken, error) {
-	accessTokenModel := models.AccessTokenOrm{}
-	accessTokenModel.MapToAccessTokenGorm(&accessToken)
-	result := repo.database.Gorm.Create(&accessTokenModel)
-	if result.Error != nil {
-		return nil, result.Error
+	res, err := repo.accessTokenDbDatasource.CreateAccessToken(ctx, accessToken)
+	if err != nil {
+		return nil, err
 	}
-
-	res := accessTokenModel.MapFromAccessTokenGorm()
 	return res, nil
 }

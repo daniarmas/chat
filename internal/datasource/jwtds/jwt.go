@@ -1,18 +1,37 @@
-package jwt_utils
+package jwtds
 
 import (
 	"errors"
 	"fmt"
 	"time"
 
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	jwt "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 )
 
-func CreateAccessToken(acToken *entity.AccessToken, secret string, expirationTime time.Time) (accessToken string, err error) {
+type JwtDatasource interface {
+	IsAuthorized(requestToken string) (bool, error)
+	CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error)
+	CreateRefreshToken(rfToken *entity.RefreshToken, expirationTime time.Time) (refreshToken string, err error)
+	CreateAccessToken(acToken *entity.AccessToken, expirationTime time.Time) (accessToken string, err error)
+	ExtractTokenClaim(requestToken string) (*models.JwtCustomClaims, error)
+	ExtractApiKeyDataFromToken(requestToken string) (string, error)
+}
+
+type jwtDatasource struct {
+	cfg *config.Config
+}
+
+func NewJwtDatasource(cfg *config.Config) JwtDatasource {
+	return &jwtDatasource{
+		cfg: cfg,
+	}
+}
+
+func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expirationTime time.Time) (accessToken string, err error) {
 	claims := &models.JwtCustomClaims{
 		ID:     *acToken.ID,
 		UserId: *acToken.User.ID,
@@ -21,14 +40,14 @@ func CreateAccessToken(acToken *entity.AccessToken, secret string, expirationTim
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString([]byte(secret))
+	t, err := token.SignedString([]byte(ds.cfg.JwtSecret))
 	if err != nil {
 		return "", err
 	}
 	return t, err
 }
 
-func CreateRefreshToken(rfToken *entity.RefreshToken, secret string, expirationTime time.Time) (refreshToken string, err error) {
+func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirationTime time.Time) (refreshToken string, err error) {
 	claimsRefresh := &models.JwtCustomRefreshClaims{
 		ID:     *rfToken.ID,
 		UserId: *rfToken.User.ID,
@@ -37,15 +56,14 @@ func CreateRefreshToken(rfToken *entity.RefreshToken, secret string, expirationT
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsRefresh)
-	rt, err := token.SignedString([]byte(secret))
+	rt, err := token.SignedString([]byte(ds.cfg.JwtSecret))
 	if err != nil {
 		return "", err
 	}
 	return rt, err
 }
 
-func CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error) {
-	cfg := config.NewConfig()
+func (ds jwtDatasource) CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error) {
 	claimsRefresh := &models.ApiKeyJwtCustomClaims{
 		ID:         *apiKey.ID,
 		AppVersion: apiKey.AppVersion,
@@ -54,19 +72,19 @@ func CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsRefresh)
-	rt, err := token.SignedString([]byte(cfg.JwtSecret))
+	rt, err := token.SignedString([]byte(ds.cfg.JwtSecret))
 	if err != nil {
 		return "", err
 	}
 	return rt, err
 }
 
-func IsAuthorized(requestToken string, secret string) (bool, error) {
+func (ds jwtDatasource) IsAuthorized(requestToken string) (bool, error) {
 	_, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secret), nil
+		return []byte(ds.cfg.JwtSecret), nil
 	})
 	if err != nil {
 		return false, err
@@ -74,12 +92,12 @@ func IsAuthorized(requestToken string, secret string) (bool, error) {
 	return true, nil
 }
 
-func ExtractTokenClaim(requestToken string, secret string) (*models.JwtCustomClaims, error) {
+func (ds jwtDatasource) ExtractTokenClaim(requestToken string) (*models.JwtCustomClaims, error) {
 	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secret), nil
+		return []byte(ds.cfg.JwtSecret), nil
 	})
 
 	if err != nil {
@@ -99,12 +117,12 @@ func ExtractTokenClaim(requestToken string, secret string) (*models.JwtCustomCla
 	}, nil
 }
 
-func ExtractApiKeyDataFromToken(requestToken string, secret string) (string, error) {
+func (ds jwtDatasource) ExtractApiKeyDataFromToken(requestToken string) (string, error) {
 	token, err := jwt.Parse(requestToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(secret), nil
+		return []byte(ds.cfg.JwtSecret), nil
 	})
 
 	if err != nil {

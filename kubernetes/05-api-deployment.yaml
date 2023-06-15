@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: chat
+  name: chat-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-api
+  template:
+    metadata:
+      labels:
+        app: chat-api
+    spec:
+      containers:
+      - name: chat-api
+        image: ghcr.io/daniarmas/chat:v0.1.0
+        env:
+        # You have to change this values to your own values
+        - name: POSTGRESQL_DSN
+          value: "host=localhost user=postgres password=postgres dbname=chat port=54322 sslmode=disable"
+        - name: REDIS_DSN
+          value: "localhost:6379"
+        - name: REDIS_PASSWORD
+          value: ""
+        - name: REDIS_DB
+          value: "0"
+        - name: JWT_SECRET
+          value: "JWT_SECRET"
+        - name: REFRESH_TOKEN_EXPIRE_HOURS
+          value: "24"
+        - name: ACCESS_TOKEN_EXPIRE_HOURS
+          value: "1"
+        - name: GRAPHQL_PORT
+          value: "8080"
+        ports:
+        - containerPort: 8080
+          name: graphql

@@ -4,9 +4,9 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	bcryptutils "github.com/daniarmas/chat/pkg/bcrypt_utils"
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -24,23 +24,25 @@ func (UserOrm) TableName() string {
 }
 
 func (i *UserOrm) BeforeCreate(tx *gorm.DB) (err error) {
-	hash, err := bcryptutils.HashPassword(i.Password)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(i.Password), 14)
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	i.Password = hash
+	i.Password = string(bytes)
 	i.CreateTime = time.Now().UTC()
 	return
 }
 
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *UserOrm) MapToUserGorm(user *entity.User) {
-	a.ID = user.ID
-	a.Email = user.Email
-	a.Password = user.Password
-	a.Fullname = user.Fullname
-	a.Username = user.Username
-	a.CreateTime = user.CreateTime
+	if user != nil {
+		a.ID = user.ID
+		a.Email = user.Email
+		a.Password = user.Password
+		a.Fullname = user.Fullname
+		a.Username = user.Username
+		a.CreateTime = user.CreateTime
+	}
 }
 
 func (a UserOrm) MapFromUserGorm() *entity.User {

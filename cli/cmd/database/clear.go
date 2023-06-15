@@ -4,7 +4,7 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package database
 
 import (
-	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
@@ -24,21 +24,27 @@ to quickly create a Cobra application.`,
 		cfg := config.NewConfig()
 		db, err := sqldatabase.New(cfg)
 		if err != nil {
-			log.Fatal().Msgf("Postgres Error: %v", err)
+			go log.Fatal().Msgf("Postgres Error: %v", err)
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"user\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"api_key\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"refresh_token\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"access_token\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
-		log.Info().Msg("Database cleaned!")
+		if err := db.Gorm.Exec("DELETE FROM \"message\";").Error; err != nil {
+			go log.Fatal().Msg(err.Error())
+		}
+		if err := db.Gorm.Exec("DELETE FROM \"chat\";").Error; err != nil {
+			go log.Fatal().Msg(err.Error())
+		}
+		go log.Info().Msg("Database cleaned!")
 	},
 }
 

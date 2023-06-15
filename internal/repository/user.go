@@ -3,10 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
-	myerror "github.com/daniarmas/chat/pkg/my_error"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 )
 
 type UserRepository interface {
@@ -16,49 +14,35 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	database *sqldatabase.Sql
+	userDbDatasource databaseds.UserDbDatasource
 }
 
-func NewUserRepository(database *sqldatabase.Sql) UserRepository {
+func NewUser(userDbDatasource databaseds.UserDbDatasource) UserRepository {
 	return &userRepository{
-		database: database,
+		userDbDatasource: userDbDatasource,
 	}
 }
 
 func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity.User, error) {
-	var user *models.UserOrm
-	result := repo.database.Gorm.Where("id = ?", id).Take(&user)
-	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			return nil, myerror.NotFoundError{}
-		} else {
-			return nil, myerror.InternalServerError{}
-		}
+	user, err := repo.userDbDatasource.GetUserById(ctx, id)
+	if err != nil {
+		return nil, err
 	}
-	res := user.MapFromUserGorm()
-	return res, nil
+	return user, nil
 }
 
 func (repo *userRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-	var user *models.UserOrm
-	result := repo.database.Gorm.Where("email = ?", email).Take(&user)
-	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
-			return nil, myerror.NotFoundError{}
-		} else {
-			return nil, myerror.InternalServerError{}
-		}
+	user, err := repo.userDbDatasource.GetUserByEmail(ctx, email)
+	if err != nil {
+		return nil, err
 	}
-	res := user.MapFromUserGorm()
-	return res, nil
+	return user, nil
 }
 
 func (repo *userRepository) CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error) {
-	user := models.UserOrm{Email: email, Password: password, Username: username, Fullname: fullname}
-	result := repo.database.Gorm.Create(&user)
-	if result.Error != nil {
-		return nil, result.Error
+	user, err := repo.userDbDatasource.CreateUser(ctx, email, password, username, fullname)
+	if err != nil {
+		return nil, err
 	}
-	userEntity := user.MapFromUserGorm()
-	return userEntity, nil
+	return user, nil
 }

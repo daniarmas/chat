@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 )
 
 type ApiKeyRepository interface {
@@ -13,22 +12,19 @@ type ApiKeyRepository interface {
 }
 
 type apiKeyRepository struct {
-	database *sqldatabase.Sql
+	apiKeyDbDatasource databaseds.ApiKeyDbDatasource
 }
 
-func NewApiKeyRepository(database *sqldatabase.Sql) ApiKeyRepository {
+func NewApiKey(apiKeyDbDatasource databaseds.ApiKeyDbDatasource) ApiKeyRepository {
 	return &apiKeyRepository{
-		database: database,
+		apiKeyDbDatasource: apiKeyDbDatasource,
 	}
 }
 
 func (repo *apiKeyRepository) CreateApiKey(ctx context.Context, apiKey *entity.ApiKey) (*entity.ApiKey, error) {
-	apiKeyGorm := models.ApiKeyOrm{}
-	apiKeyGorm.MapToApiKeyGorm(apiKey)
-	result := repo.database.Gorm.Create(&apiKeyGorm)
-	if result.Error != nil {
-		return nil, result.Error
+	res, err := repo.apiKeyDbDatasource.CreateApiKey(ctx, apiKey)
+	if err != nil {
+		return nil, err
 	}
-	response := apiKeyGorm.MapFromApiKeyGorm()
-	return response, nil
+	return res, nil
 }
