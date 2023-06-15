@@ -32,7 +32,7 @@ func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity
 }
 
 func (repo *userRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-	user, err := repo.userDbDatasource.GetUserById(ctx, email)
+	user, err := repo.userDbDatasource.GetUserByEmail(ctx, email)
 	if err != nil {
 		return nil, err
 	}
