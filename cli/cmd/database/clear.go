@@ -24,27 +24,27 @@ to quickly create a Cobra application.`,
 		cfg := config.NewConfig()
 		db, err := sqldatabase.New(cfg)
 		if err != nil {
-			log.Fatal().Msgf("Postgres Error: %v", err)
+			go log.Fatal().Msgf("Postgres Error: %v", err)
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"user\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"api_key\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"refresh_token\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"access_token\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"message\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		if err := db.Gorm.Exec("DELETE FROM \"chat\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
-		log.Info().Msg("Database cleaned!")
+		go log.Info().Msg("Database cleaned!")
 	},
 }
 

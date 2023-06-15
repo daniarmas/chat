@@ -29,7 +29,7 @@ func NewApiKey(apiKeyRepo repository.ApiKeyRepository, jwtDatasource jwtds.JwtDa
 func (u apiKeyUsecase) CreateApiKey(ctx context.Context, input inputs.CreateApiKeyInput) (*entity.ApiKey, error) {
 	apiKey, err := u.apiKeyRepository.CreateApiKey(ctx, &entity.ApiKey{AppVersion: input.AppVersion, Revoked: input.Revoked, ExpirationTime: input.ExpirationTime})
 	if err != nil {
-		log.Fatal().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	apiKeyJwt, _ := u.jwtDatasource.CreateApiKey(apiKey)

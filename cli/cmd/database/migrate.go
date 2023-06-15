@@ -25,13 +25,13 @@ to quickly create a Cobra application.`,
 		cfg := config.NewConfig()
 		db, err := sqldatabase.New(cfg)
 		if err != nil {
-			log.Fatal().Msgf("Postgres Error: %v", err)
+			go log.Fatal().Msgf("Postgres Error: %v", err)
 		}
 		if err := db.Gorm.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Fatal().Msg(err.Error())
 		}
 		db.Gorm.AutoMigrate(&models.UserOrm{}, &models.ApiKeyOrm{}, &models.RefreshTokenOrm{}, &models.AccessTokenOrm{}, &models.MessageOrm{}, &models.ChatOrm{})
-		log.Info().Msg("Database migrations complete!")
+		go log.Info().Msg("Database migrations complete!")
 	},
 }
 

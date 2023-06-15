@@ -37,7 +37,7 @@ to quickly create a Cobra application.`,
 		cfg := config.NewConfig()
 		db, err := sqldatabase.New(cfg)
 		if err != nil {
-			log.Fatal().Msgf("Postgres Error: %v", err)
+			go log.Error().Msgf("Postgres Error: %v", err)
 		}
 
 		defer db.Close()
@@ -47,17 +47,17 @@ to quickly create a Cobra application.`,
 		apiKeyUsecase := usecases.NewApiKey(apiKeyRepo, jwtDs)
 		apiKey, err := apiKeyUsecase.CreateApiKey(ctx, inputs.CreateApiKeyInput{AppVersion: appVersion, Revoked: revoked})
 		if err != nil {
-			log.Fatal().Msg(err.Error())
+			go log.Error().Msg(err.Error())
 		}
-		log.Info().Msg("Api key created sucessfully.")
-		log.Info().Msgf("Api key: %s", apiKey.Jwt)
+		go log.Info().Msg("Api key created sucessfully.")
+		go log.Info().Msgf("Api key: %s", apiKey.Jwt)
 	},
 }
 
 func init() {
 	apikeyCmd.Flags().StringVarP(&appVersion, "appVersion", "a", "", "The appVersion of the apikey")
 	if err := apikeyCmd.MarkFlagRequired("appVersion"); err != nil {
-		log.Fatal().Msg(err.Error())
+		go log.Fatal().Msg(err.Error())
 	}
 	apikeyCmd.Flags().BoolVarP(&revoked, "revoked", "r", false, "Revoke the apikey")
 

@@ -69,10 +69,10 @@ func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, userId strin
 			// This will jump to the default case if the channel is closed.
 			select {
 			case ch <- &messageObj: // This is the actual send.
-				log.Info().Msgf("Msg Sended: %s", messageObj.Content)
+				go log.Info().Msgf("Msg Sended: %s", messageObj.Content)
 				// Our message went through, do nothing
 			default: // This is run when our send does not work.
-				log.Info().Msgf("Channel usecase closed")
+				go log.Info().Msgf("Channel usecase closed")
 				// You can handle any deregistration of the channel here.
 				return // We'll just return ending the routine.
 			}
@@ -110,10 +110,10 @@ func (usecase *messageUsecase) ReceiveMessagesByChat(ctx context.Context, input 
 			// This will jump to the default case if the channel is closed.
 			select {
 			case ch <- &messageObj: // This is the actual send.
-				log.Info().Msgf("Msg Sended: %s", messageObj.Content)
+				go log.Info().Msgf("Msg Sended: %s", messageObj.Content)
 				// Our message went through, do nothing
 			default: // This is run when our send does not work.
-				log.Info().Msgf("Channel usecase closed")
+				go log.Info().Msgf("Channel usecase closed")
 				// You can handle any deregistration of the channel here.
 				return // We'll just return ending the routine.
 			}
@@ -127,7 +127,7 @@ func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetM
 	var res response.GetMessagesByChatResponse
 	messages, err := m.messageRepository.GetMessagesByChatId(ctx, input.ChatId, createTimeCursor)
 	if err != nil {
-		log.Error().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	res.Messages = messages
@@ -137,12 +137,12 @@ func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetM
 func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId uuid.UUID) (*entity.Message, error) {
 	message, err := usecase.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID, UserId: &userId})
 	if err != nil {
-		log.Error().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	chat, err := usecase.chatRepository.GetChatById(ctx, message.ChatId.String())
 	if err != nil {
-		log.Fatal().Msgf(err.Error())
+		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	var otherUserId uuid.UUID

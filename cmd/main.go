@@ -34,14 +34,14 @@ func main() {
 
 	db, err := sqldatabase.New(cfg)
 	if err != nil {
-		log.Fatal().Msgf("Postgres Error: %v", err)
+		go log.Fatal().Msgf("Postgres Error: %v", err)
 	}
 
 	defer db.Close()
 
 	redis, err := ownredis.NewRedis(cfg)
 	if err != nil {
-		log.Fatal().Msgf("Redis Error: %v", err)
+		go log.Fatal().Msgf("Redis Error: %v", err)
 	}
 
 	// Database Datasources
@@ -99,7 +99,7 @@ func main() {
 	router.Handle("/", playground.Handler("GraphQL playground", "/query"))
 	router.Handle("/query", c.Handler(srv))
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", cfg.GraphqlPort)
+	go log.Printf("connect to http://localhost:%s/ for GraphQL playground", cfg.GraphqlPort)
 
 	err = http.ListenAndServe(":8080", router)
 	if err != nil {
