@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/config"
+	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	bcryptutils "github.com/daniarmas/chat/pkg/bcrypt_utils"
-	"github.com/daniarmas/chat/pkg/jwt_utils"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/response"
 )
@@ -25,16 +25,18 @@ type authUsecase struct {
 	userRepository    repository.UserRepository
 	refreshRepository repository.RefreshTokenRepository
 	accessRepository  repository.AccessTokenRepository
+	jwtDatasource     jwtds.JwtDatasource
 	cfg               *config.Config
 }
 
 // NewAuth will create new an authUsecase object representation of usecases.AuthUsecase interface
-func NewAuth(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, cfg *config.Config) AuthUsecase {
+func NewAuth(userRepo repository.UserRepository, refreshRepository repository.RefreshTokenRepository, accessRepository repository.AccessTokenRepository, jwtDatasource jwtds.JwtDatasource, cfg *config.Config) AuthUsecase {
 	return &authUsecase{
 		userRepository:    userRepo,
 		refreshRepository: refreshRepository,
 		accessRepository:  accessRepository,
 		cfg:               cfg,
+		jwtDatasource:     jwtDatasource,
 	}
 }
 
@@ -111,8 +113,8 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 	}
 	// Create the user jwt for the accessJwt and the refreshToken
 	// accessJwt, _ := jwt_utils.CreateAccessToken(, u.cfg.JwtSecret, 1)
-	refreshJwt, _ := jwt_utils.CreateRefreshToken(refreshToken, u.cfg.JwtSecret, refreshTokenExpireTime)
-	accessJwt, _ := jwt_utils.CreateAccessToken(accessToken, u.cfg.JwtSecret, accessTokenExpireTime)
+	refreshJwt, _ := u.jwtDatasource.CreateRefreshToken(refreshToken, refreshTokenExpireTime)
+	accessJwt, _ := u.jwtDatasource.CreateAccessToken(accessToken, accessTokenExpireTime)
 
 	return &response.SignInResponse{
 		User:         user,

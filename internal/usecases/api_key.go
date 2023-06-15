@@ -3,10 +3,10 @@ package usecases
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
-	"github.com/daniarmas/chat/pkg/jwt_utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -16,11 +16,13 @@ type ApiKeyUsecase interface {
 
 type apiKeyUsecase struct {
 	apiKeyRepository repository.ApiKeyRepository
+	jwtDatasource    jwtds.JwtDatasource
 }
 
-func NewApiKey(apiKeyRepo repository.ApiKeyRepository) ApiKeyUsecase {
+func NewApiKey(apiKeyRepo repository.ApiKeyRepository, jwtDatasource jwtds.JwtDatasource) ApiKeyUsecase {
 	return &apiKeyUsecase{
 		apiKeyRepository: apiKeyRepo,
+		jwtDatasource:    jwtDatasource,
 	}
 }
 
@@ -30,7 +32,7 @@ func (u apiKeyUsecase) CreateApiKey(ctx context.Context, input inputs.CreateApiK
 		log.Fatal().Msgf(err.Error())
 		return nil, err
 	}
-	apiKeyJwt, _ := jwt_utils.CreateApiKey(apiKey)
+	apiKeyJwt, _ := u.jwtDatasource.CreateApiKey(apiKey)
 	apiKey.Jwt = apiKeyJwt
 	return apiKey, nil
 }

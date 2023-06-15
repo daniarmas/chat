@@ -12,6 +12,7 @@ import (
 	"github.com/daniarmas/chat/graph"
 	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
+	"github.com/daniarmas/chat/internal/datasource/jwtds"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	"github.com/daniarmas/chat/middleware"
@@ -53,6 +54,9 @@ func main() {
 	// Cache Datasources
 	chatCacheDs := cacheds.NewChatCacheDatasource(redis)
 
+	// Jwt Datasource
+	jwtDs := jwtds.NewJwtDatasource(cfg)
+
 	// Repositories
 	userRepo := repository.NewUser(userDatabaseDs)
 	refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
@@ -61,7 +65,7 @@ func main() {
 	chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
 	// Usecases
-	authUsecase := usecases.NewAuth(userRepo, refreshTokenRepo, accessTokenRepo, cfg)
+	authUsecase := usecases.NewAuth(userRepo, refreshTokenRepo, accessTokenRepo, jwtDs, cfg)
 	messageUsecase := usecases.NewMessage(userRepo, messageRepo, chatRepo, cfg, redis)
 	chatUsecase := usecases.NewChat(chatRepo)
 

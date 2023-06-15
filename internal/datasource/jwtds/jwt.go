@@ -1,4 +1,4 @@
-package jwt_utils
+package jwtds
 
 import (
 	"errors"
