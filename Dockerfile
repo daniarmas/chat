@@ -21,11 +21,11 @@ FROM gcr.io/distroless/base-debian10
 
 WORKDIR /app
 
-COPY --from=build /app/main /app/main
+COPY --from=build /app/chat /app/chat
 COPY --from=build ./app/app.env /app/
 
 EXPOSE 8080
 
 USER nonroot:nonroot
 
-ENTRYPOINT ["chat", "server", "run"]
+ENTRYPOINT ["/app/chat", "server", "run"]
