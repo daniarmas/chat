@@ -76,11 +76,14 @@ to quickly create a Cobra application.`,
 			go log.Fatal().Msgf("Redis Error: %v", err)
 		}
 
+		// Hash Datasource
+		hashDs := hashds.NewBcryptHash()
+
 		// Database Datasources
 		chatDatabaseDs := databaseds.NewChat(db)
-		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
-		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
-		userDatabaseDs := databaseds.NewUser(db, conn)
+		accessTokenDatabaseDs := databaseds.NewAccessToken(db, conn)
+		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, conn)
+		userDatabaseDs := databaseds.NewUser(db, conn, hashDs)
 		messageDatabaseDs := databaseds.NewMessage(db)
 
 		// Cache Datasources
@@ -88,9 +91,6 @@ to quickly create a Cobra application.`,
 
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
-
-		// Hash Datasource
-		hashDs := hashds.NewBcryptHash()
 
 		// Repositories
 		userRepo := repository.NewUser(userDatabaseDs)

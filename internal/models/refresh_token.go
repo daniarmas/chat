@@ -28,7 +28,7 @@ func (i *RefreshTokenOrm) BeforeCreate(tx *gorm.DB) (err error) {
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *RefreshTokenOrm) MapToRefreshTokenGorm(refreshToken *entity.RefreshToken) {
 	userOrm := UserOrm{}
-	userOrm.MapToUserGorm(refreshToken.User)
+	// userOrm.MapToUserGorm(refreshToken.User)
 	a.ID = refreshToken.ID
 	a.User = userOrm
 	a.UserId = userOrm.ID
@@ -38,8 +38,8 @@ func (a *RefreshTokenOrm) MapToRefreshTokenGorm(refreshToken *entity.RefreshToke
 
 func (a RefreshTokenOrm) MapFromRefreshTokenGorm() *entity.RefreshToken {
 	return &entity.RefreshToken{
-		ID:             a.ID,
-		User:           a.User.MapFromUserGorm(),
+		ID: a.ID,
+		// User:           a.User.MapFromUserGorm(),
 		ExpirationTime: a.ExpirationTime,
 		CreateTime:     a.CreateTime,
 	}

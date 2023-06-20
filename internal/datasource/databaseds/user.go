@@ -2,9 +2,11 @@ package databaseds
 
 import (
 	"context"
+	"time"
 
+	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
+	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
@@ -19,12 +21,14 @@ type UserDbDatasource interface {
 type userDbDatasource struct {
 	database *sqldatabase.Sql
 	pgxConn  *pgxpool.Pool
+	hashDs   hashds.HashDatasource
 }
 
-func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) UserDbDatasource {
+func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool, hashDs hashds.HashDatasource) UserDbDatasource {
 	return &userDbDatasource{
 		database: database,
 		pgxConn:  pgxConn,
+		hashDs:   hashDs,
 	}
 }
 
@@ -47,8 +51,13 @@ func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*enti
 	var user entity.User
 	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
 	if err != nil {
-		log.Error().Msg(err.Error())
-		return nil, err
+		if err.Error() == "no rows in result set" {
+			log.Error().Msg(err.Error())
+			return nil, myerror.NotFoundError{}
+		} else {
+			log.Error().Msg(err.Error())
+			return nil, err
+		}
 	}
 	return &user, nil
 }
@@ -60,18 +69,31 @@ func (repo *userDbDatasource) GetUserByEmail(ctx context.Context, email string) 
 	var user entity.User
 	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
 	if err != nil {
-		log.Error().Msg(err.Error())
-		return nil, err
+		if err.Error() == "no rows in result set" {
+			log.Error().Msg(err.Error())
+			return nil, myerror.NotFoundError{}
+		} else {
+			log.Error().Msg(err.Error())
+			return nil, err
+		}
 	}
 	return &user, nil
 }
 
 func (repo *userDbDatasource) CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error) {
-	user := models.UserOrm{Email: email, Password: password, Username: username, Fullname: fullname}
-	result := repo.database.Gorm.Create(&user)
-	if result.Error != nil {
-		return nil, result.Error
+	// user := models.UserOrm{Email: email, Password: password, Username: username, Fullname: fullname}
+	// result := repo.database.Gorm.Create(&user)
+	// if result.Error != nil {
+	// 	return nil, result.Error
+	// }
+	// userEntity := user.MapFromUserGorm()
+	// return userEntity, nil
+
+	var user entity.User
+	passwordHashed, _ := repo.hashDs.Hash(password)
+	err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"user\" (email, fullname, username, password, create_time) VALUES ($1, $2, $3) RETURNING id, email, fullname, username, password, create_time", email, fullname, passwordHashed, time.Now().UTC()).Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
+	if err != nil {
+		log.Error().Msg(err.Error())
 	}
-	userEntity := user.MapFromUserGorm()
-	return userEntity, nil
+	return &user, nil
 }

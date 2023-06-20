@@ -104,12 +104,12 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 	}
 	// Create RefreshToken and AccessToken in the database for track sessions.
 	refreshTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.RefreshTokenExpireHours)).UTC()
-	refreshToken, err := u.refreshRepository.CreateRefreshToken(ctx, entity.RefreshToken{User: user, ExpirationTime: refreshTokenExpireTime})
+	refreshToken, err := u.refreshRepository.CreateRefreshToken(ctx, entity.RefreshToken{UserId: user.ID, ExpirationTime: refreshTokenExpireTime})
 	if err != nil {
 		return nil, err
 	}
 	accessTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.AccessTokenExpireHours)).UTC()
-	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken})
+	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, UserId: user.ID, ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken})
 	if err != nil {
 		return nil, err
 	}

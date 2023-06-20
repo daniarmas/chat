@@ -34,7 +34,7 @@ func NewJwtDatasource(cfg *config.Config) JwtDatasource {
 func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expirationTime time.Time) (accessToken string, err error) {
 	claims := &models.JwtCustomClaims{
 		ID:     *acToken.ID,
-		UserId: *acToken.User.ID,
+		UserId: *acToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -50,7 +50,7 @@ func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expiratio
 func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirationTime time.Time) (refreshToken string, err error) {
 	claimsRefresh := &models.JwtCustomRefreshClaims{
 		ID:     *rfToken.ID,
-		UserId: *rfToken.User.ID,
+		UserId: *rfToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
