@@ -84,7 +84,7 @@ to quickly create a Cobra application.`,
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db, conn)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, conn)
 		userDatabaseDs := databaseds.NewUser(db, conn, hashDs)
-		messageDatabaseDs := databaseds.NewMessage(db)
+		messageDatabaseDs := databaseds.NewMessage(db, conn)
 
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)
