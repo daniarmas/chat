@@ -41,13 +41,11 @@ func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*enti
 	// res := user.MapFromUserGorm()
 	// return res, nil
 
-	// Get user by id with pgx
-	// Query a single row from the "users" table
-	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, create_time FROM users WHERE id = $1", id)
+	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, password, create_time FROM \"user\" WHERE id = $1;", id)
 
 	// Scan the row into a User struct
 	var user entity.User
-	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.CreateTime)
+	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
 	if err != nil {
 		log.Error().Msg(err.Error())
 		return nil, err
