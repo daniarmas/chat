@@ -7,6 +7,7 @@ import (
 
 type Config struct {
 	PostgresqlDsn           string `mapstructure:"POSTGRESQL_DSN"`
+	PostgresqlUrl           string `mapstructure:"POSTGRESQL_URL"`
 	RedisDsn                string `mapstructure:"Redis_DSN"`
 	RedisPassword           string `mapstructure:"Redis_Password"`
 	RedisDb                 int    `mapstructure:"Redis_DB"`
