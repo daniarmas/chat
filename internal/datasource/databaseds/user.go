@@ -33,18 +33,6 @@ func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool, hashDs hashds.Has
 }
 
 func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*entity.User, error) {
-	// var user *models.UserOrm
-	// result := repo.database.Gorm.Where("id = ?", id).Take(&user)
-	// if result.Error != nil {
-	// 	if result.Error.Error() == "record not found" {
-	// 		return nil, myerror.NotFoundError{}
-	// 	} else {
-	// 		return nil, myerror.InternalServerError{}
-	// 	}
-	// }
-	// res := user.MapFromUserGorm()
-	// return res, nil
-
 	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, password, create_time FROM \"user\" WHERE id = $1;", id)
 
 	// Scan the row into a User struct
@@ -81,14 +69,6 @@ func (repo *userDbDatasource) GetUserByEmail(ctx context.Context, email string) 
 }
 
 func (repo *userDbDatasource) CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error) {
-	// user := models.UserOrm{Email: email, Password: password, Username: username, Fullname: fullname}
-	// result := repo.database.Gorm.Create(&user)
-	// if result.Error != nil {
-	// 	return nil, result.Error
-	// }
-	// userEntity := user.MapFromUserGorm()
-	// return userEntity, nil
-
 	var user entity.User
 	passwordHashed, _ := repo.hashDs.Hash(password)
 	err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"user\" (email, fullname, username, password, create_time) VALUES ($1, $2, $3) RETURNING id, email, fullname, username, password, create_time", email, fullname, passwordHashed, time.Now().UTC()).Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
