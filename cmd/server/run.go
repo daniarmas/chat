@@ -80,7 +80,7 @@ to quickly create a Cobra application.`,
 		hashDs := hashds.NewBcryptHash()
 
 		// Database Datasources
-		chatDatabaseDs := databaseds.NewChat(db)
+		chatDatabaseDs := databaseds.NewChat(db, conn)
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db, conn)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, conn)
 		userDatabaseDs := databaseds.NewUser(db, conn, hashDs)

@@ -8,6 +8,8 @@ import (
 	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog/log"
 )
 
 type ChatDbDatasource interface {
@@ -19,11 +21,13 @@ type ChatDbDatasource interface {
 
 type chatPostgresDatasource struct {
 	database *sqldatabase.Sql
+	pgxConn  *pgxpool.Pool
 }
 
-func NewChat(database *sqldatabase.Sql) ChatDbDatasource {
+func NewChat(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) ChatDbDatasource {
 	return &chatPostgresDatasource{
 		database: database,
+		pgxConn:  pgxConn,
 	}
 }
 
@@ -58,17 +62,31 @@ func (data chatPostgresDatasource) GetChat(ctx context.Context, userId string, o
 }
 
 func (data chatPostgresDatasource) GetChatById(ctx context.Context, chatId string) (*entity.Chat, error) {
-	var chat *models.ChatOrm
-	result := data.database.Gorm.Where("id = ?", chatId).Take(&chat)
-	if result.Error != nil {
-		if result.Error.Error() == "record not found" {
+	// var chat *models.ChatOrm
+	// result := data.database.Gorm.Where("id = ?", chatId).Take(&chat)
+	// if result.Error != nil {
+	// 	if result.Error.Error() == "record not found" {
+	// 		return nil, myerror.NotFoundError{}
+	// 	} else {
+	// 		return nil, myerror.InternalServerError{}
+	// 	}
+	// }
+	// res := chat.MapFromChatGorm()
+	// return res, nil
+
+	var chat entity.Chat
+	row := data.pgxConn.QueryRow(context.Background(), "SELECT id, first_user_id, second_user_id, create_time, update_time FROM \"chat\" WHERE id = $1;", chatId)
+	err := row.Scan(&chat.ID, &chat.FirstUserId, &chat.SecondUserId, &chat.CreateTime, &chat.UpdateTime)
+	if err != nil {
+		if err.Error() == "no rows in result set" {
+			log.Error().Msg(err.Error())
 			return nil, myerror.NotFoundError{}
 		} else {
-			return nil, myerror.InternalServerError{}
+			log.Error().Msg(err.Error())
+			return nil, err
 		}
 	}
-	res := chat.MapFromChatGorm()
-	return res, nil
+	return &chat, nil
 }
 
 func (data chatPostgresDatasource) GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) ([]*entity.Chat, error) {
