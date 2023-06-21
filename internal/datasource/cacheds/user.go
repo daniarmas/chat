@@ -12,9 +12,9 @@ import (
 )
 
 type UserCacheDatasource interface {
-	GetUser(ctx context.Context, keyValue string) (*models.UserOrm, error)
-	CacheUserById(ctx context.Context, user models.UserOrm) error
-	CacheUserByEmail(ctx context.Context, user models.UserOrm) error
+	GetUser(ctx context.Context, keyValue string) (*models.User, error)
+	CacheUserById(ctx context.Context, user models.User) error
+	CacheUserByEmail(ctx context.Context, user models.User) error
 }
 
 type userRedisDatasource struct {
@@ -29,8 +29,8 @@ func NewUserCacheDatasource(redis *redis.Client, cfg *config.Config) UserCacheDa
 	}
 }
 
-func (repo userRedisDatasource) GetUser(ctx context.Context, userId string) (*models.UserOrm, error) {
-	var user models.UserOrm
+func (repo userRedisDatasource) GetUser(ctx context.Context, userId string) (*models.User, error) {
+	var user models.User
 	cacheKey := fmt.Sprintf("user:%s", userId)
 	err := repo.redis.HGetAll(ctx, cacheKey).Scan(&user)
 	if err != nil {
@@ -41,7 +41,7 @@ func (repo userRedisDatasource) GetUser(ctx context.Context, userId string) (*mo
 	return &user, nil
 }
 
-func (repo userRedisDatasource) CacheUserById(ctx context.Context, user models.UserOrm) error {
+func (repo userRedisDatasource) CacheUserById(ctx context.Context, user models.User) error {
 	cacheKey := fmt.Sprintf("user:%s", user.ID)
 	if err := repo.redis.HSet(ctx, cacheKey, user).Err(); err != nil {
 		go log.Error().Msg(err.Error())
@@ -55,7 +55,7 @@ func (repo userRedisDatasource) CacheUserById(ctx context.Context, user models.U
 	return nil
 }
 
-func (repo userRedisDatasource) CacheUserByEmail(ctx context.Context, user models.UserOrm) error {
+func (repo userRedisDatasource) CacheUserByEmail(ctx context.Context, user models.User) error {
 	cacheKey := fmt.Sprintf("user:%s", user.Email)
 	if err := repo.redis.HSet(ctx, cacheKey, user).Err(); err != nil {
 		go log.Error().Msg(err.Error())

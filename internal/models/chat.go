@@ -4,29 +4,18 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"gorm.io/gorm"
 )
 
-type ChatOrm struct {
-	ID           string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	FirstUserId  string    `gorm:"not null" json:"firstUserId"`
-	SecondUserId string    `gorm:"not null" json:"secondUserId"`
+type Chat struct {
+	ID           string    `json:"id"`
+	FirstUserId  string    `json:"firstUserId"`
+	SecondUserId string    `json:"secondUserId"`
 	CreateTime   time.Time `json:"create_time"`
 	UpdateTime   time.Time `json:"update_time"`
 }
 
-func (ChatOrm) TableName() string {
-	return "chat"
-}
-
-func (i *ChatOrm) BeforeCreate(tx *gorm.DB) (err error) {
-	i.CreateTime = time.Now().UTC()
-	i.UpdateTime = time.Now().UTC()
-	return
-}
-
 // This methods map to and from a ApiKeyGorm for avoid using gorm models in the usecases.
-func (a *ChatOrm) MapToChatGorm(chat *entity.Chat) {
+func (a *Chat) MapToChatModel(chat *entity.Chat) {
 	if chat != nil {
 		a.ID = chat.ID
 		a.FirstUserId = chat.FirstUserId
@@ -36,7 +25,7 @@ func (a *ChatOrm) MapToChatGorm(chat *entity.Chat) {
 	}
 }
 
-func (a ChatOrm) MapFromChatGorm() *entity.Chat {
+func (a Chat) MapFromChatModel() *entity.Chat {
 	return &entity.Chat{
 		ID:           a.ID,
 		FirstUserId:  a.FirstUserId,

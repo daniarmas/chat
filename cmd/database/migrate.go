@@ -30,7 +30,7 @@ to quickly create a Cobra application.`,
 		if err := db.Gorm.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		db.Gorm.AutoMigrate(&models.UserOrm{}, &models.ApiKeyOrm{}, &models.RefreshTokenOrm{}, &models.AccessTokenOrm{}, &models.MessageOrm{}, &models.ChatOrm{})
+		db.Gorm.AutoMigrate(&models.User{}, &models.ApiKey{}, &models.RefreshToken{}, &models.AccessToken{}, &models.Message{}, &models.Chat{})
 		go log.Info().Msg("Database migrations complete!")
 	},
 }

@@ -28,7 +28,7 @@ func NewUser(userDbDatasource databaseds.UserDbDatasource, userCacheDs cacheds.U
 }
 
 func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity.User, error) {
-	var user *models.UserOrm
+	var user *models.User
 	var res entity.User
 	var err error
 	user, err = repo.userCacheDs.GetUser(ctx, id)
@@ -45,7 +45,7 @@ func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity
 			return nil, err
 		}
 	}
-	res = *user.MapFromUserGorm()
+	res = *user.MapFromUserModel()
 	return &res, nil
 }
 

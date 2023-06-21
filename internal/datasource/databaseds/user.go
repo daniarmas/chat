@@ -14,7 +14,7 @@ import (
 )
 
 type UserDbDatasource interface {
-	GetUserById(ctx context.Context, id string) (*models.UserOrm, error)
+	GetUserById(ctx context.Context, id string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error)
 }
@@ -33,9 +33,9 @@ func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool, hashDs hashds.Has
 	}
 }
 
-func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*models.UserOrm, error) {
+func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*models.User, error) {
 	// With pgx
-	var user models.UserOrm
+	var user models.User
 	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, password, create_time FROM \"user\" WHERE id = $1;", id)
 	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
 	if err != nil {

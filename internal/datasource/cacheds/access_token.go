@@ -12,9 +12,9 @@ import (
 )
 
 type AccessTokenCacheDatasource interface {
-	GetAccessToken(ctx context.Context, keyValue string) (*models.AccessTokenOrm, error)
-	CacheAccessTokenById(ctx context.Context, accessToken models.AccessTokenOrm) error
-	DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessTokenOrm) error
+	GetAccessToken(ctx context.Context, keyValue string) (*models.AccessToken, error)
+	CacheAccessTokenById(ctx context.Context, accessToken models.AccessToken) error
+	DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessToken) error
 }
 
 type accessTokenRedisDatasource struct {
@@ -29,7 +29,7 @@ func NewAccessTokenCacheDatasource(redis *redis.Client, cfg *config.Config) Acce
 	}
 }
 
-func (repo accessTokenRedisDatasource) DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessTokenOrm) error {
+func (repo accessTokenRedisDatasource) DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessToken) error {
 	cacheKeyById := fmt.Sprintf("access_token:%s", accessToken.ID)
 	err := repo.redis.Del(ctx, cacheKeyById).Err()
 	if err != nil {
@@ -39,8 +39,8 @@ func (repo accessTokenRedisDatasource) DeleteAccessTokenCache(ctx context.Contex
 	return nil
 }
 
-func (repo accessTokenRedisDatasource) GetAccessToken(ctx context.Context, keyValue string) (*models.AccessTokenOrm, error) {
-	var accessToken models.AccessTokenOrm
+func (repo accessTokenRedisDatasource) GetAccessToken(ctx context.Context, keyValue string) (*models.AccessToken, error) {
+	var accessToken models.AccessToken
 	cacheKey := fmt.Sprintf("access_token:%s", keyValue)
 	err := repo.redis.HGetAll(ctx, cacheKey).Scan(&accessToken)
 	if err != nil {
@@ -51,7 +51,7 @@ func (repo accessTokenRedisDatasource) GetAccessToken(ctx context.Context, keyVa
 	return &accessToken, nil
 }
 
-func (repo accessTokenRedisDatasource) CacheAccessTokenById(ctx context.Context, accessToken models.AccessTokenOrm) error {
+func (repo accessTokenRedisDatasource) CacheAccessTokenById(ctx context.Context, accessToken models.AccessToken) error {
 	cacheKey := fmt.Sprintf("access_token:%s", accessToken.ID)
 	if err := repo.redis.HSet(ctx, cacheKey, accessToken).Err(); err != nil {
 		go log.Error().Msg(err.Error())

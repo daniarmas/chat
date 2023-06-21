@@ -64,6 +64,4 @@ require (
 	github.com/rs/cors v1.9.0
 	github.com/spf13/viper v1.16.0
 	golang.org/x/sys v0.8.0 // indirect
-	gorm.io/driver/postgres v1.5.2
-	gorm.io/gorm v1.25.1
 )

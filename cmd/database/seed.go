@@ -30,7 +30,7 @@ to quickly create a Cobra application.`,
 		if err := db.Gorm.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		var users = []models.UserOrm{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
+		var users = []models.User{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
 		db.Gorm.Create(&users)
 		go log.Info().Msg("Database migrations complete!")
 	},

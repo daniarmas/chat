@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,15 +31,14 @@ func NewChat(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) ChatDbDatasource 
 }
 
 func (data chatPostgresDatasource) CreateChat(ctx context.Context, chat *entity.Chat) (*entity.Chat, error) {
-	chatModel := models.ChatOrm{}
-	chatModel.MapToChatGorm(chat)
-	result := data.database.Gorm.Create(&chatModel)
-	if result.Error != nil {
-		return nil, result.Error
+	var res entity.Chat
+	createUpdateTime := time.Now().UTC()
+	err := data.pgxConn.QueryRow(context.Background(), "INSERT INTO \"chat\" (first_user_id, second_user_id, create_time, update_time) VALUES ($1, $2, $3, $4) RETURNING id, first_user_id, second_user_id, create_time, update_time", chat.FirstUserId, chat.SecondUserId, createUpdateTime, createUpdateTime).Scan(&res.ID, &res.FirstUserId, &res.SecondUserId, &res.CreateTime, &res.UpdateTime)
+	if err != nil {
+		log.Error().Msg(err.Error())
+		return nil, err
 	}
-
-	res := chatModel.MapFromChatGorm()
-	return res, nil
+	return &res, nil
 }
 
 func (data chatPostgresDatasource) GetChat(ctx context.Context, userId string, otherUserId string) (*entity.Chat, error) {

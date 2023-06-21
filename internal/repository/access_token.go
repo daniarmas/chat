@@ -61,11 +61,11 @@ func (repo accessToken) CreateAccessToken(ctx context.Context, accessToken entit
 	if err != nil {
 		return nil, err
 	}
-	return res.MapFromAccessTokenGorm(), nil
+	return res.MapFromAccessTokenModel(), nil
 }
 
 func (repo accessToken) GetAccessTokenById(ctx context.Context, id string) (*entity.AccessToken, error) {
-	var accessToken *models.AccessTokenOrm
+	var accessToken *models.AccessToken
 	var res entity.AccessToken
 	var err error
 	accessToken, err = repo.accessTokenCacheDs.GetAccessToken(ctx, id)
@@ -82,6 +82,6 @@ func (repo accessToken) GetAccessTokenById(ctx context.Context, id string) (*ent
 			return nil, err
 		}
 	}
-	res = *accessToken.MapFromAccessTokenGorm()
+	res = *accessToken.MapFromAccessTokenModel()
 	return &res, nil
 }
