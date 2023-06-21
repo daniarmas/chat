@@ -88,12 +88,13 @@ to quickly create a Cobra application.`,
 
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)
+		userCacheDs := cacheds.NewUserCacheDatasource(redis)
 
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 
 		// Repositories
-		userRepo := repository.NewUser(userDatabaseDs)
+		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
 		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs)
 		messageRepo := repository.NewMessage(messageDatabaseDs)

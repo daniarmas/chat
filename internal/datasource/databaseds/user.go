@@ -6,6 +6,7 @@ import (
 
 	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/entity"
+	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -13,7 +14,7 @@ import (
 )
 
 type UserDbDatasource interface {
-	GetUserById(ctx context.Context, id string) (*entity.User, error)
+	GetUserById(ctx context.Context, id string) (*models.UserOrm, error)
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error)
 }
@@ -32,9 +33,9 @@ func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool, hashDs hashds.Has
 	}
 }
 
-func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*entity.User, error) {
+func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*models.UserOrm, error) {
 	// With pgx
-	var user entity.User
+	var user models.UserOrm
 	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, password, create_time FROM \"user\" WHERE id = $1;", id)
 	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
 	if err != nil {

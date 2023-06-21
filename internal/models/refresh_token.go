@@ -28,10 +28,11 @@ func (i *RefreshTokenOrm) BeforeCreate(tx *gorm.DB) (err error) {
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *RefreshTokenOrm) MapToRefreshTokenGorm(refreshToken *entity.RefreshToken) {
 	userOrm := UserOrm{}
+	userId := uuid.MustParse(userOrm.ID)
 	// userOrm.MapToUserGorm(refreshToken.User)
 	a.ID = refreshToken.ID
 	a.User = userOrm
-	a.UserId = userOrm.ID
+	a.UserId = &userId
 	a.ExpirationTime = refreshToken.ExpirationTime
 	a.CreateTime = refreshToken.CreateTime
 }

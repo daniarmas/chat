@@ -41,6 +41,8 @@ func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.
 						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					}
+					// Check if the user is logged in the system
+
 					// put it in context
 					ctx := context.WithValue(r.Context(), userCtxKey, &UserContext{ID: accessTokenClaim.UserId})
 

@@ -11,12 +11,12 @@ import (
 )
 
 type UserOrm struct {
-	ID         *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	Email      string     `gorm:"unique;not null" json:"email"`
-	Password   string     `gorm:"not null" json:"password"`
-	Fullname   string     `gorm:"not null" json:"fullname"`
-	Username   string     `gorm:"unique;not null" json:"username"`
-	CreateTime time.Time  `json:"create_time"`
+	ID         string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id" redis:"id"`
+	Email      string    `gorm:"unique;not null" json:"email" redis:"email"`
+	Password   string    `gorm:"not null" json:"password" redis:"password"`
+	Fullname   string    `gorm:"not null" json:"fullname" redis:"fullname"`
+	Username   string    `gorm:"unique;not null" json:"username" redis:"username"`
+	CreateTime time.Time `json:"create_time" redis:"create_time"`
 }
 
 func (UserOrm) TableName() string {
@@ -36,7 +36,7 @@ func (i *UserOrm) BeforeCreate(tx *gorm.DB) (err error) {
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *UserOrm) MapToUserGorm(user *entity.User) {
 	if user != nil {
-		a.ID = user.ID
+		a.ID = user.ID.String()
 		a.Email = user.Email
 		a.Password = user.Password
 		a.Fullname = user.Fullname
@@ -46,8 +46,9 @@ func (a *UserOrm) MapToUserGorm(user *entity.User) {
 }
 
 func (a UserOrm) MapFromUserGorm() *entity.User {
+	id := uuid.MustParse(a.ID)
 	return &entity.User{
-		ID:         a.ID,
+		ID:         &id,
 		Email:      a.Email,
 		Password:   a.Password,
 		Fullname:   a.Fullname,

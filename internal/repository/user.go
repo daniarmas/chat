@@ -3,8 +3,10 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
+	"github.com/daniarmas/chat/internal/models"
 )
 
 type UserRepository interface {
@@ -15,20 +17,36 @@ type UserRepository interface {
 
 type userRepository struct {
 	userDbDatasource databaseds.UserDbDatasource
+	userCacheDs      cacheds.UserCacheDatasource
 }
 
-func NewUser(userDbDatasource databaseds.UserDbDatasource) UserRepository {
+func NewUser(userDbDatasource databaseds.UserDbDatasource, userCacheDs cacheds.UserCacheDatasource) UserRepository {
 	return &userRepository{
 		userDbDatasource: userDbDatasource,
+		userCacheDs:      userCacheDs,
 	}
 }
 
 func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity.User, error) {
-	user, err := repo.userDbDatasource.GetUserById(ctx, id)
+	var user *models.UserOrm
+	var res entity.User
+	var err error
+	user, err = repo.userCacheDs.GetUser(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	if user.ID == "" {
+		user, err = repo.userDbDatasource.GetUserById(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		err = repo.userCacheDs.CreateUser(ctx, *user)
+		if err != nil {
+			return nil, err
+		}
+	}
+	res = *user.MapFromUserGorm()
+	return &res, nil
 }
 
 func (repo *userRepository) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {

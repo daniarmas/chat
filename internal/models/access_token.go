@@ -9,13 +9,13 @@ import (
 )
 
 type AccessTokenOrm struct {
-	ID             *uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	ID             *uuid.UUID      `gorm:"type:uuid;default:uuid_generate_v4()" json:"id" redis:"id"`
 	User           UserOrm         `gorm:"foreignKey:UserId;constraint:OnDelete:CASCADE;"`
-	UserId         *uuid.UUID      `json:"user_id"`
-	RefreshTokenId *uuid.UUID      `json:"refresh_token_id"`
+	UserId         *uuid.UUID      `json:"user_id" redis:"user_id"`
+	RefreshTokenId *uuid.UUID      `json:"refresh_token_id" redis:"refresh_token_id"`
 	RefreshToken   RefreshTokenOrm `gorm:"foreignKey:RefreshTokenId;constraint:OnDelete:CASCADE;"`
-	ExpirationTime time.Time       `json:"expiration_time"`
-	CreateTime     time.Time       `json:"create_time"`
+	ExpirationTime time.Time       `json:"expiration_time" redis:"expiration_time"`
+	CreateTime     time.Time       `json:"create_time" redis:"create_time"`
 }
 
 func (AccessTokenOrm) TableName() string {
@@ -33,9 +33,10 @@ func (a *AccessTokenOrm) MapToAccessTokenGorm(accessToken *entity.AccessToken) {
 	refreshTokenOrm.MapToRefreshTokenGorm(accessToken.RefreshToken)
 	userOrm := UserOrm{}
 	userOrm.MapToUserGorm(accessToken.User)
+	userId := uuid.MustParse(userOrm.ID)
 	a.ID = accessToken.ID
 	a.User = userOrm
-	a.UserId = userOrm.ID
+	a.UserId = &userId
 	a.RefreshTokenId = accessToken.ID
 	a.RefreshToken = refreshTokenOrm
 	a.ExpirationTime = accessToken.ExpirationTime
