@@ -1,10 +1,6 @@
 package inputs
 
-import (
-	"github.com/google/uuid"
-)
-
 type SendMessage struct {
-	ChatID  *uuid.UUID
+	ChatID  string
 	Content string
 }

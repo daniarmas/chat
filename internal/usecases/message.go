@@ -10,7 +10,6 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/pkg/response"
-	"github.com/google/uuid"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
@@ -18,7 +17,7 @@ import (
 type MessageUsecase interface {
 	ReceiveMessagesByChat(ctx context.Context, input inputs.ReceiveMessagesInput) (<-chan *entity.Message, error)
 	ReceiveMessages(ctx context.Context, userId string) (<-chan *entity.Message, error)
-	SendMessage(ctx context.Context, input inputs.SendMessage, userId uuid.UUID) (*entity.Message, error)
+	SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error)
 	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChatId, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error)
 }
 
@@ -134,30 +133,30 @@ func (m *messageUsecase) GetMessageByChat(ctx context.Context, input inputs.GetM
 	return &res, nil
 }
 
-func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId uuid.UUID) (*entity.Message, error) {
-	message, err := usecase.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID, UserId: &userId})
+func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error) {
+	message, err := usecase.messageRepository.CreateMessage(ctx, entity.Message{Content: input.Content, ChatId: input.ChatID, UserId: userId})
 	if err != nil {
 		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
-	chat, err := usecase.chatRepository.GetChatById(ctx, message.ChatId.String())
+	chat, err := usecase.chatRepository.GetChatById(ctx, message.ChatId)
 	if err != nil {
 		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
-	var otherUserId uuid.UUID
-	if chat.FirstUserId.String() != userId.String() {
-		otherUserId = *chat.FirstUserId
+	var otherUserId string
+	if chat.FirstUserId.String() != userId {
+		otherUserId = chat.FirstUserId.String()
 	} else {
-		otherUserId = *chat.SecondUserId
+		otherUserId = chat.SecondUserId.String()
 	}
 	// Publish the message on the redis channel corresponding to the chat
-	err = usecase.redis.Publish(ctx, input.ChatID.String(), message).Err()
+	err = usecase.redis.Publish(ctx, input.ChatID, message).Err()
 	if err != nil {
 		panic(err)
 	}
 	// Publish the message on the redis channel corresponding to the user
-	err = usecase.redis.Publish(ctx, otherUserId.String(), message).Err()
+	err = usecase.redis.Publish(ctx, otherUserId, message).Err()
 	if err != nil {
 		panic(err)
 	}

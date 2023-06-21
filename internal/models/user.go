@@ -46,13 +46,17 @@ func (a *UserOrm) MapToUserGorm(user *entity.User) {
 }
 
 func (a UserOrm) MapFromUserGorm() *entity.User {
-	id := uuid.MustParse(a.ID)
-	return &entity.User{
-		ID:         &id,
-		Email:      a.Email,
-		Password:   a.Password,
-		Fullname:   a.Fullname,
-		Username:   a.Username,
-		CreateTime: a.CreateTime,
+	var user entity.User
+	if a.ID != "" {
+		id := uuid.MustParse(a.ID)
+		return &entity.User{
+			ID:         &id,
+			Email:      a.Email,
+			Password:   a.Password,
+			Fullname:   a.Fullname,
+			Username:   a.Username,
+			CreateTime: a.CreateTime,
+		}
 	}
+	return &user
 }

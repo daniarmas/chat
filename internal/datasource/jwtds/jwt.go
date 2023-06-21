@@ -9,7 +9,6 @@ import (
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 )
 
 type JwtDatasource interface {
@@ -33,8 +32,8 @@ func NewJwtDatasource(cfg *config.Config) JwtDatasource {
 
 func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expirationTime time.Time) (accessToken string, err error) {
 	claims := &models.JwtCustomClaims{
-		ID:     *acToken.ID,
-		UserId: *acToken.UserId,
+		ID:     acToken.ID,
+		UserId: acToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -112,8 +111,8 @@ func (ds jwtDatasource) ExtractTokenClaim(requestToken string) (*models.JwtCusto
 
 	// return claims["id"].(string), nil
 	return &models.JwtCustomClaims{
-		ID:     uuid.MustParse(claims["id"].(string)),
-		UserId: uuid.MustParse(claims["user_id"].(string)),
+		ID:     claims["id"].(string),
+		UserId: claims["user_id"].(string),
 	}, nil
 }
 

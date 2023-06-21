@@ -14,6 +14,7 @@ import (
 type AccessTokenCacheDatasource interface {
 	GetAccessToken(ctx context.Context, keyValue string) (*models.AccessTokenOrm, error)
 	CacheAccessTokenById(ctx context.Context, accessToken models.AccessTokenOrm) error
+	DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessTokenOrm) error
 }
 
 type accessTokenRedisDatasource struct {
@@ -26,6 +27,16 @@ func NewAccessTokenCacheDatasource(redis *redis.Client, cfg *config.Config) Acce
 		redis: redis,
 		cfg:   cfg,
 	}
+}
+
+func (repo accessTokenRedisDatasource) DeleteAccessTokenCache(ctx context.Context, accessToken *models.AccessTokenOrm) error {
+	cacheKeyById := fmt.Sprintf("access_token:%s", accessToken.ID)
+	err := repo.redis.Del(ctx, cacheKeyById).Err()
+	if err != nil {
+		go log.Error().Msg(err.Error())
+		return err
+	}
+	return nil
 }
 
 func (repo accessTokenRedisDatasource) GetAccessToken(ctx context.Context, keyValue string) (*models.AccessTokenOrm, error) {

@@ -43,7 +43,16 @@ func NewAuth(userRepo repository.UserRepository, refreshRepository repository.Re
 }
 
 func (u *authUsecase) SignOut(ctx context.Context, userId string) error {
-	err := u.refreshRepository.DeleteRefreshTokenByUserId(ctx, userId)
+	err := u.accessRepository.DeleteAccessTokenByUserId(ctx, userId)
+	if err != nil {
+		switch err.(type) {
+		case myerror.NotFoundError:
+			// Do nothing
+		default:
+			return err
+		}
+	}
+	err = u.refreshRepository.DeleteRefreshTokenByUserId(ctx, userId)
 	if err != nil {
 		switch err.(type) {
 		case myerror.NotFoundError:
@@ -95,6 +104,10 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		}
 	}
 	if refreshTokenCheck != nil && in.Logout {
+		err = u.accessRepository.DeleteAccessTokenByRefreshTokenId(ctx, refreshTokenCheck.ID.String())
+		if err != nil {
+			return nil, err
+		}
 		err = u.refreshRepository.DeleteRefreshToken(ctx, *refreshTokenCheck)
 		if err != nil {
 			return nil, err
@@ -109,7 +122,7 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		return nil, err
 	}
 	accessTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.AccessTokenExpireHours)).UTC()
-	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, UserId: user.ID, ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken})
+	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, UserId: user.ID.String(), ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken, RefreshTokenId: refreshToken.ID.String()})
 	if err != nil {
 		return nil, err
 	}

@@ -131,7 +131,7 @@ func (r *mutationResolver) SignOut(ctx context.Context) (*model.SignOutResponse,
 		return &res, nil
 	}
 
-	err := r.AuthUsecase.SignOut(ctx, user.ID.String())
+	err := r.AuthUsecase.SignOut(ctx, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -204,7 +204,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: &chatId, Content: input.Content}, user.ID)
+	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: chatId.String(), Content: input.Content}, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -223,7 +223,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.SendMessageData{
-		Message: &model.Message{ID: result.ID.String(), Content: result.Content, ChatID: result.ChatId.String(), CreateTime: result.CreateTime},
+		Message: &model.Message{ID: result.ID, Content: result.Content, ChatID: result.ChatId, CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -272,7 +272,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 		return &res, nil
 	}
 
-	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{ReceiverId: &receiverId}, user.ID.String())
+	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{ReceiverId: &receiverId}, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -315,7 +315,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 		return &res, nil
 	}
 
-	result, err := r.AuthUsecase.Me(ctx, user.ID.String())
+	result, err := r.AuthUsecase.Me(ctx, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -364,7 +364,7 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChatId{ChatId: input.ChatID}, user.ID.String(), createTimeCursor)
+	result, err := r.MessageUsecase.GetMessageByChat(ctx, inputs.GetMessagesByChatId{ChatId: input.ChatID}, user.ID, createTimeCursor)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -382,9 +382,9 @@ func (r *queryResolver) FetchMessages(ctx context.Context, input model.FetchAllM
 
 	for _, element := range result.Messages {
 		messages = append(messages, &model.Message{
-			ID:         element.ID.String(),
+			ID:         element.ID,
 			Content:    element.Content,
-			ChatID:     element.ChatId.String(),
+			ChatID:     element.ChatId,
 			CreateTime: element.CreateTime,
 		})
 	}
@@ -433,7 +433,7 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 		return &res, nil
 	}
 
-	result, err := r.ChatUsecase.GetChats(ctx, user.ID.String(), updateTimeCursor)
+	result, err := r.ChatUsecase.GetChats(ctx, user.ID, updateTimeCursor)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -494,15 +494,15 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 		for entityMsg := range result {
 			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
-				ID:         entityMsg.ID.String(),
+				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
-				ChatID:     entityMsg.ID.String(),
-				UserID:     entityMsg.UserId.String(),
+				ChatID:     entityMsg.ID,
+				UserID:     entityMsg.UserId,
 				CreateTime: entityMsg.CreateTime,
 			}
 
 			// send the model.Message to the modelMessages channel
-			if modelMsg.UserID != user.ID.String() && modelMsg.ChatID == input.ChatID {
+			if modelMsg.UserID != user.ID && modelMsg.ChatID == input.ChatID {
 				res <- modelMsg
 			}
 		}
@@ -520,7 +520,7 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 		return nil, errors.New("access token missing")
 	}
 
-	result, err := r.MessageUsecase.ReceiveMessages(ctx, user.ID.String())
+	result, err := r.MessageUsecase.ReceiveMessages(ctx, user.ID)
 	if err != nil {
 		return nil, errors.New("internal server error")
 	}
@@ -532,15 +532,15 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 		for entityMsg := range result {
 			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
-				ID:         entityMsg.ID.String(),
+				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
-				ChatID:     entityMsg.ID.String(),
-				UserID:     entityMsg.UserId.String(),
+				ChatID:     entityMsg.ID,
+				UserID:     entityMsg.UserId,
 				CreateTime: entityMsg.CreateTime,
 			}
 
 			// send the model.Message to the modelMessages channel
-			if modelMsg.UserID != user.ID.String() {
+			if modelMsg.UserID != user.ID {
 				res <- modelMsg
 			}
 		}

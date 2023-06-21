@@ -89,6 +89,7 @@ to quickly create a Cobra application.`,
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)
 		userCacheDs := cacheds.NewUserCacheDatasource(redis, cfg)
+		accessTokenCacheDs := cacheds.NewAccessTokenCacheDatasource(redis, cfg)
 
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
@@ -96,7 +97,7 @@ to quickly create a Cobra application.`,
 		// Repositories
 		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
-		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs)
+		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs, accessTokenCacheDs)
 		messageRepo := repository.NewMessage(messageDatabaseDs)
 		chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
@@ -115,7 +116,7 @@ to quickly create a Cobra application.`,
 			Debug:            false,
 		})
 
-		router.Use(middleware.AuthorizationMiddleware(jwtDs))
+		router.Use(middleware.AuthorizationMiddleware(jwtDs, accessTokenRepo))
 
 		srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 
