@@ -55,6 +55,9 @@ func (u chatUsecase) GetChats(ctx context.Context, userId string, updateTimeCurs
 		return nil, err
 	}
 	res.Chats = chats
+	if len(chats) != 0 {
+		res.Cursor = chats[len(chats)-1].UpdateTime
+	}
 	return &res, nil
 
 }

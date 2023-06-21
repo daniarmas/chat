@@ -462,17 +462,11 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 		chats = chats[:len(chats)-1]
 	}
 
-	var updateTimeCursorRes time.Time
-
-	if len(chats) != 0 {
-		updateTimeCursorRes = chats[len(chats)-1].CreateTime
-	}
-
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.FetchChatsData{
 		Chats:            chats,
-		UpdateTimeCursor: &updateTimeCursorRes,
+		UpdateTimeCursor: &result.Cursor,
 	}
 	res.Error = nil
 
