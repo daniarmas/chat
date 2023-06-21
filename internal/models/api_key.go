@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ApiKeyOrm struct {
-	ID             *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	AppVersion     string     `gorm:"not null" json:"app_version"`
-	Revoked        bool       `gorm:"default:false" json:"revoked"`
-	ExpirationTime time.Time  `json:"expiration_time"`
-	CreateTime     time.Time  `json:"create_time"`
+	ID             string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	AppVersion     string    `gorm:"not null" json:"app_version"`
+	Revoked        bool      `gorm:"default:false" json:"revoked"`
+	ExpirationTime time.Time `json:"expiration_time"`
+	CreateTime     time.Time `json:"create_time"`
 }
 
 func (ApiKeyOrm) TableName() string {

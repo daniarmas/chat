@@ -48,8 +48,8 @@ func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expiratio
 
 func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirationTime time.Time) (refreshToken string, err error) {
 	claimsRefresh := &models.JwtCustomRefreshClaims{
-		ID:     *rfToken.ID,
-		UserId: *rfToken.UserId,
+		ID:     rfToken.ID,
+		UserId: rfToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -64,7 +64,7 @@ func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirat
 
 func (ds jwtDatasource) CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error) {
 	claimsRefresh := &models.ApiKeyJwtCustomClaims{
-		ID:         *apiKey.ID,
+		ID:         apiKey.ID,
 		AppVersion: apiKey.AppVersion,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: apiKey.ExpirationTime.Unix(),

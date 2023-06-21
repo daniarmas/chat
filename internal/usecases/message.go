@@ -145,10 +145,10 @@ func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.Sen
 		return nil, err
 	}
 	var otherUserId string
-	if chat.FirstUserId.String() != userId {
-		otherUserId = chat.FirstUserId.String()
+	if chat.FirstUserId != userId {
+		otherUserId = chat.FirstUserId
 	} else {
-		otherUserId = chat.SecondUserId.String()
+		otherUserId = chat.SecondUserId
 	}
 	// Publish the message on the redis channel corresponding to the chat
 	err = usecase.redis.Publish(ctx, input.ChatID, message).Err()

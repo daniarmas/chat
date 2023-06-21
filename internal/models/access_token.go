@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -33,10 +32,9 @@ func (a *AccessTokenOrm) MapToAccessTokenGorm(accessToken *entity.AccessToken) {
 	refreshTokenOrm.MapToRefreshTokenGorm(accessToken.RefreshToken)
 	userOrm := UserOrm{}
 	userOrm.MapToUserGorm(accessToken.User)
-	userId := uuid.MustParse(userOrm.ID)
 	a.ID = accessToken.ID
 	a.User = userOrm
-	a.UserId = userId.String()
+	a.UserId = userOrm.ID
 	a.RefreshTokenId = accessToken.ID
 	a.RefreshToken = refreshTokenOrm
 	a.ExpirationTime = accessToken.ExpirationTime
@@ -44,9 +42,8 @@ func (a *AccessTokenOrm) MapToAccessTokenGorm(accessToken *entity.AccessToken) {
 }
 
 func (a AccessTokenOrm) MapFromAccessTokenGorm() *entity.AccessToken {
-	id := uuid.MustParse(a.ID)
 	return &entity.AccessToken{
-		ID:             id.String(),
+		ID:             a.ID,
 		User:           a.User.MapFromUserGorm(),
 		UserId:         a.UserId,
 		RefreshToken:   a.RefreshToken.MapFromRefreshTokenGorm(),

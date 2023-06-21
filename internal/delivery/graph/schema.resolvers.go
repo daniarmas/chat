@@ -14,7 +14,6 @@ import (
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
-	"github.com/google/uuid"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -101,7 +100,7 @@ func (r *mutationResolver) SignIn(ctx context.Context, input model.SignInInput) 
 	res.Data = &model.SignInData{
 		Status: http.StatusOK,
 		User: &model.User{
-			ID:         result.User.ID.String(),
+			ID:         result.User.ID,
 			Email:      result.User.Email,
 			Fullname:   result.User.Fullname,
 			Username:   result.User.Username,
@@ -159,7 +158,6 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	var res model.SendMessageResponse
 	var errorDetails []*model.ErrorDetails
 	var validationErr = false
-	var chatId uuid.UUID
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
@@ -188,8 +186,6 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 			Message: "This field is required",
 		})
 		validationErr = true
-	} else {
-		chatId = uuid.MustParse(input.ChatID)
 	}
 
 	if validationErr {
@@ -204,7 +200,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		return &res, nil
 	}
 
-	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: chatId.String(), Content: input.Content}, user.ID)
+	result, err := r.MessageUsecase.SendMessage(ctx, inputs.SendMessage{ChatID: input.ChatID, Content: input.Content}, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -235,7 +231,6 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 	var res model.GetOrCreateChatResponse
 	var errorDetails []*model.ErrorDetails
 	var validationErr = false
-	var receiverId uuid.UUID
 
 	user := middleware.ForContext(ctx)
 	if user == nil {
@@ -256,8 +251,6 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 			Message: "This field is required",
 		})
 		validationErr = true
-	} else {
-		receiverId = uuid.MustParse(input.ReceiverID)
 	}
 
 	if validationErr {
@@ -272,7 +265,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 		return &res, nil
 	}
 
-	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{ReceiverId: &receiverId}, user.ID)
+	result, err := r.ChatUsecase.GetOrCreateChat(ctx, inputs.GetOrCreateChatInput{ReceiverId: input.ReceiverID}, user.ID)
 	if err != nil {
 		switch err.Error() {
 		default:
@@ -291,7 +284,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.GetOrCreateChatData{
-		Chat: &model.Chat{ID: result.ID.String(), FirstUserID: result.FirstUserId.String(), SecondUserID: result.SecondUserId.String(), CreateTime: result.CreateTime},
+		Chat: &model.Chat{ID: result.ID, FirstUserID: result.FirstUserId, SecondUserID: result.SecondUserId, CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -334,7 +327,7 @@ func (r *queryResolver) Me(ctx context.Context) (*model.MeResponse, error) {
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.MeData{
-		User: &model.User{ID: result.ID.String(), Email: result.Email, Fullname: result.Fullname, Username: result.Username, CreateTime: result.CreateTime},
+		User: &model.User{ID: result.ID, Email: result.Email, Fullname: result.Fullname, Username: result.Username, CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -451,9 +444,9 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 
 	for _, element := range result.Chats {
 		chats = append(chats, &model.Chat{
-			ID:           element.ID.String(),
-			FirstUserID:  element.FirstUserId.String(),
-			SecondUserID: element.SecondUserId.String(),
+			ID:           element.ID,
+			FirstUserID:  element.FirstUserId,
+			SecondUserID: element.SecondUserId,
 			CreateTime:   element.CreateTime,
 		})
 	}

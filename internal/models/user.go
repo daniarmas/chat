@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -36,7 +35,7 @@ func (i *UserOrm) BeforeCreate(tx *gorm.DB) (err error) {
 // This methods map to and from a UserGorm for avoid using gorm models in the usecases.
 func (a *UserOrm) MapToUserGorm(user *entity.User) {
 	if user != nil {
-		a.ID = user.ID.String()
+		a.ID = user.ID
 		a.Email = user.Email
 		a.Password = user.Password
 		a.Fullname = user.Fullname
@@ -48,9 +47,8 @@ func (a *UserOrm) MapToUserGorm(user *entity.User) {
 func (a UserOrm) MapFromUserGorm() *entity.User {
 	var user entity.User
 	if a.ID != "" {
-		id := uuid.MustParse(a.ID)
 		return &entity.User{
-			ID:         &id,
+			ID:         a.ID,
 			Email:      a.Email,
 			Password:   a.Password,
 			Fullname:   a.Fullname,

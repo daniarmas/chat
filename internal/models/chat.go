@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type ChatOrm struct {
-	ID           *uuid.UUID `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
-	FirstUserId  *uuid.UUID `gorm:"not null" json:"firstUserId"`
-	SecondUserId *uuid.UUID `gorm:"not null" json:"secondUserId"`
-	CreateTime   time.Time  `json:"create_time"`
-	UpdateTime   time.Time  `json:"update_time"`
+	ID           string    `gorm:"type:uuid;default:uuid_generate_v4()" json:"id"`
+	FirstUserId  string    `gorm:"not null" json:"firstUserId"`
+	SecondUserId string    `gorm:"not null" json:"secondUserId"`
+	CreateTime   time.Time `json:"create_time"`
+	UpdateTime   time.Time `json:"update_time"`
 }
 
 func (ChatOrm) TableName() string {
