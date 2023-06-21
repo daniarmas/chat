@@ -58,7 +58,7 @@ func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.
 						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					default:
-						http.Error(w, "The server has an internal error.", http.StatusUnauthorized)
+						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					}
 				}

@@ -40,7 +40,7 @@ func (repo *userRepository) GetUserById(ctx context.Context, id string) (*entity
 		if err != nil {
 			return nil, err
 		}
-		err = repo.userCacheDs.CreateUser(ctx, *user)
+		err = repo.userCacheDs.CacheUserById(ctx, *user)
 		if err != nil {
 			return nil, err
 		}

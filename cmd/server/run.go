@@ -88,7 +88,7 @@ to quickly create a Cobra application.`,
 
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)
-		userCacheDs := cacheds.NewUserCacheDatasource(redis)
+		userCacheDs := cacheds.NewUserCacheDatasource(redis, cfg)
 
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)

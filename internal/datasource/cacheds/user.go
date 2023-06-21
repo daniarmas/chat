@@ -3,7 +3,9 @@ package cacheds
 import (
 	"context"
 	"fmt"
+	"time"
 
+	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/models"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
@@ -11,16 +13,19 @@ import (
 
 type UserCacheDatasource interface {
 	GetUser(ctx context.Context, keyValue string) (*models.UserOrm, error)
-	CreateUser(ctx context.Context, user models.UserOrm) error
+	CacheUserById(ctx context.Context, user models.UserOrm) error
+	CacheUserByEmail(ctx context.Context, user models.UserOrm) error
 }
 
 type userRedisDatasource struct {
 	redis *redis.Client
+	cfg   *config.Config
 }
 
-func NewUserCacheDatasource(redis *redis.Client) UserCacheDatasource {
+func NewUserCacheDatasource(redis *redis.Client, cfg *config.Config) UserCacheDatasource {
 	return &userRedisDatasource{
 		redis: redis,
+		cfg:   cfg,
 	}
 }
 
@@ -36,9 +41,28 @@ func (repo userRedisDatasource) GetUser(ctx context.Context, userId string) (*mo
 	return &user, nil
 }
 
-func (repo userRedisDatasource) CreateUser(ctx context.Context, user models.UserOrm) error {
+func (repo userRedisDatasource) CacheUserById(ctx context.Context, user models.UserOrm) error {
 	cacheKey := fmt.Sprintf("user:%s", user.ID)
 	if err := repo.redis.HSet(ctx, cacheKey, user).Err(); err != nil {
+		go log.Error().Msg(err.Error())
+		return err
+	}
+	err := repo.redis.Expire(ctx, cacheKey, time.Duration(repo.cfg.RedisExpirationTimeSeconds)*time.Second).Err()
+	if err != nil {
+		go log.Error().Msg(err.Error())
+		return err
+	}
+	return nil
+}
+
+func (repo userRedisDatasource) CacheUserByEmail(ctx context.Context, user models.UserOrm) error {
+	cacheKey := fmt.Sprintf("user:%s", user.Email)
+	if err := repo.redis.HSet(ctx, cacheKey, user).Err(); err != nil {
+		go log.Error().Msg(err.Error())
+		return err
+	}
+	err := repo.redis.Expire(ctx, cacheKey, time.Duration(repo.cfg.RedisExpirationTimeSeconds)*time.Second).Err()
+	if err != nil {
 		go log.Error().Msg(err.Error())
 		return err
 	}
