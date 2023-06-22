@@ -16,12 +16,8 @@ type AccessToken struct {
 
 // This methods map to and from a UserModel for avoid using models in the usecases.
 func (a *AccessToken) MapToAccessTokenModel(accessToken *entity.AccessToken) {
-	refreshTokenOrm := RefreshToken{}
-	refreshTokenOrm.MapToRefreshTokenModel(accessToken.RefreshToken)
-	userOrm := User{}
-	userOrm.MapToUserModel(accessToken.User)
 	a.ID = accessToken.ID
-	a.UserId = userOrm.ID
+	a.UserId = accessToken.UserId
 	a.RefreshTokenId = accessToken.ID
 	a.ExpirationTime = accessToken.ExpirationTime
 	a.CreateTime = accessToken.CreateTime

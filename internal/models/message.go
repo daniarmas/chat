@@ -16,10 +16,6 @@ type Message struct {
 
 // This methods map to and from a UserModel for avoid using models in the usecases.
 func (a *Message) MapToMessageModel(message *entity.Message) {
-	chatOrm := Chat{}
-	chatOrm.MapToChatModel(message.Chat)
-	userOrm := User{}
-	userOrm.MapToUserModel(message.User)
 	a.ID = message.ID
 	a.ChatId = message.ChatId
 	a.UserId = message.UserId

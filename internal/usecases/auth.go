@@ -122,7 +122,7 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		return nil, err
 	}
 	accessTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.AccessTokenExpireHours)).UTC()
-	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, UserId: user.ID, ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken, RefreshTokenId: refreshToken.ID})
+	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{UserId: user.ID, ExpirationTime: accessTokenExpireTime, RefreshTokenId: refreshToken.ID})
 	if err != nil {
 		return nil, err
 	}
