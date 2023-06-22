@@ -8,7 +8,7 @@ import (
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -17,19 +17,18 @@ type UserDbDatasource interface {
 	GetUserById(ctx context.Context, id string) (*models.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*entity.User, error)
 	CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error)
+	BulkCreateUser(ctx context.Context, users []*models.User) ([]*models.User, error)
 }
 
 type userDbDatasource struct {
-	database *sqldatabase.Sql
-	pgxConn  *pgxpool.Pool
-	hashDs   hashds.HashDatasource
+	pgxConn *pgxpool.Pool
+	hashDs  hashds.HashDatasource
 }
 
-func NewUser(database *sqldatabase.Sql, pgxConn *pgxpool.Pool, hashDs hashds.HashDatasource) UserDbDatasource {
+func NewUser(pgxConn *pgxpool.Pool, hashDs hashds.HashDatasource) UserDbDatasource {
 	return &userDbDatasource{
-		database: database,
-		pgxConn:  pgxConn,
-		hashDs:   hashDs,
+		pgxConn: pgxConn,
+		hashDs:  hashDs,
 	}
 }
 
@@ -90,4 +89,35 @@ func (repo *userDbDatasource) CreateUser(ctx context.Context, email string, pass
 		log.Error().Msg(err.Error())
 	}
 	return &user, nil
+}
+
+func (repo *userDbDatasource) BulkCreateUser(ctx context.Context, users []*models.User) ([]*models.User, error) {
+	var res []*models.User
+
+	// Create a Batch object for the transaction
+	batch := &pgx.Batch{}
+
+	// Add an INSERT statement for each row of data
+	for _, item := range users {
+		passwordHashed, _ := repo.hashDs.Hash(item.Password)
+		batch.Queue("INSERT INTO \"user\" (email, fullname, username, password, create_time) VALUES ($1, $2, $3, $4, $5) RETURNING id, email, fullname, username, password, create_time", item.Email, item.Fullname, item.Username, passwordHashed, time.Now().UTC())
+	}
+
+	// Execute the transaction and get the results
+	results := repo.pgxConn.SendBatch(context.Background(), batch)
+	defer results.Close()
+
+	// Iterate over the results and scan the data into the struct
+	for i := 0; i < len(users); i++ {
+		var user models.User
+		// Get the result of the statement and check for errors
+		err := results.QueryRow().Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
+		if err != nil {
+			log.Error().Msg(err.Error())
+			return nil, err
+		}
+		res = append(res, &user)
+	}
+
+	return res, nil
 }
