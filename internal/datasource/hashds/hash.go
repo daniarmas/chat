@@ -17,7 +17,7 @@ func NewBcryptHash() HashDatasource {
 }
 
 func (ds hashDatasource) Hash(value string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(value), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(value), 10)
 	return string(bytes), err
 }
 

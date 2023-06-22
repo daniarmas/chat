@@ -52,7 +52,7 @@ func (repo chatRedisDatasource) GetChats(ctx context.Context, userId string, upd
 			if err != nil {
 				return nil, err
 			}
-			chatFields[chat.ID.String()] = string(chatBytes)
+			chatFields[chat.ID] = string(chatBytes)
 		}
 
 		// set the chat objects in Redis using HMSet command

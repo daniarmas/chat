@@ -21,9 +21,9 @@ import (
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	ownredis "github.com/daniarmas/chat/pkg/own-redis"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -46,9 +46,19 @@ to quickly create a Cobra application.`,
 
 		cfg := config.NewConfig()
 
-		db, err := sqldatabase.New(cfg)
+		// Set connection pool configuration options
+		config, err := pgxpool.ParseConfig(cfg.PostgresqlUrl)
 		if err != nil {
-			go log.Fatal().Msgf("Postgres Error: %v", err)
+			panic(err)
+		}
+
+		config.MaxConns = 20                     // Set the maximum number of connections in the pool
+		config.MaxConnIdleTime = time.Minute * 5 // Set the maximum idle time for connections
+
+		// pgx
+		db, err := pgxpool.NewWithConfig(context.Background(), config)
+		if err != nil {
+			go log.Fatal().Msgf("Pgx connector Error: %v", err)
 		}
 
 		defer db.Close()
@@ -58,26 +68,28 @@ to quickly create a Cobra application.`,
 			go log.Fatal().Msgf("Redis Error: %v", err)
 		}
 
+		// Hash Datasource
+		hashDs := hashds.NewBcryptHash()
+
 		// Database Datasources
 		chatDatabaseDs := databaseds.NewChat(db)
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
-		userDatabaseDs := databaseds.NewUser(db)
+		userDatabaseDs := databaseds.NewUser(db, hashDs)
 		messageDatabaseDs := databaseds.NewMessage(db)
 
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)
+		userCacheDs := cacheds.NewUserCacheDatasource(redis, cfg)
+		accessTokenCacheDs := cacheds.NewAccessTokenCacheDatasource(redis, cfg)
 
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 
-		// Hash Datasource
-		hashDs := hashds.NewBcryptHash()
-
 		// Repositories
-		userRepo := repository.NewUser(userDatabaseDs)
+		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
-		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs)
+		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs, accessTokenCacheDs)
 		messageRepo := repository.NewMessage(messageDatabaseDs)
 		chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
@@ -96,7 +108,7 @@ to quickly create a Cobra application.`,
 			Debug:            false,
 		})
 
-		router.Use(middleware.AuthorizationMiddleware(jwtDs))
+		router.Use(middleware.AuthorizationMiddleware(jwtDs, accessTokenRepo))
 
 		srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 

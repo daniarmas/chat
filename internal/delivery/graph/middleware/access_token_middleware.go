@@ -8,7 +8,7 @@ import (
 
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
-	"github.com/google/uuid"
+	"github.com/daniarmas/chat/internal/repository"
 )
 
 // A private key for context that only this package can access. This is important
@@ -21,11 +21,11 @@ type contextKey struct {
 
 // A stand-in for our database backed user object
 type UserContext struct {
-	ID uuid.UUID
+	ID string
 }
 
 // Middleware decodes the share session cookie and packs the session into context
-func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.Handler {
+func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource, accessTokenRepo repository.AccessTokenRepository) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
@@ -41,6 +41,13 @@ func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.
 						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					}
+					// Check if the user is logged in the system
+					_, err = accessTokenRepo.GetAccessTokenById(context.Background(), accessTokenClaim.ID)
+					if err != nil {
+						http.Error(w, "Unauthorized.", http.StatusUnauthorized)
+						return
+					}
+
 					// put it in context
 					ctx := context.WithValue(r.Context(), userCtxKey, &UserContext{ID: accessTokenClaim.UserId})
 
@@ -56,7 +63,7 @@ func AuthorizationMiddleware(jwtDs jwtds.JwtDatasource) func(http.Handler) http.
 						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					default:
-						http.Error(w, "The server has an internal error.", http.StatusUnauthorized)
+						http.Error(w, "The access token is invalid. Please obtain a new access token and try again.", http.StatusUnauthorized)
 						return
 					}
 				}

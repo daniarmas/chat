@@ -4,9 +4,14 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package database
 
 import (
+	"context"
+	"time"
+
 	"github.com/daniarmas/chat/internal/config"
+	"github.com/daniarmas/chat/internal/datasource/databaseds"
+	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/models"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -23,15 +28,26 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.NewConfig()
-		db, err := sqldatabase.New(cfg)
+		// Set connection pool configuration options
+		config, err := pgxpool.ParseConfig(cfg.PostgresqlUrl)
 		if err != nil {
-			go log.Fatal().Msgf("Postgres Error: %v", err)
+			panic(err)
 		}
-		if err := db.Gorm.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";").Error; err != nil {
-			go log.Fatal().Msg(err.Error())
+
+		config.MaxConns = 20                     // Set the maximum number of connections in the pool
+		config.MaxConnIdleTime = time.Minute * 5 // Set the maximum idle time for connections
+
+		// pgx
+		conn, err := pgxpool.NewWithConfig(context.Background(), config)
+		if err != nil {
+			go log.Fatal().Msgf("Pgx connector Error: %v", err)
 		}
-		var users = []models.UserOrm{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
-		db.Gorm.Create(&users)
+
+		defer conn.Close()
+		var users = []*models.User{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
+		hashDs := hashds.NewBcryptHash()
+		userDs := databaseds.NewUser(conn, hashDs)
+		userDs.BulkCreateUser(context.Background(), users)
 		go log.Info().Msg("Database migrations complete!")
 	},
 }

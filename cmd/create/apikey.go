@@ -5,6 +5,7 @@ package create
 
 import (
 	"context"
+	"time"
 
 	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
@@ -12,7 +13,7 @@ import (
 	"github.com/daniarmas/chat/internal/inputs"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -35,12 +36,24 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 		cfg := config.NewConfig()
-		db, err := sqldatabase.New(cfg)
+
+		// Set connection pool configuration options
+		config, err := pgxpool.ParseConfig(cfg.PostgresqlUrl)
 		if err != nil {
-			go log.Error().Msgf("Postgres Error: %v", err)
+			panic(err)
+		}
+
+		config.MaxConns = 20                     // Set the maximum number of connections in the pool
+		config.MaxConnIdleTime = time.Minute * 5 // Set the maximum idle time for connections
+
+		// pgx
+		db, err := pgxpool.NewWithConfig(context.Background(), config)
+		if err != nil {
+			go log.Fatal().Msgf("Pgx connector Error: %v", err)
 		}
 
 		defer db.Close()
+
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 		apiKeyDbDatasource := databaseds.NewApiKey(db)
 		apiKeyRepo := repository.NewApiKey(apiKeyDbDatasource)

@@ -43,7 +43,16 @@ func NewAuth(userRepo repository.UserRepository, refreshRepository repository.Re
 }
 
 func (u *authUsecase) SignOut(ctx context.Context, userId string) error {
-	err := u.refreshRepository.DeleteRefreshTokenByUserId(ctx, userId)
+	err := u.accessRepository.DeleteAccessTokenByUserId(ctx, userId)
+	if err != nil {
+		switch err.(type) {
+		case myerror.NotFoundError:
+			// Do nothing
+		default:
+			return err
+		}
+	}
+	err = u.refreshRepository.DeleteRefreshTokenByUserId(ctx, userId)
 	if err != nil {
 		switch err.(type) {
 		case myerror.NotFoundError:
@@ -85,7 +94,7 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		return nil, errors.New("the credentials are incorrect")
 	}
 	// Check if the user is already loged in the system
-	refreshTokenCheck, err := u.refreshRepository.GetRefreshTokenByUserId(ctx, user.ID.String())
+	refreshTokenCheck, err := u.refreshRepository.GetRefreshTokenByUserId(ctx, user.ID)
 	if err != nil {
 		switch err.(type) {
 		case myerror.NotFoundError:
@@ -95,6 +104,10 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 		}
 	}
 	if refreshTokenCheck != nil && in.Logout {
+		err = u.accessRepository.DeleteAccessTokenByRefreshTokenId(ctx, refreshTokenCheck.ID)
+		if err != nil {
+			return nil, err
+		}
 		err = u.refreshRepository.DeleteRefreshToken(ctx, *refreshTokenCheck)
 		if err != nil {
 			return nil, err
@@ -104,12 +117,12 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 	}
 	// Create RefreshToken and AccessToken in the database for track sessions.
 	refreshTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.RefreshTokenExpireHours)).UTC()
-	refreshToken, err := u.refreshRepository.CreateRefreshToken(ctx, entity.RefreshToken{User: user, ExpirationTime: refreshTokenExpireTime})
+	refreshToken, err := u.refreshRepository.CreateRefreshToken(ctx, entity.RefreshToken{UserId: user.ID, ExpirationTime: refreshTokenExpireTime})
 	if err != nil {
 		return nil, err
 	}
 	accessTokenExpireTime := time.Now().Add(time.Hour * time.Duration(u.cfg.AccessTokenExpireHours)).UTC()
-	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{User: user, ExpirationTime: accessTokenExpireTime, RefreshToken: refreshToken})
+	accessToken, err := u.accessRepository.CreateAccessToken(ctx, entity.AccessToken{UserId: user.ID, ExpirationTime: accessTokenExpireTime, RefreshTokenId: refreshToken.ID})
 	if err != nil {
 		return nil, err
 	}

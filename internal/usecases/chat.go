@@ -9,7 +9,6 @@ import (
 	"github.com/daniarmas/chat/internal/repository"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
 	"github.com/daniarmas/chat/pkg/response"
-	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
 )
 
@@ -29,13 +28,12 @@ func NewChat(chatRepo repository.ChatRepository) ChatUsecase {
 }
 
 func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error) {
-	userIdUUID := uuid.MustParse(userId)
-	chat, err := u.chatRepository.GetChat(ctx, userId, input.ReceiverId.String())
+	chat, err := u.chatRepository.GetChat(ctx, userId, input.ReceiverId)
 	switch err.(type) {
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{FirstUserId: &userIdUUID, SecondUserId: input.ReceiverId})
+		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{FirstUserId: userId, SecondUserId: input.ReceiverId})
 		if err != nil {
 			go log.Error().Msgf(err.Error())
 			return nil, err
@@ -55,6 +53,9 @@ func (u chatUsecase) GetChats(ctx context.Context, userId string, updateTimeCurs
 		return nil, err
 	}
 	res.Chats = chats
+	if len(chats) != 0 {
+		res.Cursor = chats[len(chats)-1].UpdateTime
+	}
 	return &res, nil
 
 }

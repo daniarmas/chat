@@ -9,7 +9,6 @@ import (
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	jwt "github.com/golang-jwt/jwt/v4"
-	"github.com/google/uuid"
 )
 
 type JwtDatasource interface {
@@ -33,8 +32,8 @@ func NewJwtDatasource(cfg *config.Config) JwtDatasource {
 
 func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expirationTime time.Time) (accessToken string, err error) {
 	claims := &models.JwtCustomClaims{
-		ID:     *acToken.ID,
-		UserId: *acToken.User.ID,
+		ID:     acToken.ID,
+		UserId: acToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -49,8 +48,8 @@ func (ds jwtDatasource) CreateAccessToken(acToken *entity.AccessToken, expiratio
 
 func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirationTime time.Time) (refreshToken string, err error) {
 	claimsRefresh := &models.JwtCustomRefreshClaims{
-		ID:     *rfToken.ID,
-		UserId: *rfToken.User.ID,
+		ID:     rfToken.ID,
+		UserId: rfToken.UserId,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -65,7 +64,7 @@ func (ds jwtDatasource) CreateRefreshToken(rfToken *entity.RefreshToken, expirat
 
 func (ds jwtDatasource) CreateApiKey(apiKey *entity.ApiKey) (apikey string, err error) {
 	claimsRefresh := &models.ApiKeyJwtCustomClaims{
-		ID:         *apiKey.ID,
+		ID:         apiKey.ID,
 		AppVersion: apiKey.AppVersion,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: apiKey.ExpirationTime.Unix(),
@@ -112,8 +111,8 @@ func (ds jwtDatasource) ExtractTokenClaim(requestToken string) (*models.JwtCusto
 
 	// return claims["id"].(string), nil
 	return &models.JwtCustomClaims{
-		ID:     uuid.MustParse(claims["id"].(string)),
-		UserId: uuid.MustParse(claims["user_id"].(string)),
+		ID:     claims["id"].(string),
+		UserId: claims["user_id"].(string),
 	}, nil
 }
 
