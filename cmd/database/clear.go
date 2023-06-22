@@ -4,8 +4,11 @@ Copyright © 2023 NAME HERE <EMAIL ADDRESS>
 package database
 
 import (
+	"context"
+	"time"
+
 	"github.com/daniarmas/chat/internal/config"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 )
@@ -22,28 +25,54 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.NewConfig()
-		db, err := sqldatabase.New(cfg)
+
+		// Set connection pool configuration options
+		config, err := pgxpool.ParseConfig(cfg.PostgresqlUrl)
 		if err != nil {
-			go log.Fatal().Msgf("Postgres Error: %v", err)
+			panic(err)
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"user\";").Error; err != nil {
+
+		config.MaxConns = 20                     // Set the maximum number of connections in the pool
+		config.MaxConnIdleTime = time.Minute * 5 // Set the maximum idle time for connections
+
+		// pgx
+		conn, err := pgxpool.NewWithConfig(context.Background(), config)
+		if err != nil {
+			go log.Fatal().Msgf("Pgx connector Error: %v", err)
+		}
+
+		defer conn.Close()
+
+		rows, err := conn.Query(context.Background(), "DELETE FROM \"user\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"api_key\";").Error; err != nil {
+		defer rows.Close()
+		rows, err = conn.Query(context.Background(), "DELETE FROM \"api_key\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"refresh_token\";").Error; err != nil {
+		defer rows.Close()
+		rows, err = conn.Query(context.Background(), "DELETE FROM \"refresh_token\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"access_token\";").Error; err != nil {
+		defer rows.Close()
+		rows, err = conn.Query(context.Background(), "DELETE FROM \"access_token\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"message\";").Error; err != nil {
+		defer rows.Close()
+		rows, err = conn.Query(context.Background(), "DELETE FROM \"message\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
-		if err := db.Gorm.Exec("DELETE FROM \"chat\";").Error; err != nil {
+		defer rows.Close()
+		rows, err = conn.Query(context.Background(), "DELETE FROM \"chat\";")
+		if err != nil {
 			go log.Fatal().Msg(err.Error())
 		}
+		defer rows.Close()
 		go log.Info().Msg("Database cleaned!")
 	},
 }

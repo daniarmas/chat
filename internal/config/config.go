@@ -6,14 +6,16 @@ import (
 )
 
 type Config struct {
-	PostgresqlDsn           string `mapstructure:"POSTGRESQL_DSN"`
-	RedisDsn                string `mapstructure:"Redis_DSN"`
-	RedisPassword           string `mapstructure:"Redis_Password"`
-	RedisDb                 int    `mapstructure:"Redis_DB"`
-	JwtSecret               string `mapstructure:"JWT_SECRET"`
-	RefreshTokenExpireHours int    `mapstructure:"REFRESH_TOKEN_EXPIRE_HOURS"`
-	AccessTokenExpireHours  int    `mapstructure:"ACCESS_TOKEN_EXPIRE_HOURS"`
-	GraphqlPort             string `mapstructure:"GRAPHQL_PORT"`
+	PostgresqlDsn              string `mapstructure:"POSTGRESQL_DSN"`
+	PostgresqlUrl              string `mapstructure:"POSTGRESQL_URL"`
+	RedisDsn                   string `mapstructure:"Redis_DSN"`
+	RedisPassword              string `mapstructure:"Redis_Password"`
+	RedisDb                    int    `mapstructure:"Redis_DB"`
+	RedisExpirationTimeSeconds int    `mapstructure:"REDIS_EXPIRATION_TIME_SECONDS"`
+	JwtSecret                  string `mapstructure:"JWT_SECRET"`
+	RefreshTokenExpireHours    int    `mapstructure:"REFRESH_TOKEN_EXPIRE_HOURS"`
+	AccessTokenExpireHours     int    `mapstructure:"ACCESS_TOKEN_EXPIRE_HOURS"`
+	GraphqlPort                string `mapstructure:"GRAPHQL_PORT"`
 }
 
 func NewConfig() *Config {
