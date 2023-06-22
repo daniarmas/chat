@@ -14,7 +14,7 @@ type Message struct {
 	CreateTime time.Time `json:"create_time"`
 }
 
-// This methods map to and from a UserGorm for avoid using gorm models in the usecases.
+// This methods map to and from a UserModel for avoid using models in the usecases.
 func (a *Message) MapToMessageModel(message *entity.Message) {
 	chatOrm := Chat{}
 	chatOrm.MapToChatModel(message.Chat)

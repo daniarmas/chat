@@ -51,7 +51,6 @@ require (
 	golang.org/x/tools v0.6.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	gorm.io/gorm v1.25.1 // indirect
 )
 
 require (
@@ -65,5 +64,4 @@ require (
 	github.com/rs/cors v1.9.0
 	github.com/spf13/viper v1.16.0
 	golang.org/x/sys v0.8.0 // indirect
-	gorm.io/driver/postgres v1.5.2
 )

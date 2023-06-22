@@ -7,7 +7,6 @@ import (
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -20,13 +19,11 @@ type AccessTokenDbDatasource interface {
 }
 
 type accessTokenDbDatasource struct {
-	database *sqldatabase.Sql
 	pgxConn  *pgxpool.Pool
 }
 
-func NewAccessToken(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) AccessTokenDbDatasource {
+func NewAccessToken(pgxConn *pgxpool.Pool) AccessTokenDbDatasource {
 	return &accessTokenDbDatasource{
-		database: database,
 		pgxConn:  pgxConn,
 	}
 }

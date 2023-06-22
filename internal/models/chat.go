@@ -14,7 +14,7 @@ type Chat struct {
 	UpdateTime   time.Time `json:"update_time"`
 }
 
-// This methods map to and from a ApiKeyGorm for avoid using gorm models in the usecases.
+// This methods map to and from a ApiKeyModel for avoid using models in the usecases.
 func (a *Chat) MapToChatModel(chat *entity.Chat) {
 	if chat != nil {
 		a.ID = chat.ID

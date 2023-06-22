@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -15,13 +14,11 @@ type ApiKeyDbDatasource interface {
 }
 
 type apiKeyDbDatasource struct {
-	database *sqldatabase.Sql
 	pgxConn  *pgxpool.Pool
 }
 
-func NewApiKey(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) ApiKeyDbDatasource {
+func NewApiKey(pgxConn *pgxpool.Pool) ApiKeyDbDatasource {
 	return &apiKeyDbDatasource{
-		database: database,
 		pgxConn:  pgxConn,
 	}
 }

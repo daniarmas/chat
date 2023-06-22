@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/daniarmas/chat/internal/entity"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -16,39 +15,16 @@ type MessageDbDatasource interface {
 }
 
 type messageDbDatasource struct {
-	database *sqldatabase.Sql
 	pgxConn  *pgxpool.Pool
 }
 
-func NewMessage(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) MessageDbDatasource {
+func NewMessage(pgxConn *pgxpool.Pool) MessageDbDatasource {
 	return &messageDbDatasource{
-		database: database,
 		pgxConn:  pgxConn,
 	}
 }
 
 func (repo messageDbDatasource) GetMessagesByChatId(ctx context.Context, chatId string, createTimeCursor time.Time) ([]*entity.Message, error) {
-	// With GORM
-
-	// var cursor time.Time
-	// if createTimeCursor.IsZero() {
-	// 	cursor = time.Now().UTC()
-	// } else {
-	// 	cursor = createTimeCursor
-	// }
-	// var messagesOrm []models.MessageOrm
-	// var messages []*entity.Message
-	// result := repo.database.Gorm.Where("chat_id = ?", chatId).Where("create_time < ?", cursor).Limit(11).Order("create_time DESC").Find(&messagesOrm)
-	// if result.Error != nil {
-	// 	return nil, result.Error
-	// }
-	// for _, element := range messagesOrm {
-	// 	messages = append(messages, element.MapFromMessageGorm())
-	// }
-	// return messages, nil
-
-	// With PGX
-
 	var cursor time.Time
 	if createTimeCursor.IsZero() {
 		cursor = time.Now().UTC()

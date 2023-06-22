@@ -21,7 +21,6 @@ import (
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	ownredis "github.com/daniarmas/chat/pkg/own-redis"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -47,13 +46,6 @@ to quickly create a Cobra application.`,
 
 		cfg := config.NewConfig()
 
-		db, err := sqldatabase.New(cfg)
-		if err != nil {
-			go log.Fatal().Msgf("Postgres Error: %v", err)
-		}
-
-		defer db.Close()
-
 		// Set connection pool configuration options
 		config, err := pgxpool.ParseConfig(cfg.PostgresqlUrl)
 		if err != nil {
@@ -64,12 +56,12 @@ to quickly create a Cobra application.`,
 		config.MaxConnIdleTime = time.Minute * 5 // Set the maximum idle time for connections
 
 		// pgx
-		conn, err := pgxpool.NewWithConfig(context.Background(), config)
+		db, err := pgxpool.NewWithConfig(context.Background(), config)
 		if err != nil {
 			go log.Fatal().Msgf("Pgx connector Error: %v", err)
 		}
 
-		defer conn.Close()
+		defer db.Close()
 
 		redis, err := ownredis.NewRedis(cfg)
 		if err != nil {
@@ -80,11 +72,11 @@ to quickly create a Cobra application.`,
 		hashDs := hashds.NewBcryptHash()
 
 		// Database Datasources
-		chatDatabaseDs := databaseds.NewChat(db, conn)
-		accessTokenDatabaseDs := databaseds.NewAccessToken(db, conn)
-		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, conn)
-		userDatabaseDs := databaseds.NewUser(conn, hashDs)
-		messageDatabaseDs := databaseds.NewMessage(db, conn)
+		chatDatabaseDs := databaseds.NewChat(db)
+		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
+		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
+		userDatabaseDs := databaseds.NewUser(db, hashDs)
+		messageDatabaseDs := databaseds.NewMessage(db)
 
 		// Cache Datasources
 		chatCacheDs := cacheds.NewChatCacheDatasource(redis)

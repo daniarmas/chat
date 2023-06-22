@@ -14,7 +14,7 @@ type ApiKey struct {
 	CreateTime     time.Time `json:"create_time"`
 }
 
-// This methods map to and from a ApiKeyGorm for avoid using gorm models in the usecases.
+// This methods map to and from a ApiKeyModel for avoid using models in the usecases.
 func (a *ApiKey) MapToApiKeyModel(apiKey *entity.ApiKey) {
 	a.ID = apiKey.ID
 	a.AppVersion = apiKey.AppVersion

@@ -6,7 +6,6 @@ import (
 
 	"github.com/daniarmas/chat/internal/entity"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
-	"github.com/daniarmas/chat/pkg/sqldatabase"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -19,13 +18,11 @@ type RefreshTokenDbDatasource interface {
 }
 
 type refreshTokenDbDatasource struct {
-	database *sqldatabase.Sql
 	pgxConn  *pgxpool.Pool
 }
 
-func NewRefreshToken(database *sqldatabase.Sql, pgxConn *pgxpool.Pool) RefreshTokenDbDatasource {
+func NewRefreshToken(pgxConn *pgxpool.Pool) RefreshTokenDbDatasource {
 	return &refreshTokenDbDatasource{
-		database: database,
 		pgxConn:  pgxConn,
 	}
 }
