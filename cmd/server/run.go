@@ -105,7 +105,8 @@ to quickly create a Cobra application.`,
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 
 		// Stream Datasource
-		messageStreamDatasource := stream.NewMessageStreamDatasource(redis)
+		// messageStreamDatasource := stream.NewMessageStreamRedisDatasource(redis)
+		messageStreamDatasource := stream.NewMessageStreamNatsDatasource(nc)
 
 		// Repositories
 		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)

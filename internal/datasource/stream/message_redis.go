@@ -15,17 +15,17 @@ type MessageStreamDatasource interface {
 	SubscribeByUser(ctx context.Context, userId string) (chan *entity.Message, error)
 }
 
-type messageStreamDatasource struct {
+type messageStreamRedisDatasource struct {
 	redis *redis.Client
 }
 
-func NewMessageStreamDatasource(redis *redis.Client) MessageStreamDatasource {
-	return &messageStreamDatasource{
+func NewMessageStreamRedisDatasource(redis *redis.Client) MessageStreamDatasource {
+	return &messageStreamRedisDatasource{
 		redis: redis,
 	}
 }
 
-func (ds *messageStreamDatasource) PublishMessage(ctx context.Context, message *entity.Message, userId string) error {
+func (ds *messageStreamRedisDatasource) PublishMessage(ctx context.Context, message *entity.Message, userId string) error {
 	// Publish the message on the redis channel corresponding to the chat
 	err := ds.redis.Publish(ctx, message.ChatId, message).Err()
 	if err != nil {
@@ -39,7 +39,7 @@ func (ds *messageStreamDatasource) PublishMessage(ctx context.Context, message *
 	return nil
 }
 
-func (ds *messageStreamDatasource) SubscribeByChat(ctx context.Context, chatId string) (chan *entity.Message, error) {
+func (ds *messageStreamRedisDatasource) SubscribeByChat(ctx context.Context, chatId string) (chan *entity.Message, error) {
 	ch := make(chan *entity.Message)
 
 	go func() {
@@ -80,7 +80,7 @@ func (ds *messageStreamDatasource) SubscribeByChat(ctx context.Context, chatId s
 	return ch, nil
 }
 
-func (ds *messageStreamDatasource) SubscribeByUser(ctx context.Context, userId string) (chan *entity.Message, error) {
+func (ds *messageStreamRedisDatasource) SubscribeByUser(ctx context.Context, userId string) (chan *entity.Message, error) {
 	ch := make(chan *entity.Message)
 
 	go func() {
