@@ -77,6 +77,7 @@ to quickly create a Cobra application.`,
 			go log.Fatal().Msgf("Error connecting to NATS server: %s", err)
 			return
 		}
+
 		defer nc.Close()
 
 		// Check if the connection is still active
