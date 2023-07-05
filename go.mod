@@ -25,8 +25,12 @@ require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.0 // indirect
+	github.com/klauspost/compress v1.16.5 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nats-io/nats.go v1.27.1 // indirect
+	github.com/nats-io/nkeys v0.4.4 // indirect
+	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/afero v1.9.5 // indirect
