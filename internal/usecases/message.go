@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/daniarmas/chat/internal/config"
@@ -41,44 +40,11 @@ func NewMessage(userRepo repository.UserRepository, messageRepository repository
 }
 
 func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, userId string) (<-chan *entity.Message, error) {
-	ch := make(chan *entity.Message)
-
-	go func() {
-		// There is no error because go-redis automatically reconnects on error.
-		pubsub := usecase.redis.Subscribe(ctx, userId)
-
-		// Close the subscription when we are done.
-		defer pubsub.Close()
-
-		for {
-			msg, err := pubsub.ReceiveMessage(ctx)
-			if err != nil {
-				panic(err)
-			}
-
-			// parse the message payload into a Message object
-			var messageObj entity.Message
-			err = json.Unmarshal([]byte(msg.Payload), &messageObj)
-			if err != nil {
-				panic(err) // handle the error appropriately
-			}
-
-			// The channel may have gotten closed due to the client disconnecting.
-			// To not have our Goroutine block or panic, we do the send in a select block.
-			// This will jump to the default case if the channel is closed.
-			select {
-			case ch <- &messageObj: // This is the actual send.
-				go log.Info().Msgf("Msg Sended: %s", messageObj.Content)
-				// Our message went through, do nothing
-			default: // This is run when our send does not work.
-				go log.Info().Msgf("Channel usecase closed")
-				// You can handle any deregistration of the channel here.
-				return // We'll just return ending the routine.
-			}
-		}
-	}()
-
-	return ch, nil
+	res, err := usecase.messageRepository.ReceiveMessageByUser(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func (usecase *messageUsecase) ReceiveMessagesByChat(ctx context.Context, input inputs.ReceiveMessagesInput) (chan *entity.Message, error) {
@@ -117,13 +83,7 @@ func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.Sen
 	} else {
 		otherUserId = chat.SecondUserId
 	}
-	// Publish the message on the redis channel corresponding to the chat
-	err = usecase.redis.Publish(ctx, input.ChatID, message).Err()
-	if err != nil {
-		panic(err)
-	}
-	// Publish the message on the redis channel corresponding to the user
-	err = usecase.redis.Publish(ctx, otherUserId, message).Err()
+	err = usecase.messageRepository.PublishMessage(ctx, *message, otherUserId)
 	if err != nil {
 		panic(err)
 	}
