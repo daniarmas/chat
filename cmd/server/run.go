@@ -16,6 +16,7 @@ import (
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
+	"github.com/daniarmas/chat/internal/datasource/stream"
 	"github.com/daniarmas/chat/internal/delivery/graph"
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/repository"
@@ -86,11 +87,14 @@ to quickly create a Cobra application.`,
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 
+		// Stream Datasource
+		messageStreamDatasource := stream.NewMessageStreamDatasource(redis)
+
 		// Repositories
 		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
 		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs, accessTokenCacheDs)
-		messageRepo := repository.NewMessage(messageDatabaseDs)
+		messageRepo := repository.NewMessage(messageDatabaseDs, messageStreamDatasource)
 		chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
 		// Usecases

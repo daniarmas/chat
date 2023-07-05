@@ -489,7 +489,7 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 			modelMsg := &model.Message{
 				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
-				ChatID:     entityMsg.ID,
+				ChatID:     entityMsg.ChatId,
 				UserID:     entityMsg.UserId,
 				CreateTime: entityMsg.CreateTime,
 			}
