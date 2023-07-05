@@ -23,12 +23,12 @@ func (ds *messageStreamRedisDatasource) PublishMessage(ctx context.Context, mess
 	// Publish the message on the redis channel corresponding to the chat
 	err := ds.redis.Publish(ctx, message.ChatId, message).Err()
 	if err != nil {
-		panic(err)
+		go log.Fatal().Msg(err.Error())
 	}
 	// Publish the message on the redis channel corresponding to the user
 	err = ds.redis.Publish(ctx, userId, message).Err()
 	if err != nil {
-		panic(err)
+		go log.Fatal().Msg(err.Error())
 	}
 	return nil
 }
@@ -46,14 +46,14 @@ func (ds *messageStreamRedisDatasource) SubscribeByChat(ctx context.Context, cha
 		for {
 			msg, err := pubsub.ReceiveMessage(ctx)
 			if err != nil {
-				panic(err)
+				go log.Fatal().Msg(err.Error())
 			}
 
 			// parse the message payload into a Message object
 			var messageObj entity.Message
 			err = json.Unmarshal([]byte(msg.Payload), &messageObj)
 			if err != nil {
-				panic(err) // handle the error appropriately
+				go log.Fatal().Msgf("Error parsing message data: %s", err) // handle the error appropriately
 			}
 
 			// The channel may have gotten closed due to the client disconnecting.
@@ -87,14 +87,14 @@ func (ds *messageStreamRedisDatasource) SubscribeByUser(ctx context.Context, use
 		for {
 			msg, err := pubsub.ReceiveMessage(ctx)
 			if err != nil {
-				panic(err)
+				go log.Fatal().Msg(err.Error())
 			}
 
 			// parse the message payload into a Message object
 			var messageObj entity.Message
 			err = json.Unmarshal([]byte(msg.Payload), &messageObj)
 			if err != nil {
-				panic(err) // handle the error appropriately
+				go log.Fatal().Msg(err.Error()) // handle the error appropriately
 			}
 
 			// The channel may have gotten closed due to the client disconnecting.
