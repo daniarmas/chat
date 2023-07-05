@@ -25,6 +25,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -59,14 +60,29 @@ to quickly create a Cobra application.`,
 		// pgx
 		db, err := pgxpool.NewWithConfig(context.Background(), config)
 		if err != nil {
-			go log.Fatal().Msgf("Pgx connector Error: %v", err)
+			go log.Fatal().Msgf("Error connecting to PostgreSQL server: %v", err)
 		}
 
 		defer db.Close()
 
+		// Redis client
 		redis, err := ownredis.NewRedis(cfg)
 		if err != nil {
-			go log.Fatal().Msgf("Redis Error: %v", err)
+			go log.Fatal().Msgf("Error connecting to Redis server: %s", err)
+		}
+
+		// NATS client
+		nc, _ := nats.Connect(cfg.NatsUrl)
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to NATS server: %s", err)
+			return
+		}
+		defer nc.Close()
+
+		// Check if the connection is still active
+		if !nc.IsConnected() {
+			go log.Fatal().Msg("Connection to NATS server is lost")
+			return
 		}
 
 		// Hash Datasource
