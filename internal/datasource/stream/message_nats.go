@@ -75,7 +75,7 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 	ch := make(chan *entity.Message)
 
 	go func() {
-		ds.nc.Subscribe(userId, func(m *nats.Msg) {
+		sub, _ := ds.nc.Subscribe(userId, func(m *nats.Msg) {
 			var msg entity.Message
 			err := json.Unmarshal(m.Data, &msg)
 			if err != nil {
@@ -92,15 +92,17 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 		}
 
 		// Listen for values on the channel and a close signal
-		// for {
-		// 	select {
-		// 	case _, ok := <-ch:
-		// 		if !ok {
-		// 			sub.Unsubscribe()
-		// 			return
-		// 		}
-		// 	}
-		// }
+		for {
+			select {
+			case value, ok := <-ch:
+				if !ok {
+					sub.Unsubscribe()
+					return
+				} else {
+					ch <- value
+				}
+			}
+		}
 
 	}()
 
