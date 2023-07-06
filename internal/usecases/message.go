@@ -15,7 +15,7 @@ import (
 
 type MessageUsecase interface {
 	ReceiveMessagesByChat(ctx context.Context, input inputs.ReceiveMessagesInput) (chan *entity.Message, error)
-	ReceiveMessages(ctx context.Context, userId string) (<-chan *entity.Message, error)
+	ReceiveMessages(ctx context.Context, userId string) (chan *entity.Message, error)
 	SendMessage(ctx context.Context, input inputs.SendMessage, userId string) (*entity.Message, error)
 	GetMessageByChat(ctx context.Context, input inputs.GetMessagesByChatId, userId string, createTimeCursor time.Time) (*response.GetMessagesByChatResponse, error)
 }
@@ -39,7 +39,7 @@ func NewMessage(userRepo repository.UserRepository, messageRepository repository
 	}
 }
 
-func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, userId string) (<-chan *entity.Message, error) {
+func (usecase *messageUsecase) ReceiveMessages(ctx context.Context, userId string) (chan *entity.Message, error) {
 	res, err := usecase.messageRepository.ReceiveMessageByUser(ctx, userId)
 	if err != nil {
 		return nil, err

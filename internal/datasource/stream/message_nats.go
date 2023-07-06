@@ -39,7 +39,6 @@ func (ds *messageStreamNatsDatasource) SubscribeByChat(ctx context.Context, chat
 	ch := make(chan *entity.Message)
 
 	go func() {
-		// Simple Async Subscriber
 		ds.nc.Subscribe(chatId, func(m *nats.Msg) {
 			var msg entity.Message
 			err := json.Unmarshal(m.Data, &msg)
@@ -49,16 +48,26 @@ func (ds *messageStreamNatsDatasource) SubscribeByChat(ctx context.Context, chat
 			}
 			ch <- &msg
 		})
-		// Wait for messages
+
 		ds.nc.Flush()
 		if err := ds.nc.LastError(); err != nil {
 			go log.Error().Msgf("Error subscribing to NATS subject: %s", err)
 			return
 		}
-		// Keep the connection alive
-		select {}
+
+		// Listen for values on the channel and a close signal
+		// for {
+		// 	select {
+		// 	case _, ok := <-ch:
+		// 		if !ok {
+		// 			sub.Unsubscribe()
+		// 			return
+		// 		}
+		// 	}
+		// }
 
 	}()
+
 	return ch, nil
 }
 
@@ -66,7 +75,6 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 	ch := make(chan *entity.Message)
 
 	go func() {
-		// Simple Async Subscriber
 		ds.nc.Subscribe(userId, func(m *nats.Msg) {
 			var msg entity.Message
 			err := json.Unmarshal(m.Data, &msg)
@@ -76,14 +84,24 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 			}
 			ch <- &msg
 		})
-		// Wait for messages
+
 		ds.nc.Flush()
 		if err := ds.nc.LastError(); err != nil {
 			go log.Error().Msgf("Error subscribing to NATS subject: %s", err)
 			return
 		}
-		// Keep the connection alive
-		select {}
+
+		// Listen for values on the channel and a close signal
+		// for {
+		// 	select {
+		// 	case _, ok := <-ch:
+		// 		if !ok {
+		// 			sub.Unsubscribe()
+		// 			return
+		// 		}
+		// 	}
+		// }
+
 	}()
 
 	return ch, nil

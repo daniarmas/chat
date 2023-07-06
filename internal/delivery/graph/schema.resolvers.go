@@ -14,6 +14,7 @@ import (
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
+	"github.com/rs/zerolog/log"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -482,7 +483,7 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 
 	// goroutine for publishing model.Message objects to the publishing channel
 	go func() {
-		defer close(res)
+		// defer close(res)
 
 		for entityMsg := range result {
 			// convert the entity.Message to model.Message
@@ -494,12 +495,33 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 				CreateTime: entityMsg.CreateTime,
 			}
 
+			select {
+			case <-ctx.Done(): // This runs when context gets cancelled. Subscription closes.
+				go log.Error().Msg("Subscription Closed")
+				// Signal the subscription loop to unsubscribe
+				// close(res)
+				// Handle deregistration of the channel here. `close(ch)`
+				return // Remember to return to end the routine.
+
+			case res <- modelMsg: // This is the actual send.
+				// Our message went through, do nothing
+			}
+
 			// send the model.Message to the modelMessages channel
 			if modelMsg.UserID != user.ID && modelMsg.ChatID == input.ChatID {
-				res <- modelMsg
+				// The subscription may have got closed due to the client disconnecting.
+				// Hence we do send in a select block with a check for context cancellation.
+				// This avoids goroutine getting blocked forever or panicking,
+
 			}
 		}
 	}()
+
+	// Use a select statement to wait for either the context to be cancelled or a signal
+	select {
+	case <-ctx.Done():
+		go log.Error().Msgf("Context cancelled: %s", ctx.Err())
+	}
 
 	return res, nil
 }
