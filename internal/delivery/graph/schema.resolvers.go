@@ -542,27 +542,29 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 
 	// goroutine for publishing model.Message objects to the publishing channel
 	go func() {
+		for entityMsg := range result {
+			// convert the entity.Message to model.Message
+			modelMsg := &model.Message{
+				ID:         entityMsg.ID,
+				Content:    entityMsg.Content,
+				ChatID:     entityMsg.ID,
+				UserID:     entityMsg.UserId,
+				CreateTime: entityMsg.CreateTime,
+			}
+
+			// send the model.Message to the modelMessages channel
+			if modelMsg.UserID != user.ID {
+				res <- modelMsg
+			}
+		}
+	}()
+
+	go func() {
 		// Use a select statement to wait for either the context to be cancelled or a signal
 		select {
 		case <-ctx.Done():
 			close(res)
 			close(result)
-		default:
-			for entityMsg := range result {
-				// convert the entity.Message to model.Message
-				modelMsg := &model.Message{
-					ID:         entityMsg.ID,
-					Content:    entityMsg.Content,
-					ChatID:     entityMsg.ID,
-					UserID:     entityMsg.UserId,
-					CreateTime: entityMsg.CreateTime,
-				}
-
-				// send the model.Message to the modelMessages channel
-				if modelMsg.UserID != user.ID {
-					res <- modelMsg
-				}
-			}
 		}
 	}()
 
