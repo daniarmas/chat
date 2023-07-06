@@ -14,7 +14,6 @@ import (
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
-	"github.com/rs/zerolog/log"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -481,47 +480,30 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 		return nil, errors.New("internal server error")
 	}
 
-	// goroutine for publishing model.Message objects to the publishing channel
+	// Publishing the messages
 	go func() {
-		// defer close(res)
-
 		for entityMsg := range result {
-			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
 				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
-				ChatID:     entityMsg.ChatId,
+				ChatID:     entityMsg.ID,
 				UserID:     entityMsg.UserId,
 				CreateTime: entityMsg.CreateTime,
 			}
 
-			select {
-			case <-ctx.Done(): // This runs when context gets cancelled. Subscription closes.
-				go log.Error().Msg("Subscription Closed")
-				// Signal the subscription loop to unsubscribe
-				// close(res)
-				// Handle deregistration of the channel here. `close(ch)`
-				return // Remember to return to end the routine.
-
-			case res <- modelMsg: // This is the actual send.
-				// Our message went through, do nothing
-			}
-
-			// send the model.Message to the modelMessages channel
-			if modelMsg.UserID != user.ID && modelMsg.ChatID == input.ChatID {
-				// The subscription may have got closed due to the client disconnecting.
-				// Hence we do send in a select block with a check for context cancellation.
-				// This avoids goroutine getting blocked forever or panicking,
-
+			if modelMsg.UserID != user.ID {
+				res <- modelMsg
 			}
 		}
 	}()
-
-	// Use a select statement to wait for either the context to be cancelled or a signal
-	select {
-	case <-ctx.Done():
-		go log.Error().Msgf("Context cancelled: %s", ctx.Err())
-	}
+	// Waiting for context cancellation for close the channels
+	go func() {
+		select {
+		case <-ctx.Done():
+			close(res)
+			close(result)
+		}
+	}()
 
 	return res, nil
 }
@@ -540,10 +522,9 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 		return nil, errors.New("internal server error")
 	}
 
-	// goroutine for publishing model.Message objects to the publishing channel
+	// Publishing the messages
 	go func() {
 		for entityMsg := range result {
-			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
 				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
@@ -552,15 +533,13 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 				CreateTime: entityMsg.CreateTime,
 			}
 
-			// send the model.Message to the modelMessages channel
 			if modelMsg.UserID != user.ID {
 				res <- modelMsg
 			}
 		}
 	}()
-
+	// Waiting for context cancellation for close the channels
 	go func() {
-		// Use a select statement to wait for either the context to be cancelled or a signal
 		select {
 		case <-ctx.Done():
 			close(res)

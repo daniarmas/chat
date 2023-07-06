@@ -37,9 +37,11 @@ func (ds *messageStreamNatsDatasource) PublishMessage(ctx context.Context, messa
 
 func (ds *messageStreamNatsDatasource) SubscribeByChat(ctx context.Context, chatId string) (chan *entity.Message, error) {
 	ch := make(chan *entity.Message)
+	var sub *nats.Subscription
 
+	// Listening to messages from nats
 	go func() {
-		ds.nc.Subscribe(chatId, func(m *nats.Msg) {
+		sub, _ = ds.nc.Subscribe(chatId, func(m *nats.Msg) {
 			var msg entity.Message
 			err := json.Unmarshal(m.Data, &msg)
 			if err != nil {
@@ -55,17 +57,20 @@ func (ds *messageStreamNatsDatasource) SubscribeByChat(ctx context.Context, chat
 			return
 		}
 
-		// Listen for values on the channel and a close signal
-		// for {
-		// 	select {
-		// 	case _, ok := <-ch:
-		// 		if !ok {
-		// 			sub.Unsubscribe()
-		// 			return
-		// 		}
-		// 	}
-		// }
-
+	}()
+	// Listening for a channel close signal to unsubscribe from nats
+	go func() {
+		for {
+			select {
+			case value, ok := <-ch:
+				if !ok {
+					sub.Unsubscribe()
+					return
+				} else {
+					ch <- value
+				}
+			}
+		}
 	}()
 
 	return ch, nil
@@ -75,6 +80,7 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 	ch := make(chan *entity.Message)
 	var sub *nats.Subscription
 
+	// Listening to messages from nats
 	go func() {
 		sub, _ = ds.nc.Subscribe(userId, func(m *nats.Msg) {
 			var msg entity.Message
@@ -93,9 +99,8 @@ func (ds *messageStreamNatsDatasource) SubscribeByUser(ctx context.Context, user
 		}
 
 	}()
-
+	// Listening for a channel close signal to unsubscribe from nats
 	go func() {
-		// Listen for values on the channel and a close signal
 		for {
 			select {
 			case value, ok := <-ch:
