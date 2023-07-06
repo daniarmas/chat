@@ -44,13 +44,16 @@ services:
       - "4222:4222"
       - "6222:6222"
     command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --http_port 8222 "
+    restart: always
   nats-1:
     image: nats:2.9.19
     command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://ruser:T0pS3cr3t@nats:6222"
+    restart: always
     depends_on: ["nats"]
   nats-2:
     image: nats:2.9.19
     command: "--cluster_name NATS --cluster nats://0.0.0.0:6222 --routes=nats://ruser:T0pS3cr3t@nats:6222"
+    restart: always
     depends_on: ["nats"]
 volumes:
   postgresql:
