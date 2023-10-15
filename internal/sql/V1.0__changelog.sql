@@ -83,3 +83,24 @@ CREATE TABLE access_token
         ON DELETE CASCADE
 );
 --rollback DROP TABLE access_token;
+
+--changeset daniarmas:7 labels:create-chat-table context:example-context
+--comment: creating the chat table
+CREATE TABLE chat
+(
+    "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+    "name" character varying(255),
+    "create_time" timestamp without time zone NOT NULL,
+    "update_time" timestamp without time zone NOT NULL,
+    "delete_time" timestamp without time zone,
+    CONSTRAINT refreshtoken_pkey PRIMARY KEY (id),
+    CONSTRAINT refreshtoken_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES "user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE,
+    CONSTRAINT refreshtoken_refreshtoken_id_fkey FOREIGN KEY (refresh_token_id)
+        REFERENCES "refresh_token" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+--rollback DROP TABLE chat;
