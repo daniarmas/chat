@@ -41,3 +41,17 @@ CREATE TABLE user
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 --rollback DROP TABLE user;
+
+--changeset daniarmas:5 labels:create-refresh-token-table context:example-context
+--comment: creating the refresh-token table
+CREATE TABLE refresh_token
+(
+    "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+    "user_id" character varying(255) NOT NULL UNIQUE,
+    "expiration_time" character varying(255) NOT NULL,
+    "create_time" timestamp without time zone NOT NULL,
+    "update_time" timestamp without time zone NOT NULL,
+    "delete_time" timestamp without time zone,
+    CONSTRAINT refreshtoken_pkey PRIMARY KEY (id)
+);
+--rollback DROP TABLE refresh_token;
