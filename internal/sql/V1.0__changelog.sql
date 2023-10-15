@@ -31,14 +31,15 @@ CREATE TABLE apikey
 CREATE TABLE user
 (
     "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-    "email" character varying(255) NOT NULL UNIQUE,
+    "email" character varying(255) NOT NULL,
     "password" character varying(255) NOT NULL,
     "fullname" character varying(255) NOT NULL,
     "username" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
     "update_time" timestamp without time zone NOT NULL,
     "delete_time" timestamp without time zone,
-    CONSTRAINT user_pkey PRIMARY KEY (id)
+    CONSTRAINT user_pkey PRIMARY KEY (id),
+    CONSTRAINT user_email_key UNIQUE (email)
 );
 --rollback DROP TABLE user;
 
@@ -47,11 +48,15 @@ CREATE TABLE user
 CREATE TABLE refresh_token
 (
     "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
-    "user_id" character varying(255) NOT NULL UNIQUE,
+    "user_id" uuid NOT NULL,
     "expiration_time" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
     "update_time" timestamp without time zone NOT NULL,
     "delete_time" timestamp without time zone,
-    CONSTRAINT refreshtoken_pkey PRIMARY KEY (id)
+    CONSTRAINT refreshtoken_pkey PRIMARY KEY (id),
+    CONSTRAINT refreshtoken_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES "user" (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
 );
 --rollback DROP TABLE refresh_token;
