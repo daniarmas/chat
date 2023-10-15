@@ -67,5 +67,8 @@ In the kubernetes directory there are the manifests to deploy in kubernetes, run
 
 `kubectl apply -f .`
 
+## **Run database migrations**
+
+`docker run --rm --network="chat_default" -v ./internal/sql:/liquibase/changelog/ liquibase/liquibase:4.11 --url="jdbc:postgresql://postgres:5432/chat?currentSchema=public" --changelog-file="V1.0__changelog.sql" --username="postgres" --password="postgres" update --log-level error`
 
 ***This is for testing and development purposes only. It is recommended to change the passwords and environment variables.***
