@@ -25,3 +25,19 @@ CREATE TABLE apikey
     CONSTRAINT apikey_pkey PRIMARY KEY (id)
 );
 --rollback DROP TABLE apikey;
+
+--changeset daniarmas:4 labels:create-user-table context:example-context
+--comment: creating the user table
+CREATE TABLE user
+(
+    "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
+    "email" character varying(255) NOT NULL UNIQUE,
+    "password" character varying(255) NOT NULL,
+    "fullname" character varying(255) NOT NULL,
+    "username" character varying(255) NOT NULL,
+    "create_time" timestamp without time zone NOT NULL,
+    "update_time" timestamp without time zone NOT NULL,
+    "delete_time" timestamp without time zone,
+    CONSTRAINT user_pkey PRIMARY KEY (id)
+);
+--rollback DROP TABLE user;
