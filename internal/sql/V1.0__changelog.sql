@@ -104,3 +104,25 @@ CREATE TABLE chat
         ON DELETE CASCADE
 );
 --rollback DROP TABLE chat;
+
+--changeset daniarmas:8 labels:create-table-union-user-chat context:example-context
+--comment: creating the union_user_and_chat table
+CREATE TABLE union_user_and_chat
+(
+    id uuid NOT NULL DEFAULT uuid_generate_v4(),
+    user_id uuid NOT NULL,
+    chat_id uuid NOT NULL,
+    create_time timestamp with time zone NOT NULL,
+    update_time timestamp with time zone NOT NULL,
+    delete_time timestamp with time zone,
+    CONSTRAINT union_user_and_chat_pkey PRIMARY KEY (id),
+    CONSTRAINT union_user_and_chat_fkey_user_id_fkey FOREIGN KEY (user_id)
+        REFERENCES user (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT union_user_and_chat_fkey_chat_id_fkey FOREIGN KEY (chat_id)
+        REFERENCES chat (id) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE
+);
+--rollback DROP TABLE "union_user_and_chat";
