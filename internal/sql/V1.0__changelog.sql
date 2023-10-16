@@ -20,8 +20,6 @@ CREATE TABLE apikey
     "revoked" boolean NOT NULL,
     "expiration_time" timestamp without time zone NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT apikey_pkey PRIMARY KEY (id)
 );
 --rollback DROP TABLE apikey;
@@ -36,8 +34,6 @@ CREATE TABLE "user"
     "fullname" character varying(255) NOT NULL,
     "username" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT user_pkey PRIMARY KEY (id),
     CONSTRAINT user_email_key UNIQUE (email)
 );
@@ -51,8 +47,6 @@ CREATE TABLE refresh_token
     "user_id" uuid NOT NULL,
     "expiration_time" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT refreshtoken_pkey PRIMARY KEY (id),
     CONSTRAINT refreshtoken_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES "user" (id) MATCH SIMPLE
@@ -70,8 +64,6 @@ CREATE TABLE access_token
     "refresh_token_id" uuid NOT NULL,
     "expiration_time" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT accesstoken_pkey PRIMARY KEY (id),
     CONSTRAINT accesstoken_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES "user" (id) MATCH SIMPLE
@@ -91,8 +83,6 @@ CREATE TABLE chat
     "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
     "name" character varying(255),
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT chat_pkey PRIMARY KEY (id)
 );
 --rollback DROP TABLE chat;
@@ -105,8 +95,6 @@ CREATE TABLE union_user_and_chat
     user_id uuid NOT NULL,
     chat_id uuid NOT NULL,
     create_time timestamp with time zone NOT NULL,
-    update_time timestamp with time zone NOT NULL,
-    delete_time timestamp with time zone,
     CONSTRAINT union_user_and_chat_pkey PRIMARY KEY (id),
     CONSTRAINT union_user_and_chat_fkey_user_id_fkey FOREIGN KEY (user_id)
         REFERENCES "user" (id) MATCH SIMPLE
@@ -128,8 +116,6 @@ CREATE TABLE message
     "user_id" uuid NOT NULL,
     "content" character varying(255) NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
-    "update_time" timestamp without time zone NOT NULL,
-    "delete_time" timestamp without time zone,
     CONSTRAINT message_pkey PRIMARY KEY (id),
     CONSTRAINT message_fkey FOREIGN KEY (user_id)
         REFERENCES "user" (id) MATCH SIMPLE
