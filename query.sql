@@ -15,3 +15,6 @@ INSERT INTO "access_token" (refresh_token_id, user_id, expiration_time, create_t
 
 -- name: DeleteAccessTokenByUserId :one
 DELETE FROM "access_token" WHERE user_id = $1 RETURNING *;
+
+-- name: DeleteRefreshTokenByUserid :one
+DELETE FROM "refresh_token" WHERE user_id = $1 RETURNING *;

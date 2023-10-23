@@ -102,16 +102,27 @@ func (repo refreshTokenDbDatasource) DeleteRefreshToken(ctx context.Context, ref
 }
 
 func (repo refreshTokenDbDatasource) DeleteRefreshTokenByUserId(ctx context.Context, userId string) error {
-	result, err := repo.pgxConn.Exec(context.Background(), "DELETE FROM \"refresh_token\" WHERE user_id = $1", userId)
-	if err != nil {
-		go log.Error().Msg(err.Error())
-		return err
-	}
+	// result, err := repo.pgxConn.Exec(context.Background(), "DELETE FROM \"refresh_token\" WHERE user_id = $1", userId)
+	// if err != nil {
+	// 	go log.Error().Msg(err.Error())
+	// 	return err
+	// }
 
-	// Check if the record was actually deleted
-	if result.RowsAffected() == 0 {
-		return myerror.NotFoundError{}
-	} else {
-		return nil
+	// // Check if the record was actually deleted
+	// if result.RowsAffected() == 0 {
+	// 	return myerror.NotFoundError{}
+	// } else {
+	// 	return nil
+	// }
+	_, err := repo.queries.DeleteRefreshTokenByUserid(ctx, uuid.MustParse(userId))
+	if err != nil {
+		if strings.Contains(err.Error(), "no rows in result set") {
+			go log.Error().Msg(err.Error())
+			return myerror.NotFoundError{}
+		} else {
+			go log.Error().Msg(err.Error())
+			return nil
+		}
 	}
+	return nil
 }
