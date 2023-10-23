@@ -105,7 +105,10 @@ func (u *authUsecase) SignIn(ctx context.Context, in inputs.SignInInput) (*respo
 	}
 	if refreshTokenCheck != nil && in.Logout {
 		err = u.accessRepository.DeleteAccessTokenByRefreshTokenId(ctx, refreshTokenCheck.ID)
-		if err != nil {
+		switch err.(type) {
+		case myerror.NotFoundError:
+			// Do nothing
+		default:
 			return nil, err
 		}
 		err = u.refreshRepository.DeleteRefreshToken(ctx, *refreshTokenCheck)

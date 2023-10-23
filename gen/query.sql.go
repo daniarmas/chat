@@ -12,6 +12,35 @@ import (
 	"github.com/google/uuid"
 )
 
+const createAccessToken = `-- name: CreateAccessToken :one
+INSERT INTO "access_token" (refresh_token_id, user_id, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING id, user_id, refresh_token_id, expiration_time, create_time
+`
+
+type CreateAccessTokenParams struct {
+	RefreshTokenID uuid.UUID
+	UserID         uuid.UUID
+	ExpirationTime time.Time
+	CreateTime     time.Time
+}
+
+func (q *Queries) CreateAccessToken(ctx context.Context, arg CreateAccessTokenParams) (AccessToken, error) {
+	row := q.db.QueryRowContext(ctx, createAccessToken,
+		arg.RefreshTokenID,
+		arg.UserID,
+		arg.ExpirationTime,
+		arg.CreateTime,
+	)
+	var i AccessToken
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshTokenID,
+		&i.ExpirationTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const createRefreshToken = `-- name: CreateRefreshToken :one
 INSERT INTO "refresh_token" (user_id, expiration_time, create_time) VALUES ($1, $2, $3) RETURNING id, user_id, expiration_time, create_time
 `

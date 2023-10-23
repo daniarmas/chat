@@ -3,7 +3,6 @@ package databaseds
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/entity"
@@ -83,13 +82,25 @@ func (repo accessTokenDbDatasource) DeleteAccessTokenByRefreshTokenId(ctx contex
 }
 
 func (repo accessTokenDbDatasource) CreateAccessToken(ctx context.Context, accessToken entity.AccessToken) (*models.AccessToken, error) {
-	var res models.AccessToken
-	err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"access_token\" (refresh_token_id, user_id, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING id, user_id, refresh_token_id, expiration_time, create_time", accessToken.RefreshTokenId, accessToken.UserId, accessToken.ExpirationTime, time.Now().UTC()).Scan(&res.ID, &res.UserId, &res.RefreshTokenId, &res.ExpirationTime, &res.CreateTime)
+	// var res models.AccessToken
+	// err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"access_token\" (refresh_token_id, user_id, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING id, user_id, refresh_token_id, expiration_time, create_time", accessToken.RefreshTokenId, accessToken.UserId, accessToken.ExpirationTime, time.Now().UTC()).Scan(&res.ID, &res.UserId, &res.RefreshTokenId, &res.ExpirationTime, &res.CreateTime)
+	// if err != nil {
+	// 	log.Error().Msg(err.Error())
+	// 	return nil, err
+	// }
+	// return &res, nil
+	res, err := repo.queries.CreateAccessToken(ctx, gen.CreateAccessTokenParams{UserID: uuid.MustParse(accessToken.UserId), ExpirationTime: accessToken.ExpirationTime, CreateTime: accessToken.CreateTime, RefreshTokenID: uuid.MustParse(accessToken.RefreshTokenId)})
 	if err != nil {
-		log.Error().Msg(err.Error())
+		go log.Error().Msg(err.Error())
 		return nil, err
 	}
-	return &res, nil
+	return &models.AccessToken{
+		ID:             res.ID.String(),
+		UserId:         res.UserID.String(),
+		ExpirationTime: res.ExpirationTime,
+		RefreshTokenId: res.RefreshTokenID.String(),
+		CreateTime:     res.CreateTime,
+	}, nil
 }
 
 func (repo accessTokenDbDatasource) GetAccessTokenById(ctx context.Context, id string) (*models.AccessToken, error) {
