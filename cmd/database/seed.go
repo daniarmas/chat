@@ -5,8 +5,10 @@ package database
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/datasource/hashds"
@@ -44,9 +46,19 @@ to quickly create a Cobra application.`,
 		}
 
 		defer conn.Close()
+
+		// sqlc client
+		sql, err := sql.Open("postgres", "user=postgres dbname=chat sslmode=disable")
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to PostgreSQL server: %v", err)
+		}
+
+		// sqlc client
+		sqlcQueries := gen.New(sql)
+
 		var users = []*models.User{{Email: "user1@example.com", Password: "prueba1234", Username: "user1", Fullname: "User1"}, {Email: "user2@example.com", Password: "prueba1234", Username: "user2", Fullname: "User2"}, {Email: "admin@example.com", Password: "prueba1234", Username: "admin", Fullname: "Admin"}}
 		hashDs := hashds.NewBcryptHash()
-		userDs := databaseds.NewUser(conn, hashDs)
+		userDs := databaseds.NewUser(conn, hashDs, sqlcQueries)
 		userDs.BulkCreateUser(context.Background(), users)
 		go log.Info().Msg("Database migrations complete!")
 	},

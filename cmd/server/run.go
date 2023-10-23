@@ -5,12 +5,15 @@ package server
 
 import (
 	"context"
+	"database/sql"
+	_ "github.com/lib/pq"
 	"net/http"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
@@ -65,6 +68,15 @@ to quickly create a Cobra application.`,
 
 		defer db.Close()
 
+		// sqlc client
+		dbsqlc, err := sql.Open("postgres", cfg.PostgresqlDsn)
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to postgres: %s", err)
+		}
+
+		// sqlc client
+		sqlcQueries := gen.New(dbsqlc)
+
 		// Redis client
 		redis, err := ownredis.NewRedis(cfg)
 		if err != nil {
@@ -93,7 +105,7 @@ to quickly create a Cobra application.`,
 		chatDatabaseDs := databaseds.NewChat(db)
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
-		userDatabaseDs := databaseds.NewUser(db, hashDs)
+		userDatabaseDs := databaseds.NewUser(db, hashDs, sqlcQueries)
 		messageDatabaseDs := databaseds.NewMessage(db)
 
 		// Cache Datasources
@@ -109,7 +121,7 @@ to quickly create a Cobra application.`,
 		messageStreamDatasource := stream.NewMessageStreamNatsDatasource(nc)
 
 		// Repositories
-		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
+		userRepo := repository.NewUser(userDatabaseDs, userCacheDs, sqlcQueries)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
 		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs, accessTokenCacheDs)
 		messageRepo := repository.NewMessage(messageDatabaseDs, messageStreamDatasource)

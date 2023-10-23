@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
@@ -23,12 +24,15 @@ type UserDbDatasource interface {
 type userDbDatasource struct {
 	pgxConn *pgxpool.Pool
 	hashDs  hashds.HashDatasource
+	queries *gen.Queries
 }
 
-func NewUser(pgxConn *pgxpool.Pool, hashDs hashds.HashDatasource) UserDbDatasource {
+func NewUser(pgxConn *pgxpool.Pool, hashDs hashds.HashDatasource,
+	queries *gen.Queries) UserDbDatasource {
 	return &userDbDatasource{
 		pgxConn: pgxConn,
 		hashDs:  hashDs,
+		queries: queries,
 	}
 }
 
@@ -49,21 +53,18 @@ func (repo *userDbDatasource) GetUserById(ctx context.Context, id string) (*mode
 }
 
 func (repo *userDbDatasource) GetUserByEmail(ctx context.Context, email string) (*entity.User, error) {
-	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, email, fullname, username, password, create_time FROM \"user\" WHERE email = $1;", email)
-
-	// Scan the row into a User struct
-	var user entity.User
-	err := row.Scan(&user.ID, &user.Email, &user.Fullname, &user.Username, &user.Password, &user.CreateTime)
+	res, err := repo.queries.GetUserByEmail(ctx, email)
 	if err != nil {
-		if err.Error() == "no rows in result set" {
-			log.Error().Msg(err.Error())
-			return nil, myerror.NotFoundError{}
-		} else {
-			log.Error().Msg(err.Error())
-			return nil, err
-		}
+		return nil, err
 	}
-	return &user, nil
+	return &entity.User{
+		ID:         res.ID.String(),
+		Email:      res.Email,
+		Password:   "",
+		Fullname:   res.Fullname,
+		Username:   res.Username,
+		CreateTime: res.CreateTime,
+	}, nil
 }
 
 func (repo *userDbDatasource) CreateUser(ctx context.Context, email string, password string, username string, fullname string) (*entity.User, error) {
