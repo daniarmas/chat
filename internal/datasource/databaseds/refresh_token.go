@@ -3,7 +3,6 @@ package databaseds
 import (
 	"context"
 	"strings"
-	"time"
 
 	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/entity"
@@ -33,13 +32,24 @@ func NewRefreshToken(pgxConn *pgxpool.Pool, queries *gen.Queries) RefreshTokenDb
 }
 
 func (repo refreshTokenDbDatasource) CreateRefreshToken(ctx context.Context, refreshToken entity.RefreshToken) (*entity.RefreshToken, error) {
-	var res entity.RefreshToken
-	err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"refresh_token\" (user_id, expiration_time, create_time) VALUES ($1, $2, $3) RETURNING id, user_id, expiration_time, create_time", refreshToken.UserId, refreshToken.ExpirationTime, time.Now().UTC()).Scan(&res.ID, &res.UserId, &res.ExpirationTime, &res.CreateTime)
+	// var res entity.RefreshToken
+	// err := repo.pgxConn.QueryRow(context.Background(), "INSERT INTO \"refresh_token\" (user_id, expiration_time, create_time) VALUES ($1, $2, $3) RETURNING id, user_id, expiration_time, create_time", refreshToken.UserId, refreshToken.ExpirationTime, time.Now().UTC()).Scan(&res.ID, &res.UserId, &res.ExpirationTime, &res.CreateTime)
+	// if err != nil {
+	// 	log.Error().Msg(err.Error())
+	// 	return nil, err
+	// }
+	// return &res, nil
+	res, err := repo.queries.CreateRefreshToken(ctx, gen.CreateRefreshTokenParams{UserID: uuid.MustParse(refreshToken.UserId), ExpirationTime: refreshToken.ExpirationTime, CreateTime: refreshToken.CreateTime})
 	if err != nil {
-		log.Error().Msg(err.Error())
+		go log.Error().Msg(err.Error())
 		return nil, err
 	}
-	return &res, nil
+	return &entity.RefreshToken{
+		ID:             res.ID.String(),
+		UserId:         res.UserID.String(),
+		ExpirationTime: res.ExpirationTime,
+		CreateTime:     res.CreateTime,
+	}, nil
 }
 
 func (repo refreshTokenDbDatasource) GetRefreshTokenByUserId(ctx context.Context, id string) (*entity.RefreshToken, error) {

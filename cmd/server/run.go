@@ -103,7 +103,7 @@ to quickly create a Cobra application.`,
 
 		// Database Datasources
 		chatDatabaseDs := databaseds.NewChat(db)
-		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
+		accessTokenDatabaseDs := databaseds.NewAccessToken(db, sqlcQueries)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, sqlcQueries)
 		userDatabaseDs := databaseds.NewUser(db, hashDs, sqlcQueries)
 		messageDatabaseDs := databaseds.NewMessage(db)

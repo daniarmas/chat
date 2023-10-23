@@ -15,7 +15,7 @@ type AccessToken struct {
 	ID             uuid.UUID
 	UserID         uuid.UUID
 	RefreshTokenID uuid.UUID
-	ExpirationTime string
+	ExpirationTime time.Time
 	CreateTime     time.Time
 }
 

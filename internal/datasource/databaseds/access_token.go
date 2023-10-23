@@ -2,11 +2,14 @@ package databaseds
 
 import (
 	"context"
+	"strings"
 	"time"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/entity"
 	"github.com/daniarmas/chat/internal/models"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -19,12 +22,14 @@ type AccessTokenDbDatasource interface {
 }
 
 type accessTokenDbDatasource struct {
-	pgxConn  *pgxpool.Pool
+	pgxConn *pgxpool.Pool
+	queries *gen.Queries
 }
 
-func NewAccessToken(pgxConn *pgxpool.Pool) AccessTokenDbDatasource {
+func NewAccessToken(pgxConn *pgxpool.Pool, queries *gen.Queries) AccessTokenDbDatasource {
 	return &accessTokenDbDatasource{
-		pgxConn:  pgxConn,
+		pgxConn: pgxConn,
+		queries: queries,
 	}
 }
 
@@ -45,19 +50,36 @@ func (repo accessTokenDbDatasource) DeleteAccessTokenByUserId(ctx context.Contex
 }
 
 func (repo accessTokenDbDatasource) DeleteAccessTokenByRefreshTokenId(ctx context.Context, refreshTokenId string) (*models.AccessToken, error) {
-	var accessToken models.AccessToken
-	row := repo.pgxConn.QueryRow(context.Background(), "DELETE FROM \"access_token\" WHERE refresh_token_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time;", refreshTokenId)
-	err := row.Scan(&accessToken.ID, &accessToken.UserId, &accessToken.RefreshTokenId, &accessToken.ExpirationTime, &accessToken.CreateTime)
+	// var accessToken models.AccessToken
+	// row := repo.pgxConn.QueryRow(context.Background(), "DELETE FROM \"access_token\" WHERE refresh_token_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time;", refreshTokenId)
+	// err := row.Scan(&accessToken.ID, &accessToken.UserId, &accessToken.RefreshTokenId, &accessToken.ExpirationTime, &accessToken.CreateTime)
+	// if err != nil {
+	// 	if err.Error() == "no rows in result set" {
+	// 		log.Error().Msg(err.Error())
+	// 		return nil, myerror.NotFoundError{}
+	// 	} else {
+	// 		log.Error().Msg(err.Error())
+	// 		return nil, err
+	// 	}
+	// }
+	// return &accessToken, nil
+	res, err := repo.queries.DeleteAccessTokenByRefreshTokenId(ctx, uuid.MustParse(refreshTokenId))
 	if err != nil {
-		if err.Error() == "no rows in result set" {
-			log.Error().Msg(err.Error())
+		if strings.Contains(err.Error(), "no rows in result set") {
+			go log.Error().Msg(err.Error())
 			return nil, myerror.NotFoundError{}
 		} else {
-			log.Error().Msg(err.Error())
+			go log.Error().Msg(err.Error())
 			return nil, err
 		}
 	}
-	return &accessToken, nil
+	return &models.AccessToken{
+		ID:             res.ID.String(),
+		UserId:         res.UserID.String(),
+		RefreshTokenId: res.RefreshTokenID.String(),
+		ExpirationTime: res.ExpirationTime,
+		CreateTime:     res.CreateTime,
+	}, nil
 }
 
 func (repo accessTokenDbDatasource) CreateAccessToken(ctx context.Context, accessToken entity.AccessToken) (*models.AccessToken, error) {

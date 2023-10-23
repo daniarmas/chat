@@ -7,9 +7,49 @@ package gen
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 )
+
+const createRefreshToken = `-- name: CreateRefreshToken :one
+INSERT INTO "refresh_token" (user_id, expiration_time, create_time) VALUES ($1, $2, $3) RETURNING id, user_id, expiration_time, create_time
+`
+
+type CreateRefreshTokenParams struct {
+	UserID         uuid.UUID
+	ExpirationTime time.Time
+	CreateTime     time.Time
+}
+
+func (q *Queries) CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error) {
+	row := q.db.QueryRowContext(ctx, createRefreshToken, arg.UserID, arg.ExpirationTime, arg.CreateTime)
+	var i RefreshToken
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.ExpirationTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
+const deleteAccessTokenByRefreshTokenId = `-- name: DeleteAccessTokenByRefreshTokenId :one
+DELETE FROM "access_token" WHERE refresh_token_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time
+`
+
+func (q *Queries) DeleteAccessTokenByRefreshTokenId(ctx context.Context, refreshTokenID uuid.UUID) (AccessToken, error) {
+	row := q.db.QueryRowContext(ctx, deleteAccessTokenByRefreshTokenId, refreshTokenID)
+	var i AccessToken
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshTokenID,
+		&i.ExpirationTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
 
 const getRefreshTokenByUserId = `-- name: GetRefreshTokenByUserId :one
 SELECT id, user_id, expiration_time, create_time FROM "refresh_token" WHERE user_id = $1 LIMIT 1
