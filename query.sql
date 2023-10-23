@@ -12,3 +12,6 @@ INSERT INTO "refresh_token" (user_id, expiration_time, create_time) VALUES ($1, 
 
 -- name: CreateAccessToken :one
 INSERT INTO "access_token" (refresh_token_id, user_id, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING *;
+
+-- name: DeleteAccessTokenByUserId :one
+DELETE FROM "access_token" WHERE user_id = $1 RETURNING *;

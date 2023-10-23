@@ -80,6 +80,23 @@ func (q *Queries) DeleteAccessTokenByRefreshTokenId(ctx context.Context, refresh
 	return i, err
 }
 
+const deleteAccessTokenByUserId = `-- name: DeleteAccessTokenByUserId :one
+DELETE FROM "access_token" WHERE user_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time
+`
+
+func (q *Queries) DeleteAccessTokenByUserId(ctx context.Context, userID uuid.UUID) (AccessToken, error) {
+	row := q.db.QueryRowContext(ctx, deleteAccessTokenByUserId, userID)
+	var i AccessToken
+	err := row.Scan(
+		&i.ID,
+		&i.UserID,
+		&i.RefreshTokenID,
+		&i.ExpirationTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const getRefreshTokenByUserId = `-- name: GetRefreshTokenByUserId :one
 SELECT id, user_id, expiration_time, create_time FROM "refresh_token" WHERE user_id = $1 LIMIT 1
 `

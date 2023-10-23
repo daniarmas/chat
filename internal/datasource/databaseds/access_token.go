@@ -33,19 +33,36 @@ func NewAccessToken(pgxConn *pgxpool.Pool, queries *gen.Queries) AccessTokenDbDa
 }
 
 func (repo accessTokenDbDatasource) DeleteAccessTokenByUserId(ctx context.Context, userId string) (*models.AccessToken, error) {
-	var accessToken models.AccessToken
-	row := repo.pgxConn.QueryRow(context.Background(), "DELETE FROM \"access_token\" WHERE user_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time;", userId)
-	err := row.Scan(&accessToken.ID, &accessToken.UserId, &accessToken.RefreshTokenId, &accessToken.ExpirationTime, &accessToken.CreateTime)
+	// var accessToken models.AccessToken
+	// row := repo.pgxConn.QueryRow(context.Background(), "DELETE FROM \"access_token\" WHERE user_id = $1 RETURNING id, user_id, refresh_token_id, expiration_time, create_time;", userId)
+	// err := row.Scan(&accessToken.ID, &accessToken.UserId, &accessToken.RefreshTokenId, &accessToken.ExpirationTime, &accessToken.CreateTime)
+	// if err != nil {
+	// 	if err.Error() == "no rows in result set" {
+	// 		log.Error().Msg(err.Error())
+	// 		return nil, myerror.NotFoundError{}
+	// 	} else {
+	// 		log.Error().Msg(err.Error())
+	// 		return nil, err
+	// 	}
+	// }
+	// return &accessToken, nil
+	res, err := repo.queries.DeleteAccessTokenByUserId(ctx, uuid.MustParse(userId))
 	if err != nil {
-		if err.Error() == "no rows in result set" {
-			log.Error().Msg(err.Error())
+		if strings.Contains(err.Error(), "no rows in result set") {
+			go log.Error().Msg(err.Error())
 			return nil, myerror.NotFoundError{}
 		} else {
-			log.Error().Msg(err.Error())
+			go log.Error().Msg(err.Error())
 			return nil, err
 		}
 	}
-	return &accessToken, nil
+	return &models.AccessToken{
+		ID:             res.ID.String(),
+		UserId:         res.UserID.String(),
+		RefreshTokenId: res.RefreshTokenID.String(),
+		ExpirationTime: res.ExpirationTime,
+		CreateTime:     res.CreateTime,
+	}, nil
 }
 
 func (repo accessTokenDbDatasource) DeleteAccessTokenByRefreshTokenId(ctx context.Context, refreshTokenId string) (*models.AccessToken, error) {
