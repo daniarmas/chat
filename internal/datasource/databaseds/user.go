@@ -60,7 +60,7 @@ func (repo *userDbDatasource) GetUserByEmail(ctx context.Context, email string) 
 	return &entity.User{
 		ID:         res.ID.String(),
 		Email:      res.Email,
-		Password:   "",
+		Password:   res.Password,
 		Fullname:   res.Fullname,
 		Username:   res.Username,
 		CreateTime: res.CreateTime,

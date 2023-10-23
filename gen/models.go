@@ -44,7 +44,7 @@ type Message struct {
 type RefreshToken struct {
 	ID             uuid.UUID
 	UserID         uuid.UUID
-	ExpirationTime string
+	ExpirationTime time.Time
 	CreateTime     time.Time
 }
 

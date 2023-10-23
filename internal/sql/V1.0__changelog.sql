@@ -45,7 +45,7 @@ CREATE TABLE refresh_token
 (
     "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" uuid NOT NULL,
-    "expiration_time" character varying(255) NOT NULL,
+    "expiration_time" timestamp without time zone NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
     CONSTRAINT refreshtoken_pkey PRIMARY KEY (id),
     CONSTRAINT refreshtoken_user_id_fkey FOREIGN KEY (user_id)
@@ -62,7 +62,7 @@ CREATE TABLE access_token
     "id" uuid NOT NULL DEFAULT uuid_generate_v4(),
     "user_id" uuid NOT NULL,
     "refresh_token_id" uuid NOT NULL,
-    "expiration_time" character varying(255) NOT NULL,
+    "expiration_time" timestamp without time zone NOT NULL,
     "create_time" timestamp without time zone NOT NULL,
     CONSTRAINT accesstoken_pkey PRIMARY KEY (id),
     CONSTRAINT accesstoken_user_id_fkey FOREIGN KEY (user_id)

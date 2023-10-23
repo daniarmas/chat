@@ -2,10 +2,13 @@ package databaseds
 
 import (
 	"context"
+	"strings"
 	"time"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/entity"
 	myerror "github.com/daniarmas/chat/pkg/my_error"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -18,12 +21,14 @@ type RefreshTokenDbDatasource interface {
 }
 
 type refreshTokenDbDatasource struct {
-	pgxConn  *pgxpool.Pool
+	pgxConn *pgxpool.Pool
+	queries *gen.Queries
 }
 
-func NewRefreshToken(pgxConn *pgxpool.Pool) RefreshTokenDbDatasource {
+func NewRefreshToken(pgxConn *pgxpool.Pool, queries *gen.Queries) RefreshTokenDbDatasource {
 	return &refreshTokenDbDatasource{
-		pgxConn:  pgxConn,
+		pgxConn: pgxConn,
+		queries: queries,
 	}
 }
 
@@ -38,13 +43,9 @@ func (repo refreshTokenDbDatasource) CreateRefreshToken(ctx context.Context, ref
 }
 
 func (repo refreshTokenDbDatasource) GetRefreshTokenByUserId(ctx context.Context, id string) (*entity.RefreshToken, error) {
-	row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, user_id, expiration_time, create_time FROM \"refresh_token\" WHERE user_id = $1;", id)
-
-	// Scan the row into a User struct
-	var refreshToken entity.RefreshToken
-	err := row.Scan(&refreshToken.ID, &refreshToken.UserId, &refreshToken.ExpirationTime, &refreshToken.CreateTime)
+	res, err := repo.queries.GetRefreshTokenByUserId(ctx, uuid.MustParse(id))
 	if err != nil {
-		if err.Error() == "no rows in result set" {
+		if strings.Contains(err.Error(), "no rows in result set") {
 			go log.Error().Msg(err.Error())
 			return nil, myerror.NotFoundError{}
 		} else {
@@ -52,7 +53,27 @@ func (repo refreshTokenDbDatasource) GetRefreshTokenByUserId(ctx context.Context
 			return nil, err
 		}
 	}
-	return &refreshToken, nil
+	return &entity.RefreshToken{
+		ID:             res.ID.String(),
+		UserId:         res.UserID.String(),
+		ExpirationTime: res.ExpirationTime,
+		CreateTime:     res.CreateTime,
+	}, nil
+	// row := repo.pgxConn.QueryRow(context.Background(), "SELECT id, user_id, expiration_time, create_time FROM \"refresh_token\" WHERE user_id = $1;", id)
+
+	// // Scan the row into a User struct
+	// var refreshToken entity.RefreshToken
+	// err := row.Scan(&refreshToken.ID, &refreshToken.UserId, &refreshToken.ExpirationTime, &refreshToken.CreateTime)
+	// if err != nil {
+	// 	if err.Error() == "no rows in result set" {
+	// 		go log.Error().Msg(err.Error())
+	// 		return nil, myerror.NotFoundError{}
+	// 	} else {
+	// 		go log.Error().Msg(err.Error())
+	// 		return nil, err
+	// 	}
+	// }
+	// return &refreshToken, nil
 }
 
 func (repo refreshTokenDbDatasource) DeleteRefreshToken(ctx context.Context, refreshToken entity.RefreshToken) error {
