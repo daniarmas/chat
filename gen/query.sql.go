@@ -41,6 +41,35 @@ func (q *Queries) CreateAccessToken(ctx context.Context, arg CreateAccessTokenPa
 	return i, err
 }
 
+const createApiKey = `-- name: CreateApiKey :one
+INSERT INTO "apikey" (app_version, revoked, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING id, app_version, revoked, expiration_time, create_time
+`
+
+type CreateApiKeyParams struct {
+	AppVersion     string
+	Revoked        bool
+	ExpirationTime time.Time
+	CreateTime     time.Time
+}
+
+func (q *Queries) CreateApiKey(ctx context.Context, arg CreateApiKeyParams) (Apikey, error) {
+	row := q.db.QueryRowContext(ctx, createApiKey,
+		arg.AppVersion,
+		arg.Revoked,
+		arg.ExpirationTime,
+		arg.CreateTime,
+	)
+	var i Apikey
+	err := row.Scan(
+		&i.ID,
+		&i.AppVersion,
+		&i.Revoked,
+		&i.ExpirationTime,
+		&i.CreateTime,
+	)
+	return i, err
+}
+
 const createRefreshToken = `-- name: CreateRefreshToken :one
 INSERT INTO "refresh_token" (user_id, expiration_time, create_time) VALUES ($1, $2, $3) RETURNING id, user_id, expiration_time, create_time
 `

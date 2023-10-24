@@ -5,8 +5,10 @@ package create
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
@@ -54,16 +56,25 @@ to quickly create a Cobra application.`,
 
 		defer db.Close()
 
+		// sqlc client
+		dbsqlc, err := sql.Open("postgres", cfg.PostgresqlDsn)
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to postgres: %s", err)
+		}
+
+		// sqlc client
+		sqlcQueries := gen.New(dbsqlc)
+
 		jwtDs := jwtds.NewJwtDatasource(cfg)
-		apiKeyDbDatasource := databaseds.NewApiKey(db)
+		apiKeyDbDatasource := databaseds.NewApiKey(db, sqlcQueries)
 		apiKeyRepo := repository.NewApiKey(apiKeyDbDatasource)
 		apiKeyUsecase := usecases.NewApiKey(apiKeyRepo, jwtDs)
 		apiKey, err := apiKeyUsecase.CreateApiKey(ctx, inputs.CreateApiKeyInput{AppVersion: appVersion, Revoked: revoked})
 		if err != nil {
 			go log.Error().Msg(err.Error())
 		}
-		go log.Info().Msg("Api key created sucessfully.")
-		go log.Info().Msgf("Api key: %s", apiKey.Jwt)
+		log.Info().Msg("Api key created sucessfully.")
+		log.Info().Msgf("Api key: %s", apiKey.Jwt)
 	},
 }
 
