@@ -5,17 +5,21 @@ package server
 
 import (
 	"context"
+	"database/sql"
+	_ "github.com/lib/pq"
 	"net/http"
 	"time"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/config"
 	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/datasource/hashds"
 	"github.com/daniarmas/chat/internal/datasource/jwtds"
+	"github.com/daniarmas/chat/internal/datasource/stream"
 	"github.com/daniarmas/chat/internal/delivery/graph"
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/repository"
@@ -24,6 +28,7 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/nats-io/nats.go"
 	"github.com/rs/cors"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -58,14 +63,39 @@ to quickly create a Cobra application.`,
 		// pgx
 		db, err := pgxpool.NewWithConfig(context.Background(), config)
 		if err != nil {
-			go log.Fatal().Msgf("Pgx connector Error: %v", err)
+			go log.Fatal().Msgf("Error connecting to PostgreSQL server: %v", err)
 		}
 
 		defer db.Close()
 
+		// sqlc client
+		dbsqlc, err := sql.Open("postgres", cfg.PostgresqlDsn)
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to postgres: %s", err)
+		}
+
+		// sqlc client
+		sqlcQueries := gen.New(dbsqlc)
+
+		// Redis client
 		redis, err := ownredis.NewRedis(cfg)
 		if err != nil {
-			go log.Fatal().Msgf("Redis Error: %v", err)
+			go log.Fatal().Msgf("Error connecting to Redis server: %s", err)
+		}
+
+		// NATS client
+		nc, _ := nats.Connect(cfg.NatsUrl)
+		if err != nil {
+			go log.Fatal().Msgf("Error connecting to NATS server: %s", err)
+			return
+		}
+
+		defer nc.Close()
+
+		// Check if the connection is still active
+		if !nc.IsConnected() {
+			go log.Fatal().Msg("Connection to NATS server is lost")
+			return
 		}
 
 		// Hash Datasource
@@ -73,9 +103,9 @@ to quickly create a Cobra application.`,
 
 		// Database Datasources
 		chatDatabaseDs := databaseds.NewChat(db)
-		accessTokenDatabaseDs := databaseds.NewAccessToken(db)
-		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db)
-		userDatabaseDs := databaseds.NewUser(db, hashDs)
+		accessTokenDatabaseDs := databaseds.NewAccessToken(db, sqlcQueries)
+		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, sqlcQueries)
+		userDatabaseDs := databaseds.NewUser(db, hashDs, sqlcQueries)
 		messageDatabaseDs := databaseds.NewMessage(db)
 
 		// Cache Datasources
@@ -86,11 +116,15 @@ to quickly create a Cobra application.`,
 		// Jwt Datasource
 		jwtDs := jwtds.NewJwtDatasource(cfg)
 
+		// Stream Datasource
+		// messageStreamDatasource := stream.NewMessageStreamRedisDatasource(redis)
+		messageStreamDatasource := stream.NewMessageStreamNatsDatasource(nc)
+
 		// Repositories
-		userRepo := repository.NewUser(userDatabaseDs, userCacheDs)
+		userRepo := repository.NewUser(userDatabaseDs, userCacheDs, sqlcQueries)
 		refreshTokenRepo := repository.NewRefreshToken(refreshTokenDatabaseDs)
 		accessTokenRepo := repository.NewAccessToken(accessTokenDatabaseDs, accessTokenCacheDs)
-		messageRepo := repository.NewMessage(messageDatabaseDs)
+		messageRepo := repository.NewMessage(messageDatabaseDs, messageStreamDatasource)
 		chatRepo := repository.NewChat(chatCacheDs, chatDatabaseDs)
 
 		// Usecases

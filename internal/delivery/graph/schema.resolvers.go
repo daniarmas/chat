@@ -480,12 +480,9 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 		return nil, errors.New("internal server error")
 	}
 
-	// goroutine for publishing model.Message objects to the publishing channel
+	// Publishing the messages
 	go func() {
-		defer close(res)
-
 		for entityMsg := range result {
-			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
 				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
@@ -494,10 +491,17 @@ func (r *subscriptionResolver) ReceiveMessagesByChat(ctx context.Context, input 
 				CreateTime: entityMsg.CreateTime,
 			}
 
-			// send the model.Message to the modelMessages channel
-			if modelMsg.UserID != user.ID && modelMsg.ChatID == input.ChatID {
+			if modelMsg.UserID != user.ID {
 				res <- modelMsg
 			}
+		}
+	}()
+	// Waiting for context cancellation for close the channels
+	go func() {
+		select {
+		case <-ctx.Done():
+			close(res)
+			close(result)
 		}
 	}()
 
@@ -518,12 +522,9 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 		return nil, errors.New("internal server error")
 	}
 
-	// goroutine for publishing model.Message objects to the publishing channel
+	// Publishing the messages
 	go func() {
-		defer close(res)
-
 		for entityMsg := range result {
-			// convert the entity.Message to model.Message
 			modelMsg := &model.Message{
 				ID:         entityMsg.ID,
 				Content:    entityMsg.Content,
@@ -532,10 +533,17 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 				CreateTime: entityMsg.CreateTime,
 			}
 
-			// send the model.Message to the modelMessages channel
 			if modelMsg.UserID != user.ID {
 				res <- modelMsg
 			}
+		}
+	}()
+	// Waiting for context cancellation for close the channels
+	go func() {
+		select {
+		case <-ctx.Done():
+			close(res)
+			close(result)
 		}
 	}()
 

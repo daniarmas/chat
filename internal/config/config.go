@@ -16,6 +16,7 @@ type Config struct {
 	RefreshTokenExpireHours    int    `mapstructure:"REFRESH_TOKEN_EXPIRE_HOURS"`
 	AccessTokenExpireHours     int    `mapstructure:"ACCESS_TOKEN_EXPIRE_HOURS"`
 	GraphqlPort                string `mapstructure:"GRAPHQL_PORT"`
+	NatsUrl                    string `mapstructure:"NATS_URL"`
 }
 
 func NewConfig() *Config {

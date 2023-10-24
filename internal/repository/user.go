@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/daniarmas/chat/gen"
 	"github.com/daniarmas/chat/internal/datasource/cacheds"
 	"github.com/daniarmas/chat/internal/datasource/databaseds"
 	"github.com/daniarmas/chat/internal/entity"
@@ -18,12 +19,14 @@ type UserRepository interface {
 type userRepository struct {
 	userDbDatasource databaseds.UserDbDatasource
 	userCacheDs      cacheds.UserCacheDatasource
+	queries          *gen.Queries
 }
 
-func NewUser(userDbDatasource databaseds.UserDbDatasource, userCacheDs cacheds.UserCacheDatasource) UserRepository {
+func NewUser(userDbDatasource databaseds.UserDbDatasource, userCacheDs cacheds.UserCacheDatasource, queries *gen.Queries) UserRepository {
 	return &userRepository{
 		userDbDatasource: userDbDatasource,
 		userCacheDs:      userCacheDs,
+		queries:          queries,
 	}
 }
 
