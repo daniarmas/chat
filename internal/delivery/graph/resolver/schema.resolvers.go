@@ -1,4 +1,4 @@
-package graph
+package resolver
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/daniarmas/chat/internal/delivery/graph"
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
@@ -626,13 +627,13 @@ func (r *subscriptionResolver) ReceiveMessages(ctx context.Context) (<-chan *mod
 }
 
 // Mutation returns MutationResolver implementation.
-func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+func (r *Resolver) Mutation() graph.MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+func (r *Resolver) Query() graph.QueryResolver { return &queryResolver{r} }
 
 // Subscription returns SubscriptionResolver implementation.
-func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+func (r *Resolver) Subscription() graph.SubscriptionResolver { return &subscriptionResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
