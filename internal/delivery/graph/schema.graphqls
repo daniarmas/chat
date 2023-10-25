@@ -20,6 +20,7 @@ type Query {
   me: MeResponse!
   fetchMessages(input: FetchAllMessagesInput!): FetchMessagesResponse!
   fetchChats(input: FetchAllChatsInput!): FetchChatsResponse!
+  chat(input: ChatInput): ChatResponse!
 }
 
 type Todo {
@@ -39,8 +40,7 @@ type Message {
 
 type Chat {
   id: ID!
-  firstUserId: String!
-  secondUserId: String!
+  name: String!
   createTime: Time!
 }
 
@@ -51,6 +51,10 @@ type User {
   fullname: String!
   username: String!
   createTime: Time!
+}
+
+input ChatInput {
+  id: ID!
 }
 
 input ReceiveMessagesByChatInput {
@@ -110,6 +114,13 @@ type SignInResponse implements Response {
   data: SignInData
 }
 
+type ChatResponse implements Response {
+  status: Int!
+  message: String!
+  error: Error
+  data: ChatData
+}
+
 type SignOutResponse implements Response {
   status: Int!
   message: String!
@@ -127,6 +138,11 @@ type MeResponse implements Response {
 type MeData implements Data {
   status: Int!
   user: User!
+}
+
+type ChatData implements Data {
+  status: Int!
+  chat: Chat!
 }
 
 type SignInData implements Data {

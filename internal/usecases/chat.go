@@ -15,6 +15,7 @@ import (
 type ChatUsecase interface {
 	GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error)
 	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) (*response.GetChatsResponse, error)
+	GetChat(ctx context.Context, chatId string) (*entity.Chat, error)
 }
 
 type chatUsecase struct {
@@ -27,13 +28,28 @@ func NewChat(chatRepo repository.ChatRepository) ChatUsecase {
 	}
 }
 
+func (u chatUsecase) GetChat(ctx context.Context, chatId string) (*entity.Chat, error) {
+	chat, err := u.chatRepository.GetChatById(ctx, chatId)
+	switch err.(type) {
+	case nil:
+		// Do nothing
+	case myerror.NotFoundError:
+		go log.Error().Msgf(err.Error())
+		return nil, err
+	default:
+		go log.Error().Msgf(err.Error())
+		return nil, err
+	}
+	return chat, nil
+}
+
 func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error) {
 	chat, err := u.chatRepository.GetChat(ctx, userId, input.ReceiverId)
 	switch err.(type) {
 	case nil:
 		// Do nothing
 	case myerror.NotFoundError:
-		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{FirstUserId: userId, SecondUserId: input.ReceiverId})
+		chat, err = u.chatRepository.CreateChat(ctx, &entity.Chat{})
 		if err != nil {
 			go log.Error().Msgf(err.Error())
 			return nil, err
@@ -53,9 +69,9 @@ func (u chatUsecase) GetChats(ctx context.Context, userId string, updateTimeCurs
 		return nil, err
 	}
 	res.Chats = chats
-	if len(chats) != 0 {
-		res.Cursor = chats[len(chats)-1].UpdateTime
-	}
+	// if len(chats) != 0 {
+	// 	res.Cursor = chats[len(chats)-1].UpdateTime
+	// }
 	return &res, nil
 
 }

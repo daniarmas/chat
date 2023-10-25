@@ -142,6 +142,17 @@ func (q *Queries) DeleteRefreshTokenByUserid(ctx context.Context, userID uuid.UU
 	return i, err
 }
 
+const getChatById = `-- name: GetChatById :one
+SELECT id, name, create_time FROM "chat" WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetChatById(ctx context.Context, id uuid.UUID) (Chat, error) {
+	row := q.db.QueryRowContext(ctx, getChatById, id)
+	var i Chat
+	err := row.Scan(&i.ID, &i.Name, &i.CreateTime)
+	return i, err
+}
+
 const getRefreshTokenByUserId = `-- name: GetRefreshTokenByUserId :one
 SELECT id, user_id, expiration_time, create_time FROM "refresh_token" WHERE user_id = $1 LIMIT 1
 `

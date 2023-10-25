@@ -1,4 +1,4 @@
-package graph
+package resolver
 
 import "github.com/daniarmas/chat/internal/usecases"
 

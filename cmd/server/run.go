@@ -6,9 +6,10 @@ package server
 import (
 	"context"
 	"database/sql"
-	_ "github.com/lib/pq"
 	"net/http"
 	"time"
+
+	_ "github.com/lib/pq"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
@@ -22,6 +23,7 @@ import (
 	"github.com/daniarmas/chat/internal/datasource/stream"
 	"github.com/daniarmas/chat/internal/delivery/graph"
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
+	"github.com/daniarmas/chat/internal/delivery/graph/resolver"
 	"github.com/daniarmas/chat/internal/repository"
 	"github.com/daniarmas/chat/internal/usecases"
 	ownredis "github.com/daniarmas/chat/pkg/own-redis"
@@ -102,7 +104,7 @@ to quickly create a Cobra application.`,
 		hashDs := hashds.NewBcryptHash()
 
 		// Database Datasources
-		chatDatabaseDs := databaseds.NewChat(db)
+		chatDatabaseDs := databaseds.NewChat(db, sqlcQueries)
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db, sqlcQueries)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, sqlcQueries)
 		userDatabaseDs := databaseds.NewUser(db, hashDs, sqlcQueries)
@@ -144,7 +146,7 @@ to quickly create a Cobra application.`,
 
 		router.Use(middleware.AuthorizationMiddleware(jwtDs, accessTokenRepo))
 
-		srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
+		srv := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolver.Resolver{AuthUsecase: authUsecase, MessageUsecase: messageUsecase, ChatUsecase: chatUsecase}}))
 
 		srv.AddTransport(transport.POST{})
 		srv.AddTransport(transport.Websocket{

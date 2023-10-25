@@ -21,3 +21,6 @@ DELETE FROM "refresh_token" WHERE user_id = $1 RETURNING *;
 
 -- name: CreateApiKey :one
 INSERT INTO "apikey" (app_version, revoked, expiration_time, create_time) VALUES ($1, $2, $3, $4) RETURNING *;
+
+-- name: GetChatById :one
+SELECT * FROM "chat" WHERE id = $1 LIMIT 1;

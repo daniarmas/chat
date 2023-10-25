@@ -72,17 +72,17 @@ func (usecase *messageUsecase) SendMessage(ctx context.Context, input inputs.Sen
 		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
-	chat, err := usecase.chatRepository.GetChatById(ctx, message.ChatId)
+	_, err = usecase.chatRepository.GetChatById(ctx, message.ChatId)
 	if err != nil {
 		go log.Error().Msgf(err.Error())
 		return nil, err
 	}
 	var otherUserId string
-	if chat.FirstUserId != userId {
-		otherUserId = chat.FirstUserId
-	} else {
-		otherUserId = chat.SecondUserId
-	}
+	// if chat.FirstUserId != userId {
+	// 	otherUserId = chat.FirstUserId
+	// } else {
+	// 	otherUserId = chat.SecondUserId
+	// }
 	err = usecase.messageRepository.PublishMessage(ctx, *message, otherUserId)
 	if err != nil {
 		panic(err)
