@@ -284,7 +284,7 @@ func (r *mutationResolver) GetOrCreateChat(ctx context.Context, input model.GetO
 	res.Message = "Success"
 	res.Status = http.StatusOK
 	res.Data = &model.GetOrCreateChatData{
-		Chat: &model.Chat{ID: result.ID, FirstUserID: result.FirstUserId, SecondUserID: result.SecondUserId, CreateTime: result.CreateTime},
+		Chat: &model.Chat{ID: result.ID, CreateTime: result.CreateTime},
 	}
 	res.Error = nil
 
@@ -444,10 +444,8 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 
 	for _, element := range result.Chats {
 		chats = append(chats, &model.Chat{
-			ID:           element.ID,
-			FirstUserID:  element.FirstUserId,
-			SecondUserID: element.SecondUserId,
-			CreateTime:   element.CreateTime,
+			ID:         element.ID,
+			CreateTime: element.CreateTime,
 		})
 	}
 

@@ -39,8 +39,7 @@ type Message {
 
 type Chat {
   id: ID!
-  firstUserId: String!
-  secondUserId: String!
+  name: String!
   createTime: Time!
 }
 

@@ -20,10 +20,9 @@ type Response interface {
 }
 
 type Chat struct {
-	ID           string    `json:"id"`
-	FirstUserID  string    `json:"firstUserId"`
-	SecondUserID string    `json:"secondUserId"`
-	CreateTime   time.Time `json:"createTime"`
+	ID         string    `json:"id"`
+	Name       string    `json:"name"`
+	CreateTime time.Time `json:"createTime"`
 }
 
 type Error struct {
