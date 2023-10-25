@@ -60,19 +60,6 @@ func (data chatPostgresDatasource) GetChat(ctx context.Context, userId string, o
 }
 
 func (data chatPostgresDatasource) GetChatById(ctx context.Context, chatId string) (*entity.Chat, error) {
-	// var chat entity.Chat
-	// row := data.pgxConn.QueryRow(context.Background(), "SELECT id, first_user_id, second_user_id, create_time, update_time FROM \"chat\" WHERE id = $1;", chatId)
-	// err := row.Scan(&chat.ID, &chat.FirstUserId, &chat.SecondUserId, &chat.CreateTime, &chat.UpdateTime)
-	// if err != nil {
-	// 	if err.Error() == "no rows in result set" {
-	// 		log.Error().Msg(err.Error())
-	// 		return nil, myerror.NotFoundError{}
-	// 	} else {
-	// 		log.Error().Msg(err.Error())
-	// 		return nil, err
-	// 	}
-	// }
-	// return &chat, nil
 	res, err := data.queries.GetChatById(ctx, uuid.MustParse(chatId))
 	if err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
@@ -84,8 +71,9 @@ func (data chatPostgresDatasource) GetChatById(ctx context.Context, chatId strin
 		}
 	}
 	return &entity.Chat{
-		ID:           res.ID.String(),
-		CreateTime:   res.CreateTime,
+		ID:         res.ID.String(),
+		Name:       res.Name.String,
+		CreateTime: res.CreateTime,
 	}, nil
 }
 
