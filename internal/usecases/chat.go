@@ -15,6 +15,7 @@ import (
 type ChatUsecase interface {
 	GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error)
 	GetChats(ctx context.Context, userId string, updateTimeCursor time.Time) (*response.GetChatsResponse, error)
+	GetChat(ctx context.Context, chatId string) (*entity.Chat, error)
 }
 
 type chatUsecase struct {
@@ -25,6 +26,21 @@ func NewChat(chatRepo repository.ChatRepository) ChatUsecase {
 	return &chatUsecase{
 		chatRepository: chatRepo,
 	}
+}
+
+func (u chatUsecase) GetChat(ctx context.Context, chatId string) (*entity.Chat, error) {
+	chat, err := u.chatRepository.GetChatById(ctx, chatId)
+	switch err.(type) {
+	case nil:
+		// Do nothing
+	case myerror.NotFoundError:
+		go log.Error().Msgf(err.Error())
+		return nil, err
+	default:
+		go log.Error().Msgf(err.Error())
+		return nil, err
+	}
+	return chat, nil
 }
 
 func (u chatUsecase) GetOrCreateChat(ctx context.Context, input inputs.GetOrCreateChatInput, userId string) (*entity.Chat, error) {
