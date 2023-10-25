@@ -102,7 +102,7 @@ to quickly create a Cobra application.`,
 		hashDs := hashds.NewBcryptHash()
 
 		// Database Datasources
-		chatDatabaseDs := databaseds.NewChat(db)
+		chatDatabaseDs := databaseds.NewChat(db, sqlcQueries)
 		accessTokenDatabaseDs := databaseds.NewAccessToken(db, sqlcQueries)
 		refreshTokenDatabaseDs := databaseds.NewRefreshToken(db, sqlcQueries)
 		userDatabaseDs := databaseds.NewUser(db, hashDs, sqlcQueries)
