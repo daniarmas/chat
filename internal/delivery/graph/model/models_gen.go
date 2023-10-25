@@ -25,6 +25,31 @@ type Chat struct {
 	CreateTime time.Time `json:"createTime"`
 }
 
+type ChatData struct {
+	Status int   `json:"status"`
+	Chat   *Chat `json:"chat"`
+}
+
+func (ChatData) IsData()             {}
+func (this ChatData) GetStatus() int { return this.Status }
+
+type ChatInput struct {
+	ID string `json:"id"`
+}
+
+type ChatResponse struct {
+	Status  int       `json:"status"`
+	Message string    `json:"message"`
+	Error   *Error    `json:"error,omitempty"`
+	Data    *ChatData `json:"data,omitempty"`
+}
+
+func (ChatResponse) IsResponse()             {}
+func (this ChatResponse) GetStatus() int     { return this.Status }
+func (this ChatResponse) GetMessage() string { return this.Message }
+func (this ChatResponse) GetError() *Error   { return this.Error }
+func (this ChatResponse) GetData() Data      { return *this.Data }
+
 type Error struct {
 	Code    string          `json:"code"`
 	Message string          `json:"message"`

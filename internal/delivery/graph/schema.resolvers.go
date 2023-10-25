@@ -14,6 +14,7 @@ import (
 	"github.com/daniarmas/chat/internal/delivery/graph/middleware"
 	"github.com/daniarmas/chat/internal/delivery/graph/model"
 	"github.com/daniarmas/chat/internal/inputs"
+	"github.com/daniarmas/chat/pkg/my_error"
 )
 
 // SignIn is the resolver for the signIn field.
@@ -460,6 +461,82 @@ func (r *queryResolver) FetchChats(ctx context.Context, input model.FetchAllChat
 		UpdateTimeCursor: &result.Cursor,
 	}
 	res.Error = nil
+
+	return &res, nil
+}
+
+// Chat is the resolver for the chat field.
+func (r *queryResolver) Chat(ctx context.Context, input *model.ChatInput) (*model.ChatResponse, error) {
+	var res model.ChatResponse
+	var errorDetails []*model.ErrorDetails
+	var validationErr = false
+
+	user := middleware.ForContext(ctx)
+	if user == nil {
+		res.Message = http.StatusText(http.StatusUnauthorized)
+		res.Status = http.StatusUnauthorized
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "ACCESS_TOKEN_MISSING",
+			Message: "This request requires an access token. Please provide a valid access token and try again.",
+			Details: nil,
+		}
+		return &res, nil
+	}
+
+	if input.ID == "" {
+		errorDetails = append(errorDetails, &model.ErrorDetails{
+			Field:   "id",
+			Message: "This field is required",
+		})
+		validationErr = true
+	}
+
+	if validationErr {
+		res.Message = "Bad request"
+		res.Status = http.StatusBadRequest
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "INVALID_ARGUMENT",
+			Message: "The request contains invalid arguments",
+			Details: errorDetails,
+		}
+		return &res, nil
+	}
+
+	result, err := r.ChatUsecase.GetChat(ctx, input.ID)
+
+	switch err.(type) {
+	case nil:
+		res.Message = "Success"
+		res.Status = http.StatusOK
+		res.Data = &model.ChatData{
+			Chat: &model.Chat{
+				ID:         result.ID,
+				Name:       result.Name,
+				CreateTime: result.CreateTime,
+			},
+		}
+		res.Error = nil
+	case myerror.NotFoundError:
+		res.Message = http.StatusText(http.StatusNotFound)
+		res.Status = http.StatusNotFound
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "NOT_FOUND_ERROR",
+			Message: "The requested resource could not be found.",
+			Details: nil,
+		}
+	default:
+		res.Message = http.StatusText(http.StatusInternalServerError)
+		res.Status = http.StatusInternalServerError
+		res.Data = nil
+		res.Error = &model.Error{
+			Code:    "INTERNAL_SERVER_ERROR",
+			Message: "The server has an internal error.",
+			Details: nil,
+		}
+	}
 
 	return &res, nil
 }
